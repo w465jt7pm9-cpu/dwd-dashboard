@@ -50,6 +50,7 @@
 
   background: var(--color-lightbox);
   z-index: var(--z-lightbox);
+  overflow: hidden;
 }
 
 .lightbox.open {
@@ -57,12 +58,14 @@
 }
 
 .lightbox img {
-  width: 96vw;
-  height: 96vh;
-  object-fit: contain;
+  max-width: 96vw;
+  max-height: 96vh;
 
-  cursor: zoom-out;
-  touch-action: none;
+  display: block;
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
 }
 
 /* NAV ARROWS */
