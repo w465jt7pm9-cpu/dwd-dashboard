@@ -136,6 +136,18 @@
   text-align: center;
 }
 
+:root[data-theme="day"] .links-page {
+  background: rgba(10, 30, 65, 0.92);
+  color: #edf4ff;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 80px rgba(5, 18, 40, 0.2);
+}
+
+:root[data-theme="day"] .links-title,
+:root[data-theme="day"] .links-hint {
+  color: #f2f8ff;
+}
+
 .links-title {
   font-size: var(--font-size-links-title);
   font-weight: 700;
@@ -155,7 +167,22 @@
   text-decoration: none;
   font-size: var(--font-size-link-btn);
   transition: background-color var(--transition-fast),
-    border-color var(--transition-fast), transform var(--transition-fast);
+    border-color var(--transition-fast), transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+:root[data-theme="day"] .link-btn {
+  background: linear-gradient(180deg, #2d6dca, #1d54b5);
+  border-color: rgba(135, 180, 255, 0.45);
+  color: #fff;
+  box-shadow: 0 15px 40px rgba(25, 70, 155, 0.18);
+}
+
+:root[data-theme="day"] .link-btn:hover,
+:root[data-theme="day"] .link-btn:focus-visible {
+  background: linear-gradient(180deg, #3a7ce0, #2562bf);
+  border-color: rgba(190, 220, 255, 0.75);
+  transform: translateY(-1px);
 }
 
 .link-btn:hover,
