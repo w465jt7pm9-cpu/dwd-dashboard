@@ -9,16 +9,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const LONG_PRESS_DURATION_MS = 600
   const INFO_OVERLAY_DURATION_MS = 4500
   const EDGE_TAP_ZONE_PX = 26
-  const LIGHTBOX_MAX_SCALE = 4
-  const LIGHTBOX_DOUBLE_TAP_SCALE = 2
+  const TEXT_PAGE_INDEX = 3
+
   const LIGHTBOX_MIN_SCALE = 1
+  const LIGHTBOX_MAX_SCALE = 4
   const LIGHTBOX_WHEEL_STEP = 0.18
-  const PAGE_SWIPE_MAX_DURATION_MS = 800
-  const PAGE_SWIPE_MIN_DISTANCE_PX = 50
-  const LIGHTBOX_SWIPE_MIN_DISTANCE_PX = 40
-  const LIGHTBOX_SWIPE_MAX_DURATION_MS = 800
+  const LIGHTBOX_DOUBLE_TAP_SCALE = 2
+  const LIGHTBOX_NAV_HIDE_DELAY_MS = 1800
+  const LIGHTBOX_DOUBLE_TAP_DELAY_MS = 300
+  const LIGHTBOX_PAGE_SWIPE_MIN_DISTANCE_PX = 40
+  const LIGHTBOX_PAGE_SWIPE_MAX_DURATION_MS = 800
   const LIGHTBOX_CLOSE_SWIPE_MIN_DISTANCE_PX = 80
   const LIGHTBOX_CLOSE_SWIPE_MAX_DURATION_MS = 700
+
+  const PAGE_SWIPE_MIN_DISTANCE_PX = 50
+  const PAGE_SWIPE_MAX_DURATION_MS = 800
+
   const LAST_SUCCESSFUL_REFRESH_KEY = 'dwdLastSuccessfulRefresh'
   const THEME_STORAGE_KEY = 'dwdTheme'
 
@@ -109,7 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function setStatusLabel (text) {
-    statusElement.textContent = text
+    if (statusElement) {
+      statusElement.textContent = text
+    }
   }
 
   function getLastSuccessfulRefresh () {
@@ -129,6 +137,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateOfflineUi () {
+    if (!offlineBannerElement || !offlineStampElement) {
+      return
+    }
+
     const isOffline = !navigator.onLine
     const lastSuccessfulRefresh = getLastSuccessfulRefresh()
 
@@ -161,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function initInstallHint () {
-    if (isiOSSafari() && !isStandaloneApp()) {
+    if (installHintElement && isiOSSafari() && !isStandaloneApp()) {
       installHintElement.classList.remove('is-hidden')
     }
   }
@@ -171,8 +183,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const themeIcon = theme === 'day' ? 'â—' : theme === 'night' ? 'â˜¾' : 'â—‘'
 
-    themeButton.textContent = themeIcon
-    thumbThemeButton.textContent = themeIcon
+    if (themeButton) {
+      themeButton.textContent = themeIcon
+    }
+
+    if (thumbThemeButton) {
+      thumbThemeButton.textContent = themeIcon
+    }
   }
 
   function initTheme () {
@@ -219,21 +236,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updatePageSummary () {
-    if (currentPageIndex > 2) {
-      pageSummaryElement.textContent = 'Texte'
+    if (!pageSummaryElement) {
       return
     }
 
-    const visiblePageStates = [...PAGE_STATE_BY_IMAGE.values()].filter(
+    if (currentPageIndex === TEXT_PAGE_INDEX) {
+      pageSummaryElement.textContent = ''
+      return
+    }
+
+    const currentPageStates = [...PAGE_STATE_BY_IMAGE.values()].filter(
       pageState => pageState.pageIndex === currentPageIndex
     )
-    const errorCount = visiblePageStates.filter(
+    const errorCount = currentPageStates.filter(
       pageState => pageState.state === 'error'
     ).length
-    const offlineCount = visiblePageStates.filter(
+    const offlineCount = currentPageStates.filter(
       pageState => pageState.state === 'offline'
     ).length
-    const loadingCount = visiblePageStates.filter(
+    const loadingCount = currentPageStates.filter(
       pageState => pageState.state === 'loading'
     ).length
 
@@ -257,7 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function setCardState (imageElement, state) {
     const cardElement = imageElement.closest('.card')
-
     if (!cardElement) {
       return
     }
@@ -286,7 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const pageElement = imageElement.closest('.page')
-
     if (pageElement) {
       PAGE_STATE_BY_IMAGE.set(imageElement, {
         pageIndex: Number(pageElement.dataset.page),
@@ -308,13 +327,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function refreshVisibleImages () {
-    if (currentPageIndex > 2) {
+    if (currentPageIndex === TEXT_PAGE_INDEX) {
       updateOfflineUi()
-
-      if (navigator.onLine) {
-        setStatusLabel(`Aktualisiert ${getCurrentTimeLabel()}`)
-      }
-
       updatePageSummary()
       return
     }
@@ -324,7 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     IMAGE_ELEMENTS.forEach(imageElement => {
       const pageElement = imageElement.closest('.page')
-
       if (!pageElement) {
         return
       }
@@ -334,7 +347,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       refreshedImageCount += 1
-
       const imageUrl = buildImageUrl(imageElement, timestamp)
       if (!imageUrl) {
         return
@@ -360,8 +372,16 @@ document.addEventListener('DOMContentLoaded', () => {
     )
 
     currentPageIndex = boundedPageIndex
-    carouselElement.style.transform = `translateX(${-currentPageIndex * 100}vw)`
-    pageTitleElement.textContent = PAGE_NAMES[currentPageIndex]
+    if (carouselElement) {
+      carouselElement.style.transform = `translateX(${
+        -currentPageIndex * 100
+      }vw)`
+    }
+
+    if (pageTitleElement) {
+      pageTitleElement.textContent = PAGE_NAMES[currentPageIndex]
+    }
+
     refreshVisibleImages()
   }
 
@@ -404,12 +424,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderedWidth = lightboxImageElement.offsetWidth || imageRect.width
     const renderedHeight = lightboxImageElement.offsetHeight || imageRect.height
 
-    const overflowX = Math.max(0, renderedWidth * (lightboxScale - 1))
-    const overflowY = Math.max(0, renderedHeight * (lightboxScale - 1))
-
     return {
-      overflowX,
-      overflowY
+      overflowX: Math.max(0, renderedWidth * (lightboxScale - 1)),
+      overflowY: Math.max(0, renderedHeight * (lightboxScale - 1))
     }
   }
 
@@ -439,11 +456,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function showLightboxNavigationTemporarily () {
+    if (!lightboxElement) {
+      return
+    }
+
     lightboxElement.classList.add('lb-show')
     clearTimeout(lightboxHideTimerId)
     lightboxHideTimerId = window.setTimeout(() => {
       lightboxElement.classList.remove('lb-show')
-    }, 1800)
+    }, LIGHTBOX_NAV_HIDE_DELAY_MS)
   }
 
   function showLightboxImageAt (nextIndex) {
@@ -453,8 +474,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     currentLightboxImageIndex =
       (nextIndex + lightboxImageList.length) % lightboxImageList.length
-
     const imageElement = lightboxImageList[currentLightboxImageIndex]
+
     if (!imageElement || !imageElement.src) {
       return
     }
@@ -503,7 +524,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function getTouchDistance (touches) {
     const deltaX = touches[0].clientX - touches[1].clientX
     const deltaY = touches[0].clientY - touches[1].clientY
-
     return Math.sqrt(deltaX * deltaX + deltaY * deltaY)
   }
 
@@ -529,8 +549,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (
-      gestureDurationMs <= LIGHTBOX_SWIPE_MAX_DURATION_MS &&
-      Math.abs(deltaX) >= LIGHTBOX_SWIPE_MIN_DISTANCE_PX &&
+      gestureDurationMs <= LIGHTBOX_PAGE_SWIPE_MAX_DURATION_MS &&
+      Math.abs(deltaX) >= LIGHTBOX_PAGE_SWIPE_MIN_DISTANCE_PX &&
       Math.abs(deltaX) > Math.abs(deltaY)
     ) {
       if (deltaX < 0) {
@@ -572,7 +592,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showInfoOverlay (imageElement) {
     const infoText = getUpperAirInfoText(imageElement.dataset.path || '')
-
     if (!infoText) {
       return
     }
@@ -583,7 +602,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let overlayElement = cardElement.querySelector('.info-overlay')
-
     if (!overlayElement) {
       overlayElement = document.createElement('div')
       overlayElement.className = 'info-overlay'
@@ -599,14 +617,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function startLongPress (imageElement) {
     const imagePath = imageElement.dataset.path || ''
-
     if (!isUpperAirImage(imagePath)) {
       return
     }
 
     didTriggerLongPress = false
     clearTimeout(longPressTimerId)
-
     longPressTimerId = window.setTimeout(() => {
       didTriggerLongPress = true
       showInfoOverlay(imageElement)
@@ -714,7 +730,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     IMAGE_ELEMENTS.forEach(imageElement => {
       const pageElement = imageElement.closest('.page')
-
       if (
         pageElement &&
         Number(pageElement.dataset.page) === currentPageIndex
@@ -763,7 +778,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   lightboxImageElement.addEventListener('click', event => {
     event.stopPropagation()
-
     if (isLightboxOpen) {
       showLightboxNavigationTemporarily()
     }
@@ -914,11 +928,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (didRunPinchGesture && event.touches.length === 0) {
         didRunPinchGesture = false
-
         if (lightboxScale < 1.02) {
           resetLightboxZoom()
         }
-
         return
       }
 
@@ -928,7 +940,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const changedTouch = event.changedTouches[0]
 
-      if (now - lastTapTimestamp < 300) {
+      if (now - lastTapTimestamp < LIGHTBOX_DOUBLE_TAP_DELAY_MS) {
         if (lightboxScale > 1) {
           resetLightboxZoom()
         } else {
