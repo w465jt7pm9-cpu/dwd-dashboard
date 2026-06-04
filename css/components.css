@@ -21,9 +21,10 @@
 }
 
 /* Night-mode image tint: warm, slightly red, dimmed for low-glare night driving */
-:root[data-theme="night"] .card img,
-:root[data-theme="night"] .lightbox img {
-  filter: sepia(0.18) hue-rotate(-15deg) saturate(0.85) brightness(0.82) contrast(0.95);
+:root[data-theme='night'] .card img,
+:root[data-theme='night'] .lightbox img {
+  filter: sepia(0.18) hue-rotate(-15deg) saturate(0.85) brightness(0.82)
+    contrast(0.95);
 }
 
 /* STATUS BADGE */
@@ -136,15 +137,15 @@
   text-align: center;
 }
 
-:root[data-theme="day"] .links-page {
+:root[data-theme='day'] .links-page {
   background: rgba(10, 30, 65, 0.92);
   color: #edf4ff;
   border-radius: var(--radius-lg);
   box-shadow: 0 24px 80px rgba(5, 18, 40, 0.2);
 }
 
-:root[data-theme="day"] .links-title,
-:root[data-theme="day"] .links-hint {
+:root[data-theme='day'] .links-title,
+:root[data-theme='day'] .links-hint {
   color: #f2f8ff;
 }
 
@@ -171,15 +172,15 @@
     box-shadow var(--transition-fast);
 }
 
-:root[data-theme="day"] .link-btn {
+:root[data-theme='day'] .link-btn {
   background: linear-gradient(180deg, #2d6dca, #1d54b5);
   border-color: rgba(135, 180, 255, 0.45);
   color: #fff;
   box-shadow: 0 15px 40px rgba(25, 70, 155, 0.18);
 }
 
-:root[data-theme="day"] .link-btn:hover,
-:root[data-theme="day"] .link-btn:focus-visible {
+:root[data-theme='day'] .link-btn:hover,
+:root[data-theme='day'] .link-btn:focus-visible {
   background: linear-gradient(180deg, #3a7ce0, #2562bf);
   border-color: rgba(190, 220, 255, 0.75);
   transform: translateY(-1px);
