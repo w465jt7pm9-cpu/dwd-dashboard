@@ -40,9 +40,37 @@
 
 /* Status modifiers */
 .card-status--loading {
-  background: var(--color-loading);
-  color: #000;
+  /* Make loading badge look like the topbar icon: small circular button */
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-fg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: var(--icon-btn-size);
+  height: var(--icon-btn-size);
+  min-width: var(--icon-btn-size);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  font-size: 16px;
+  line-height: 1;
   animation: status-pulse 1.2s ease-in-out infinite;
+}
+
+@media (prefers-color-scheme: light) {
+  .card-status--loading {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.06);
+    color: #000;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .card-status--loading {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
 }
 
 .card-status--error {
@@ -56,9 +84,18 @@
 }
 
 @keyframes status-pulse {
-  0% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(0.96); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* LIGHTBOX */
@@ -111,7 +148,8 @@
   color: var(--color-fg);
   text-decoration: none;
   font-size: var(--font-size-link-btn);
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  transition: background-color var(--transition-fast),
+    border-color var(--transition-fast), transform var(--transition-fast);
 }
 
 .link-btn:hover,
@@ -165,7 +203,8 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 
   opacity: 0;
-  transition: opacity var(--transition-fast), transform var(--transition-fast), background-color var(--transition-fast);
+  transition: opacity var(--transition-fast), transform var(--transition-fast),
+    background-color var(--transition-fast);
   z-index: var(--z-lightbox-nav);
 }
 
