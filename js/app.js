@@ -1,692 +1,1070 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const BASES = {
+  const IMAGE_BASE_URLS = {
     WX_URL: 'https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten',
     WX_ROOT: 'https://www.dwd.de/DWD/wetter',
     WX_SEE: 'https://www.dwd.de/DWD/wetter/wv_spez/seewetter'
-  };
-  const REFRESH_MS = 5 * 60 * 1000;
-  const LONG_PRESS_MS = 600;
-  const INFO_SHOW_MS = 4500;
-  const EDGE_TAP_ZONE = 26;
-  const LAST_OK_KEY = 'dwdLastSuccessfulRefresh';
-  const THEME_KEY = 'dwdTheme';
-  const PAGE_STATE = new Map();
-
-  const viewport = document.getElementById('viewport');
-  const carousel = document.getElementById('carousel');
-  const pageTitle = document.getElementById('pageTitle');
-  const status = document.getElementById('status');
-  const pageSummary = document.getElementById('pageSummary');
-  const offlineBanner = document.getElementById('offlineBanner');
-  const offlineStamp = document.getElementById('offlineStamp');
-  const installHint = document.getElementById('installHint');
-  const installHintClose = document.getElementById('installHintClose');
-  const refreshBtn = document.getElementById('refreshBtn');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  const modeBtn = document.getElementById('modeBtn');
-  const thumbPrev = document.getElementById('thumbPrev');
-  const thumbRefresh = document.getElementById('thumbRefresh');
-  const thumbMode = document.getElementById('thumbMode');
-  const thumbNext = document.getElementById('thumbNext');
-  const lightbox = document.getElementById('lightbox');
-  const lightImg = document.getElementById('lightboxImg');
-  const lbPrev = document.getElementById('lbPrev');
-  const lbNext = document.getElementById('lbNext');
-
-  const pageNames = ['Land', 'See / Seegang', 'Höhenwetter', 'Seewetter Texte'];
-  let currentPage = 0;
-  const imgsAll = Array.from(document.querySelectorAll('img[data-base][data-path]'));
-
-  function nowTime() {
-    return new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   }
 
-  function formatTs(ts) {
-    if (!ts) return '—';
+  const REFRESH_INTERVAL_MS = 5 * 60 * 1000
+  const LONG_PRESS_DURATION_MS = 600
+  const INFO_OVERLAY_DURATION_MS = 4500
+  const EDGE_TAP_ZONE_PX = 26
+  const LIGHTBOX_MAX_SCALE = 4
+  const LIGHTBOX_DOUBLE_TAP_SCALE = 2
+  const LIGHTBOX_MIN_SCALE = 1
+  const LIGHTBOX_WHEEL_STEP = 0.18
+  const PAGE_SWIPE_MAX_DURATION_MS = 800
+  const PAGE_SWIPE_MIN_DISTANCE_PX = 50
+  const LIGHTBOX_SWIPE_MIN_DISTANCE_PX = 40
+  const LIGHTBOX_SWIPE_MAX_DURATION_MS = 800
+  const LIGHTBOX_CLOSE_SWIPE_MIN_DISTANCE_PX = 80
+  const LIGHTBOX_CLOSE_SWIPE_MAX_DURATION_MS = 700
+  const LAST_SUCCESSFUL_REFRESH_KEY = 'dwdLastSuccessfulRefresh'
+  const THEME_STORAGE_KEY = 'dwdTheme'
+
+  const PAGE_NAMES = [
+    'Land',
+    'See / Seegang',
+    'HÃ¶henwetter',
+    'Seewetter Texte'
+  ]
+  const IMAGE_ELEMENTS = Array.from(
+    document.querySelectorAll('img[data-base][data-path]')
+  )
+  const PAGE_STATE_BY_IMAGE = new Map()
+
+  const viewportElement = document.getElementById('viewport')
+  const carouselElement = document.getElementById('carousel')
+  const pageTitleElement = document.getElementById('pageTitle')
+  const statusElement = document.getElementById('status')
+  const pageSummaryElement = document.getElementById('pageSummary')
+  const offlineBannerElement = document.getElementById('offlineBanner')
+  const offlineStampElement = document.getElementById('offlineStamp')
+  const installHintElement = document.getElementById('installHint')
+  const installHintCloseButton = document.getElementById('installHintClose')
+  const refreshButton = document.getElementById('refreshBtn')
+  const previousPageButton = document.getElementById('prevBtn')
+  const nextPageButton = document.getElementById('nextBtn')
+  const themeButton = document.getElementById('modeBtn')
+  const thumbPreviousButton = document.getElementById('thumbPrev')
+  const thumbRefreshButton = document.getElementById('thumbRefresh')
+  const thumbThemeButton = document.getElementById('thumbMode')
+  const thumbNextButton = document.getElementById('thumbNext')
+  const lightboxElement = document.getElementById('lightbox')
+  const lightboxImageElement = document.getElementById('lightboxImg')
+  const lightboxPreviousButton = document.getElementById('lbPrev')
+  const lightboxNextButton = document.getElementById('lbNext')
+
+  let currentPageIndex = 0
+  let lightboxImageList = []
+  let currentLightboxImageIndex = -1
+  let isLightboxOpen = false
+  let lightboxHideTimerId = null
+
+  let lightboxScale = 1
+  let lightboxOffsetX = 0
+  let lightboxOffsetY = 0
+  let pinchStartDistance = 0
+  let pinchStartScale = 1
+  let panStartOffsetX = 0
+  let panStartOffsetY = 0
+  let didRunPinchGesture = false
+  let lastTapTimestamp = 0
+  let isDraggingLightboxImage = false
+  let dragOriginX = 0
+  let dragOriginY = 0
+  let lightboxSwipeStartX = null
+  let lightboxSwipeStartY = null
+  let lightboxSwipeStartTimestamp = 0
+
+  let pageSwipeStartX = null
+  let pageSwipeStartY = null
+  let pageSwipeStartTimestamp = 0
+
+  let longPressTimerId = null
+  let didTriggerLongPress = false
+
+  function getCurrentTimeLabel () {
+    return new Date().toLocaleTimeString(undefined, {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+  }
+
+  function formatTimestamp (timestamp) {
+    if (!timestamp) {
+      return 'â€”'
+    }
+
     try {
-      return new Date(Number(ts)).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      return new Date(Number(timestamp)).toLocaleTimeString(undefined, {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      })
     } catch {
-      return '—';
+      return 'â€”'
     }
   }
 
-  function setStatus(text) { status.textContent = text; }
-
-  function getLastSuccessfulRefresh() {
-    try { return localStorage.getItem(LAST_OK_KEY); } catch { return null; }
+  function setStatusLabel (text) {
+    statusElement.textContent = text
   }
 
-  function setLastSuccessfulRefresh(ts) {
-    try { localStorage.setItem(LAST_OK_KEY, String(ts)); } catch {}
-  }
-
-  function updateOfflineUI() {
-    const offline = !navigator.onLine;
-    const lastOk = getLastSuccessfulRefresh();
-    if (offline) {
-      offlineBanner.classList.remove('is-hidden');
-      offlineStamp.textContent = formatTs(lastOk);
-      setStatus(`Offline ${formatTs(lastOk)}`);
-    } else {
-      offlineBanner.classList.add('is-hidden');
+  function getLastSuccessfulRefresh () {
+    try {
+      return localStorage.getItem(LAST_SUCCESSFUL_REFRESH_KEY)
+    } catch {
+      return null
     }
   }
 
-  function isiOSSafari() {
-    const ua = navigator.userAgent;
-    const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
-    return isIOS && isSafari;
-  }
-
-  function isStandalone() {
-    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  }
-
-  function initInstallHint() {
-    if (isiOSSafari() && !isStandalone()) installHint.classList.remove('is-hidden');
-  }
-
-  installHintClose?.addEventListener('click', () => installHint.classList.add('is-hidden'));
-
-  function applyMode(mode) {
-    document.documentElement.setAttribute('data-theme', mode);
-    const icon = mode === 'day' ? '◐' : mode === 'night' ? '☾' : '◑';
-    modeBtn.textContent = icon;
-    thumbMode.textContent = icon;
-  }
-
-  function initMode() {
-    let mode = 'day';
-    try { mode = localStorage.getItem(THEME_KEY) || 'day'; } catch {}
-    applyMode(mode);
-  }
-
-  function cycleMode() {
-    const current = document.documentElement.getAttribute('data-theme') || 'day';
-    const next = current === 'day' ? 'night' : current === 'night' ? 'dim' : 'day';
-    try { localStorage.setItem(THEME_KEY, next); } catch {}
-    applyMode(next);
-  }
-
-  modeBtn?.addEventListener('click', cycleMode);
-  thumbMode?.addEventListener('click', cycleMode);
-
-  // Status badges: only show deviations
-  function ensureCardStatus(card) {
-    let badge = card.querySelector('.card-status');
-    if (!badge) {
-      badge = document.createElement('div');
-      badge.className = 'card-status';
-      card.appendChild(badge);
+  function setLastSuccessfulRefresh (timestamp) {
+    try {
+      localStorage.setItem(LAST_SUCCESSFUL_REFRESH_KEY, String(timestamp))
+    } catch {
+      // localStorage is optional here.
     }
-    return badge;
   }
 
-  function setCardState(img, state) {
-    const card = img.closest('.card');
-    if (!card) return;
-    let badge = card.querySelector('.card-status');
+  function updateOfflineUi () {
+    const isOffline = !navigator.onLine
+    const lastSuccessfulRefresh = getLastSuccessfulRefresh()
+
+    if (isOffline) {
+      offlineBannerElement.classList.remove('is-hidden')
+      offlineStampElement.textContent = formatTimestamp(lastSuccessfulRefresh)
+      setStatusLabel(`Offline ${formatTimestamp(lastSuccessfulRefresh)}`)
+      return
+    }
+
+    offlineBannerElement.classList.add('is-hidden')
+  }
+
+  function isiOSSafari () {
+    const userAgent = navigator.userAgent
+    const isIosDevice =
+      /iPad|iPhone|iPod/.test(userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    const isSafariBrowser =
+      /Safari/.test(userAgent) && !/CriOS|FxiOS|EdgiOS/.test(userAgent)
+
+    return isIosDevice && isSafariBrowser
+  }
+
+  function isStandaloneApp () {
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true
+    )
+  }
+
+  function initInstallHint () {
+    if (isiOSSafari() && !isStandaloneApp()) {
+      installHintElement.classList.remove('is-hidden')
+    }
+  }
+
+  function applyTheme (theme) {
+    document.documentElement.setAttribute('data-theme', theme)
+
+    const themeIcon = theme === 'day' ? 'â—' : theme === 'night' ? 'â˜¾' : 'â—‘'
+
+    themeButton.textContent = themeIcon
+    thumbThemeButton.textContent = themeIcon
+  }
+
+  function initTheme () {
+    let theme = 'day'
+
+    try {
+      theme = localStorage.getItem(THEME_STORAGE_KEY) || 'day'
+    } catch {
+      theme = 'day'
+    }
+
+    applyTheme(theme)
+  }
+
+  function toggleTheme () {
+    const currentTheme =
+      document.documentElement.getAttribute('data-theme') || 'day'
+    const nextTheme =
+      currentTheme === 'day'
+        ? 'night'
+        : currentTheme === 'night'
+        ? 'dim'
+        : 'day'
+
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, nextTheme)
+    } catch {
+      // localStorage is optional here.
+    }
+
+    applyTheme(nextTheme)
+  }
+
+  function ensureCardStatusElement (cardElement) {
+    let badgeElement = cardElement.querySelector('.card-status')
+
+    if (!badgeElement) {
+      badgeElement = document.createElement('div')
+      badgeElement.className = 'card-status'
+      cardElement.appendChild(badgeElement)
+    }
+
+    return badgeElement
+  }
+
+  function updatePageSummary () {
+    if (currentPageIndex > 2) {
+      pageSummaryElement.textContent = 'Texte'
+      return
+    }
+
+    const visiblePageStates = [...PAGE_STATE_BY_IMAGE.values()].filter(
+      pageState => pageState.pageIndex === currentPageIndex
+    )
+    const errorCount = visiblePageStates.filter(
+      pageState => pageState.state === 'error'
+    ).length
+    const offlineCount = visiblePageStates.filter(
+      pageState => pageState.state === 'offline'
+    ).length
+    const loadingCount = visiblePageStates.filter(
+      pageState => pageState.state === 'loading'
+    ).length
+
+    if (offlineCount > 0) {
+      pageSummaryElement.textContent = `${offlineCount} offline`
+      return
+    }
+
+    if (errorCount > 0) {
+      pageSummaryElement.textContent = `${errorCount} Fehler`
+      return
+    }
+
+    if (loadingCount > 0) {
+      pageSummaryElement.textContent = `${loadingCount} lÃ¤dt`
+      return
+    }
+
+    pageSummaryElement.textContent = 'â€”'
+  }
+
+  function setCardState (imageElement, state) {
+    const cardElement = imageElement.closest('.card')
+
+    if (!cardElement) {
+      return
+    }
+
+    let badgeElement = cardElement.querySelector('.card-status')
 
     if (state === 'ok') {
-      if (badge) badge.remove();
+      if (badgeElement) {
+        badgeElement.remove()
+      }
     } else {
-      badge = ensureCardStatus(card);
-      badge.className = `card-status card-status--${state}`;
-      if (state === 'loading') badge.textContent = '⏳';
-      if (state === 'error') badge.textContent = '✕';
-      if (state === 'offline') badge.textContent = '○';
+      badgeElement = ensureCardStatusElement(cardElement)
+      badgeElement.className = `card-status card-status--${state}`
+
+      if (state === 'loading') {
+        badgeElement.textContent = 'â³'
+      }
+
+      if (state === 'error') {
+        badgeElement.textContent = 'âœ•'
+      }
+
+      if (state === 'offline') {
+        badgeElement.textContent = 'â—‹'
+      }
     }
 
-    const page = img.closest('.page');
-    if (page) {
-      PAGE_STATE.set(img, { page: Number(page.dataset.page), state });
-      updatePageSummary();
+    const pageElement = imageElement.closest('.page')
+
+    if (pageElement) {
+      PAGE_STATE_BY_IMAGE.set(imageElement, {
+        pageIndex: Number(pageElement.dataset.page),
+        state
+      })
+      updatePageSummary()
     }
   }
 
-  function updatePageSummary() {
-    if (currentPage > 2) {
-      pageSummary.textContent = 'Texte';
-      return;
-    }
-    const items = [...PAGE_STATE.values()].filter(v => v.page === currentPage);
-    const err = items.filter(v => v.state === 'error').length;
-    const off = items.filter(v => v.state === 'offline').length;
-    const loading = items.filter(v => v.state === 'loading').length;
+  function buildImageUrl (imageElement, timestamp) {
+    const baseUrl = IMAGE_BASE_URLS[imageElement.dataset.base]
+    const imagePath = imageElement.dataset.path
 
-    if (off > 0) pageSummary.textContent = `${off} offline`;
-    else if (err > 0) pageSummary.textContent = `${err} Fehler`;
-    else if (loading > 0) pageSummary.textContent = `${loading} lädt`;
-    else pageSummary.textContent = '—';
+    if (!baseUrl || !imagePath) {
+      return null
+    }
+
+    return `${baseUrl}/${imagePath}?t=${timestamp}`
   }
 
-  imgsAll.forEach((img) => {
-    setCardState(img, 'loading');
-    img.addEventListener('load', () => setCardState(img, navigator.onLine ? 'ok' : 'offline'));
-    img.addEventListener('error', () => setCardState(img, navigator.onLine ? 'error' : 'offline'));
-  });
+  function refreshVisibleImages () {
+    if (currentPageIndex > 2) {
+      updateOfflineUi()
+
+      if (navigator.onLine) {
+        setStatusLabel(`Aktualisiert ${getCurrentTimeLabel()}`)
+      }
+
+      updatePageSummary()
+      return
+    }
+
+    const timestamp = Date.now()
+    let refreshedImageCount = 0
+
+    IMAGE_ELEMENTS.forEach(imageElement => {
+      const pageElement = imageElement.closest('.page')
+
+      if (!pageElement) {
+        return
+      }
+
+      if (Number(pageElement.dataset.page) !== currentPageIndex) {
+        return
+      }
+
+      refreshedImageCount += 1
+
+      const imageUrl = buildImageUrl(imageElement, timestamp)
+      if (!imageUrl) {
+        return
+      }
+
+      setCardState(imageElement, navigator.onLine ? 'loading' : 'offline')
+      imageElement.src = imageUrl
+    })
+
+    if (navigator.onLine && refreshedImageCount > 0) {
+      setLastSuccessfulRefresh(Date.now())
+      setStatusLabel(`Aktualisiert ${getCurrentTimeLabel()}`)
+    }
+
+    updateOfflineUi()
+    updatePageSummary()
+  }
+
+  function goToPage (pageIndex) {
+    const boundedPageIndex = Math.max(
+      0,
+      Math.min(PAGE_NAMES.length - 1, pageIndex)
+    )
+
+    currentPageIndex = boundedPageIndex
+    carouselElement.style.transform = `translateX(${-currentPageIndex * 100}vw)`
+    pageTitleElement.textContent = PAGE_NAMES[currentPageIndex]
+    refreshVisibleImages()
+  }
+
+  function getGalleryImagesForPage (imageElement) {
+    const pageElement = imageElement.closest('.page')
+
+    if (!pageElement) {
+      return {
+        list: IMAGE_ELEMENTS,
+        index: IMAGE_ELEMENTS.indexOf(imageElement)
+      }
+    }
+
+    const pageIndex = Number(pageElement.dataset.page)
+    const pageImages = IMAGE_ELEMENTS.filter(candidateImageElement => {
+      const candidatePageElement = candidateImageElement.closest('.page')
+      return (
+        candidatePageElement &&
+        Number(candidatePageElement.dataset.page) === pageIndex
+      )
+    })
+
+    const imageIndex = pageImages.indexOf(imageElement)
+
+    return {
+      list: pageImages.length ? pageImages : IMAGE_ELEMENTS,
+      index: imageIndex >= 0 ? imageIndex : IMAGE_ELEMENTS.indexOf(imageElement)
+    }
+  }
+
+  function resetLightboxZoom () {
+    lightboxScale = LIGHTBOX_MIN_SCALE
+    lightboxOffsetX = 0
+    lightboxOffsetY = 0
+    applyLightboxTransform()
+  }
+
+  function getLightboxBounds () {
+    const imageRect = lightboxImageElement.getBoundingClientRect()
+    const renderedWidth = lightboxImageElement.offsetWidth || imageRect.width
+    const renderedHeight = lightboxImageElement.offsetHeight || imageRect.height
+
+    const overflowX = Math.max(0, renderedWidth * (lightboxScale - 1))
+    const overflowY = Math.max(0, renderedHeight * (lightboxScale - 1))
+
+    return {
+      overflowX,
+      overflowY
+    }
+  }
+
+  function clampLightboxPan () {
+    const { overflowX, overflowY } = getLightboxBounds()
+
+    const minOffsetX = -overflowX
+    const maxOffsetX = 0
+    const minOffsetY = -overflowY
+    const maxOffsetY = 0
+
+    lightboxOffsetX = Math.min(
+      maxOffsetX,
+      Math.max(minOffsetX, lightboxOffsetX)
+    )
+    lightboxOffsetY = Math.min(
+      maxOffsetY,
+      Math.max(minOffsetY, lightboxOffsetY)
+    )
+  }
+
+  function applyLightboxTransform () {
+    clampLightboxPan()
+    lightboxImageElement.style.transform = `translate(${lightboxOffsetX}px, ${lightboxOffsetY}px) scale(${lightboxScale})`
+    lightboxImageElement.style.transformOrigin = 'center center'
+    lightboxImageElement.style.cursor = lightboxScale > 1 ? 'grab' : 'zoom-out'
+  }
+
+  function showLightboxNavigationTemporarily () {
+    lightboxElement.classList.add('lb-show')
+    clearTimeout(lightboxHideTimerId)
+    lightboxHideTimerId = window.setTimeout(() => {
+      lightboxElement.classList.remove('lb-show')
+    }, 1800)
+  }
+
+  function showLightboxImageAt (nextIndex) {
+    if (!lightboxImageList.length) {
+      return
+    }
+
+    currentLightboxImageIndex =
+      (nextIndex + lightboxImageList.length) % lightboxImageList.length
+
+    const imageElement = lightboxImageList[currentLightboxImageIndex]
+    if (!imageElement || !imageElement.src) {
+      return
+    }
+
+    lightboxImageElement.src = imageElement.src
+    resetLightboxZoom()
+    showLightboxNavigationTemporarily()
+  }
+
+  function showPreviousLightboxImage () {
+    showLightboxImageAt(currentLightboxImageIndex - 1)
+  }
+
+  function showNextLightboxImage () {
+    showLightboxImageAt(currentLightboxImageIndex + 1)
+  }
+
+  function openLightboxForImage (imageElement) {
+    if (!imageElement.src) {
+      return
+    }
+
+    const gallery = getGalleryImagesForPage(imageElement)
+    lightboxImageList = gallery.list
+    currentLightboxImageIndex = gallery.index
+
+    lightboxImageElement.src = imageElement.src
+    resetLightboxZoom()
+    lightboxElement.classList.add('open', 'lb-show')
+    lightboxElement.setAttribute('aria-hidden', 'false')
+    isLightboxOpen = true
+    showLightboxNavigationTemporarily()
+  }
+
+  function closeLightbox () {
+    lightboxElement.classList.remove('open', 'lb-show')
+    lightboxElement.setAttribute('aria-hidden', 'true')
+    lightboxImageElement.src = ''
+    lightboxImageList = []
+    currentLightboxImageIndex = -1
+    isLightboxOpen = false
+    clearTimeout(lightboxHideTimerId)
+    resetLightboxZoom()
+  }
+
+  function getTouchDistance (touches) {
+    const deltaX = touches[0].clientX - touches[1].clientX
+    const deltaY = touches[0].clientY - touches[1].clientY
+
+    return Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+  }
+
+  function startLightboxSwipe (clientX, clientY) {
+    lightboxSwipeStartX = clientX
+    lightboxSwipeStartY = clientY
+    lightboxSwipeStartTimestamp = Date.now()
+  }
+
+  function finishLightboxSwipe (clientX, clientY) {
+    if (lightboxSwipeStartX === null || lightboxSwipeStartY === null) {
+      return
+    }
+
+    const deltaX = clientX - lightboxSwipeStartX
+    const deltaY = clientY - lightboxSwipeStartY
+    const gestureDurationMs = Date.now() - lightboxSwipeStartTimestamp
+
+    if (lightboxScale > 1) {
+      lightboxSwipeStartX = null
+      lightboxSwipeStartY = null
+      return
+    }
+
+    if (
+      gestureDurationMs <= LIGHTBOX_SWIPE_MAX_DURATION_MS &&
+      Math.abs(deltaX) >= LIGHTBOX_SWIPE_MIN_DISTANCE_PX &&
+      Math.abs(deltaX) > Math.abs(deltaY)
+    ) {
+      if (deltaX < 0) {
+        showNextLightboxImage()
+      } else {
+        showPreviousLightboxImage()
+      }
+    } else {
+      showLightboxNavigationTemporarily()
+    }
+
+    lightboxSwipeStartX = null
+    lightboxSwipeStartY = null
+  }
+
+  function isUpperAirImage (imagePath) {
+    return (
+      imagePath.includes('ico_500ht') ||
+      imagePath.includes('ico_700rf') ||
+      imagePath.includes('ico_850ht')
+    )
+  }
+
+  function getUpperAirInfoText (imagePath) {
+    if (imagePath.includes('ico_500ht')) {
+      return '500 hPa (~5,5 km): GroÃŸwetterlage & Steuerung. Jets und Trog/Keil zeigen Entwicklung und Zugbahnen.'
+    }
+
+    if (imagePath.includes('ico_700rf')) {
+      return '700 hPa (~3 km): Relative Feuchte. Gut fÃ¼r mittelhohe BewÃ¶lkung und Niederschlagstendenzen.'
+    }
+
+    if (imagePath.includes('ico_850ht')) {
+      return '850 hPa (~1,5 km): Luftmasse und Temperatur/Advektion. Gut fÃ¼r Boden-Trends und FrontnÃ¤he.'
+    }
+
+    return ''
+  }
+
+  function showInfoOverlay (imageElement) {
+    const infoText = getUpperAirInfoText(imageElement.dataset.path || '')
+
+    if (!infoText) {
+      return
+    }
+
+    const cardElement = imageElement.closest('.card')
+    if (!cardElement) {
+      return
+    }
+
+    let overlayElement = cardElement.querySelector('.info-overlay')
+
+    if (!overlayElement) {
+      overlayElement = document.createElement('div')
+      overlayElement.className = 'info-overlay'
+      cardElement.appendChild(overlayElement)
+    }
+
+    overlayElement.textContent = infoText
+    overlayElement.classList.add('show')
+    window.setTimeout(() => {
+      overlayElement.classList.remove('show')
+    }, INFO_OVERLAY_DURATION_MS)
+  }
+
+  function startLongPress (imageElement) {
+    const imagePath = imageElement.dataset.path || ''
+
+    if (!isUpperAirImage(imagePath)) {
+      return
+    }
+
+    didTriggerLongPress = false
+    clearTimeout(longPressTimerId)
+
+    longPressTimerId = window.setTimeout(() => {
+      didTriggerLongPress = true
+      showInfoOverlay(imageElement)
+    }, LONG_PRESS_DURATION_MS)
+  }
+
+  function cancelLongPress () {
+    clearTimeout(longPressTimerId)
+  }
+
+  function startPageSwipe (clientX, clientY) {
+    pageSwipeStartX = clientX
+    pageSwipeStartY = clientY
+    pageSwipeStartTimestamp = Date.now()
+  }
+
+  function finishPageSwipe (clientX, clientY) {
+    if (pageSwipeStartX === null || pageSwipeStartY === null) {
+      return
+    }
+
+    const deltaX = clientX - pageSwipeStartX
+    const deltaY = clientY - pageSwipeStartY
+    const gestureDurationMs = Date.now() - pageSwipeStartTimestamp
+
+    if (
+      gestureDurationMs <= PAGE_SWIPE_MAX_DURATION_MS &&
+      Math.abs(deltaX) >= PAGE_SWIPE_MIN_DISTANCE_PX &&
+      Math.abs(deltaX) > Math.abs(deltaY)
+    ) {
+      if (deltaX < 0) {
+        goToPage(currentPageIndex + 1)
+      } else {
+        goToPage(currentPageIndex - 1)
+      }
+    }
+
+    pageSwipeStartX = null
+    pageSwipeStartY = null
+  }
+
+  function handleEdgeTap (clientX) {
+    const viewportWidth = window.innerWidth || 0
+
+    if (clientX <= EDGE_TAP_ZONE_PX) {
+      goToPage(currentPageIndex - 1)
+      return true
+    }
+
+    if (clientX >= viewportWidth - EDGE_TAP_ZONE_PX) {
+      goToPage(currentPageIndex + 1)
+      return true
+    }
+
+    return false
+  }
+
+  IMAGE_ELEMENTS.forEach(imageElement => {
+    setCardState(imageElement, 'loading')
+
+    imageElement.addEventListener('load', () => {
+      setCardState(imageElement, navigator.onLine ? 'ok' : 'offline')
+    })
+
+    imageElement.addEventListener('error', () => {
+      setCardState(imageElement, navigator.onLine ? 'error' : 'offline')
+    })
+
+    imageElement.addEventListener('click', event => {
+      if (didTriggerLongPress) {
+        event.preventDefault()
+        event.stopPropagation()
+        didTriggerLongPress = false
+        return
+      }
+
+      openLightboxForImage(imageElement)
+    })
+
+    imageElement.addEventListener(
+      'touchstart',
+      () => startLongPress(imageElement),
+      { passive: true }
+    )
+    imageElement.addEventListener('touchend', cancelLongPress, {
+      passive: true
+    })
+    imageElement.addEventListener('touchcancel', cancelLongPress, {
+      passive: true
+    })
+    imageElement.addEventListener('mousedown', () =>
+      startLongPress(imageElement)
+    )
+    imageElement.addEventListener('mouseup', cancelLongPress)
+    imageElement.addEventListener('mouseleave', cancelLongPress)
+  })
 
   window.addEventListener('online', () => {
-    updateOfflineUI();
-    refreshVisible();
-  });
+    updateOfflineUi()
+    refreshVisibleImages()
+  })
 
   window.addEventListener('offline', () => {
-    updateOfflineUI();
-    imgsAll.forEach((img) => {
-      const page = img.closest('.page');
-      if (page && Number(page.dataset.page) === currentPage) setCardState(img, 'offline');
-    });
-  });
+    updateOfflineUi()
 
-  function buildUrl(img, ts) {
-    const base = BASES[img.dataset.base];
-    const path = img.dataset.path;
-    if (!base || !path) return null;
-    return `${base}/${path}?t=${ts}`;
-  }
+    IMAGE_ELEMENTS.forEach(imageElement => {
+      const pageElement = imageElement.closest('.page')
 
-  function refreshVisible() {
-    if (currentPage > 2) {
-      updateOfflineUI();
-      if (navigator.onLine) setStatus(`Aktualisiert ${nowTime()}`);
-      updatePageSummary();
-      return;
-    }
-
-    const ts = Date.now();
-    let touched = 0;
-
-    imgsAll.forEach((img) => {
-      const page = img.closest('.page');
-      if (!page) return;
-      if (Number(page.dataset.page) !== currentPage) return;
-      touched += 1;
-      const url = buildUrl(img, ts);
-      if (url) {
-        setCardState(img, navigator.onLine ? 'loading' : 'offline');
-        img.src = url;
+      if (
+        pageElement &&
+        Number(pageElement.dataset.page) === currentPageIndex
+      ) {
+        setCardState(imageElement, 'offline')
       }
-    });
+    })
+  })
 
-    if (navigator.onLine && touched > 0) {
-      setLastSuccessfulRefresh(Date.now());
-      setStatus(`Aktualisiert ${nowTime()}`);
+  installHintCloseButton?.addEventListener('click', () => {
+    installHintElement.classList.add('is-hidden')
+  })
+
+  themeButton?.addEventListener('click', toggleTheme)
+  thumbThemeButton?.addEventListener('click', toggleTheme)
+  refreshButton?.addEventListener('click', refreshVisibleImages)
+  thumbRefreshButton?.addEventListener('click', refreshVisibleImages)
+  previousPageButton?.addEventListener('click', () =>
+    goToPage(currentPageIndex - 1)
+  )
+  nextPageButton?.addEventListener('click', () =>
+    goToPage(currentPageIndex + 1)
+  )
+  thumbPreviousButton?.addEventListener('click', () =>
+    goToPage(currentPageIndex - 1)
+  )
+  thumbNextButton?.addEventListener('click', () =>
+    goToPage(currentPageIndex + 1)
+  )
+
+  lightboxPreviousButton?.addEventListener('click', event => {
+    event.stopPropagation()
+    showPreviousLightboxImage()
+  })
+
+  lightboxNextButton?.addEventListener('click', event => {
+    event.stopPropagation()
+    showNextLightboxImage()
+  })
+
+  lightboxElement.addEventListener('click', event => {
+    if (event.target === lightboxElement) {
+      closeLightbox()
     }
-    updateOfflineUI();
-    updatePageSummary();
-  }
+  })
 
-  function goTo(n) {
-    const next = Math.max(0, Math.min(pageNames.length - 1, n));
-    currentPage = next;
-    carousel.style.transform = `translateX(${-currentPage * 100}vw)`;
-    pageTitle.textContent = pageNames[currentPage];
-    refreshVisible();
-  }
+  lightboxImageElement.addEventListener('click', event => {
+    event.stopPropagation()
 
-  refreshBtn?.addEventListener('click', refreshVisible);
-  thumbRefresh?.addEventListener('click', refreshVisible);
-  prevBtn?.addEventListener('click', () => goTo(currentPage - 1));
-  nextBtn?.addEventListener('click', () => goTo(currentPage + 1));
-  thumbPrev?.addEventListener('click', () => goTo(currentPage - 1));
-  thumbNext?.addEventListener('click', () => goTo(currentPage + 1));
-
-  // Lightbox gallery + zoom
-  let gallery = [];
-  let galleryIndex = -1;
-  let lightboxOpen = false;
-  let lightboxHideTimer = null;
-
-  let scale = 1;
-  let posX = 0;
-  let posY = 0;
-  let startDist = 0;
-  let startScale = 1;
-  let panStartX = 0;
-  let panStartY = 0;
-  let didPinch = false;
-  let lastTap = 0;
-
-  let dragging = false;
-  let dragOriginX = 0;
-  let dragOriginY = 0;
-
-  let lbX0 = null;
-  let lbY0 = null;
-  let lbT0 = 0;
-
-  function resetZoom() {
-    scale = 1;
-    posX = 0;
-    posY = 0;
-    applyTransform();
-  }
-
-  function getBounds() {
-    const rect = lightImg.getBoundingClientRect();
-    const offsetWidth = lightImg.offsetWidth || rect.width;
-    const offsetHeight = lightImg.offsetHeight || rect.height;
-    const overflowX = Math.max(0, offsetWidth * (scale - 1));
-    const overflowY = Math.max(0, offsetHeight * (scale - 1));
-    return { overflowX, overflowY };
-  }
-
-  function clampPan() {
-    const { overflowX, overflowY } = getBounds();
-    const minX = -overflowX;
-    const maxX = 0;
-    const minY = -overflowY;
-    const maxY = 0;
-    posX = Math.min(maxX, Math.max(minX, posX));
-    posY = Math.min(maxY, Math.max(minY, posY));
-  }
-
-  function applyTransform() {
-    clampPan();
-    lightImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
-    lightImg.style.transformOrigin = 'center center';
-    lightImg.style.cursor = scale > 1 ? 'grab' : 'zoom-out';
-  }
-
-  function showArrowsTemporarily() {
-    lightbox.classList.add('lb-show');
-    clearTimeout(lightboxHideTimer);
-    lightboxHideTimer = window.setTimeout(() => lightbox.classList.remove('lb-show'), 1800);
-  }
-
-  function computeGalleryFor(img) {
-    const page = img.closest('.page');
-    if (!page) return { list: imgsAll, index: imgsAll.indexOf(img) };
-    const pageIndex = Number(page.dataset.page);
-    const list = imgsAll.filter((node) => {
-      const p = node.closest('.page');
-      return p && Number(p.dataset.page) === pageIndex;
-    });
-    const index = list.indexOf(img);
-    return { list: list.length ? list : imgsAll, index: index >= 0 ? index : imgsAll.indexOf(img) };
-  }
-
-  function showGalleryIndex(nextIndex) {
-    if (!gallery || gallery.length === 0) return;
-    galleryIndex = (nextIndex + gallery.length) % gallery.length;
-    const img = gallery[galleryIndex];
-    if (img && img.src) {
-      lightImg.src = img.src;
-      resetZoom();
+    if (isLightboxOpen) {
+      showLightboxNavigationTemporarily()
     }
-    showArrowsTemporarily();
-  }
+  })
 
-  function nextImage() { showGalleryIndex(galleryIndex + 1); }
-  function prevImage() { showGalleryIndex(galleryIndex - 1); }
+  lightboxImageElement.addEventListener(
+    'wheel',
+    event => {
+      if (!isLightboxOpen) {
+        return
+      }
 
-  function openLightboxFrom(img) {
-    if (!img.src) return;
-    const g = computeGalleryFor(img);
-    gallery = g.list;
-    galleryIndex = g.index;
-    lightImg.src = img.src;
-    resetZoom();
-    lightbox.classList.add('open', 'lb-show');
-    lightbox.setAttribute('aria-hidden', 'false');
-    lightboxOpen = true;
-    showArrowsTemporarily();
-  }
+      event.preventDefault()
 
-  function closeLightbox() {
-    lightbox.classList.remove('open', 'lb-show');
-    lightbox.setAttribute('aria-hidden', 'true');
-    lightImg.src = '';
-    gallery = [];
-    galleryIndex = -1;
-    lightboxOpen = false;
-    clearTimeout(lightboxHideTimer);
-    resetZoom();
-  }
+      const zoomDelta =
+        event.deltaY < 0 ? LIGHTBOX_WHEEL_STEP : -LIGHTBOX_WHEEL_STEP
+      lightboxScale = Math.min(
+        LIGHTBOX_MAX_SCALE,
+        Math.max(LIGHTBOX_MIN_SCALE, lightboxScale + zoomDelta)
+      )
 
-  lbPrev?.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
-  lbNext?.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
+      if (lightboxScale === LIGHTBOX_MIN_SCALE) {
+        lightboxOffsetX = 0
+        lightboxOffsetY = 0
+      }
 
-  lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) closeLightbox();
-  });
+      applyLightboxTransform()
+      showLightboxNavigationTemporarily()
+    },
+    { passive: false }
+  )
 
-  lightImg.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (lightboxOpen) showArrowsTemporarily();
-  });
-
-  lightImg.addEventListener('wheel', (e) => {
-    if (!lightboxOpen) return;
-    e.preventDefault();
-
-    const delta = e.deltaY < 0 ? 0.18 : -0.18;
-    scale = Math.min(4, Math.max(1, scale + delta));
-
-    if (scale === 1) {
-      posX = 0;
-      posY = 0;
+  lightboxImageElement.addEventListener('pointerdown', event => {
+    if (!isLightboxOpen || lightboxScale <= 1) {
+      return
     }
 
-    applyTransform();
-    showArrowsTemporarily();
-  }, { passive: false });
+    isDraggingLightboxImage = true
+    dragOriginX = event.clientX - lightboxOffsetX
+    dragOriginY = event.clientY - lightboxOffsetY
 
+    if (lightboxImageElement.setPointerCapture) {
+      lightboxImageElement.setPointerCapture(event.pointerId)
+    }
+  })
 
-  lightImg.addEventListener('pointerdown', (e) => {
-    if (!lightboxOpen || scale <= 1) return;
-    dragging = true;
-    dragOriginX = e.clientX - posX;
-    dragOriginY = e.clientY - posY;
-    if (lightImg.setPointerCapture) lightImg.setPointerCapture(e.pointerId);
-  });
-
-  lightImg.addEventListener('pointermove', (e) => {
-    if (!lightboxOpen || !dragging || scale <= 1) return;
-    posX = e.clientX - dragOriginX;
-    posY = e.clientY - dragOriginY;
-    applyTransform();
-    e.preventDefault();
-  });
-
-  lightImg.addEventListener('pointerup', () => { dragging = false; });
-  lightImg.addEventListener('pointercancel', () => { dragging = false; });
-
-  function getDistance(touches) {
-    const dx = touches[0].clientX - touches[1].clientX;
-    const dy = touches[0].clientY - touches[1].clientY;
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  function lbStart(x, y) {
-    lbX0 = x;
-    lbY0 = y;
-    lbT0 = Date.now();
-  }
-
-  function lbEnd(x, y) {
-    if (lbX0 === null || lbY0 === null) return;
-    const dx = x - lbX0;
-    const dy = y - lbY0;
-    const dt = Date.now() - lbT0;
-    const MIN_DIST = 40;
-    const MAX_TIME = 800;
-
-    if (scale > 1) {
-      lbX0 = null;
-      lbY0 = null;
-      return;
+  lightboxImageElement.addEventListener('pointermove', event => {
+    if (!isLightboxOpen || !isDraggingLightboxImage || lightboxScale <= 1) {
+      return
     }
 
-    if (dt <= MAX_TIME && Math.abs(dx) >= MIN_DIST && Math.abs(dx) > Math.abs(dy)) {
-      if (dx < 0) nextImage();
-      else prevImage();
-    } else {
-      showArrowsTemporarily();
-    }
+    lightboxOffsetX = event.clientX - dragOriginX
+    lightboxOffsetY = event.clientY - dragOriginY
+    applyLightboxTransform()
+    event.preventDefault()
+  })
 
-    lbX0 = null;
-    lbY0 = null;
-  }
+  lightboxImageElement.addEventListener('pointerup', () => {
+    isDraggingLightboxImage = false
+  })
 
-  lightImg.addEventListener('touchstart', (e) => {
-    if (!lightboxOpen) return;
+  lightboxImageElement.addEventListener('pointercancel', () => {
+    isDraggingLightboxImage = false
+  })
 
-    if (e.touches.length === 2) {
-      startDist = getDistance(e.touches);
-      startScale = scale;
-      didPinch = true;
-      return;
-    }
+  lightboxImageElement.addEventListener(
+    'touchstart',
+    event => {
+      if (!isLightboxOpen) {
+        return
+      }
 
-    if (e.touches.length === 1 && scale > 1) {
-      panStartX = e.touches[0].clientX - posX;
-      panStartY = e.touches[0].clientY - posY;
-    }
+      if (event.touches.length === 2) {
+        pinchStartDistance = getTouchDistance(event.touches)
+        pinchStartScale = lightboxScale
+        didRunPinchGesture = true
+        return
+      }
 
-    const t = e.changedTouches[0];
-    lbStart(t.clientX, t.clientY);
-  }, { passive: true });
+      if (event.touches.length === 1 && lightboxScale > 1) {
+        panStartOffsetX = event.touches[0].clientX - lightboxOffsetX
+        panStartOffsetY = event.touches[0].clientY - lightboxOffsetY
+      }
 
-  lightImg.addEventListener('touchmove', (e) => {
-    if (!lightboxOpen) return;
+      const changedTouch = event.changedTouches[0]
+      startLightboxSwipe(changedTouch.clientX, changedTouch.clientY)
+    },
+    { passive: true }
+  )
 
-  if (e.touches.length === 2) {
-    const dist = getDistance(e.touches);
+  lightboxImageElement.addEventListener(
+    'touchmove',
+    event => {
+      if (!isLightboxOpen) {
+        return
+      }
 
-    // Mittelpunkt zwischen den beiden Fingern
-    const rect = lightImg.getBoundingClientRect();
-    const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-    const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      if (event.touches.length === 2) {
+        const currentTouchDistance = getTouchDistance(event.touches)
+        const imageRect = lightboxImageElement.getBoundingClientRect()
+        const centerX =
+          (event.touches[0].clientX + event.touches[1].clientX) / 2
+        const centerY =
+          (event.touches[0].clientY + event.touches[1].clientY) / 2
+        const offsetX = centerX - imageRect.left
+        const offsetY = centerY - imageRect.top
+        const nextScale = Math.min(
+          LIGHTBOX_MAX_SCALE,
+          Math.max(
+            LIGHTBOX_MIN_SCALE,
+            pinchStartScale * (currentTouchDistance / pinchStartDistance)
+          )
+        )
+        const scaleRatio = nextScale / lightboxScale
 
-    // Position relativ zum Bild
-    const offsetX = centerX - rect.left;
-    const offsetY = centerY - rect.top;
+        lightboxOffsetX = offsetX - (offsetX - lightboxOffsetX) * scaleRatio
+        lightboxOffsetY = offsetY - (offsetY - lightboxOffsetY) * scaleRatio
+        lightboxScale = nextScale
 
-    // Neuen Zoomwert berechnen
-    const newScale = Math.min(4, Math.max(1, startScale * (dist / startDist)));
+        if (lightboxScale === LIGHTBOX_MIN_SCALE) {
+          lightboxOffsetX = 0
+          lightboxOffsetY = 0
+        }
 
-    // Zoom auf den Finger-Mittelpunkt beziehen
-    const scaleRatio = newScale / scale;
+        applyLightboxTransform()
+        event.preventDefault()
+        return
+      }
 
-    posX = offsetX - (offsetX - posX) * scaleRatio;
-    posY = offsetY - (offsetY - posY) * scaleRatio;
+      if (event.touches.length === 1 && lightboxScale > 1) {
+        lightboxOffsetX = event.touches[0].clientX - panStartOffsetX
+        lightboxOffsetY = event.touches[0].clientY - panStartOffsetY
+        applyLightboxTransform()
+        event.preventDefault()
+      }
+    },
+    { passive: false }
+  )
 
-    scale = newScale;
+  lightboxImageElement.addEventListener(
+    'touchend',
+    event => {
+      if (!isLightboxOpen) {
+        return
+      }
 
-    if (scale === 1) {
-      posX = 0;
-      posY = 0;
-    }
+      const now = Date.now()
 
-    applyTransform();
-    e.preventDefault();
-    return;
-  }
+      if (didRunPinchGesture && event.touches.length === 0) {
+        didRunPinchGesture = false
 
-    if (e.touches.length === 1 && scale > 1) {
-      posX = e.touches[0].clientX - panStartX;
-      posY = e.touches[0].clientY - panStartY;
-      applyTransform();
-      e.preventDefault();
-    }
-  }, { passive: false });
+        if (lightboxScale < 1.02) {
+          resetLightboxZoom()
+        }
 
-  lightImg.addEventListener('touchend', (e) => {
-    if (!lightboxOpen) return;
+        return
+      }
 
-    const now = Date.now();
+      if (event.changedTouches.length !== 1) {
+        return
+      }
 
-    if (didPinch && e.touches.length === 0) {
-      didPinch = false;
-      if (scale < 1.02) resetZoom();
-      return;
-    }
+      const changedTouch = event.changedTouches[0]
 
-    if (e.changedTouches.length === 1) {
-      const t = e.changedTouches[0];
-
-      if (now - lastTap < 300) {
-        if (scale > 1) {
-          resetZoom();
+      if (now - lastTapTimestamp < 300) {
+        if (lightboxScale > 1) {
+          resetLightboxZoom()
         } else {
-          scale = 2;
-          posX = 0;
-          posY = 0;
-          applyTransform();
+          lightboxScale = LIGHTBOX_DOUBLE_TAP_SCALE
+          lightboxOffsetX = 0
+          lightboxOffsetY = 0
+          applyLightboxTransform()
         }
-        showArrowsTemporarily();
+
+        showLightboxNavigationTemporarily()
       } else {
-        const dx = t.clientX - lbX0;
-        const dy = t.clientY - lbY0;
-        const dt = now - lbT0;
-        const isFastEnough = dt <= 700;
-        const isMostlyVertical = Math.abs(dy) > Math.abs(dx);
-        const isSwipeDown = dy > 80;
+        const deltaX = changedTouch.clientX - lightboxSwipeStartX
+        const deltaY = changedTouch.clientY - lightboxSwipeStartY
+        const gestureDurationMs = now - lightboxSwipeStartTimestamp
+        const isFastEnough =
+          gestureDurationMs <= LIGHTBOX_CLOSE_SWIPE_MAX_DURATION_MS
+        const isMostlyVertical = Math.abs(deltaY) > Math.abs(deltaX)
+        const isSwipeDown = deltaY > LIGHTBOX_CLOSE_SWIPE_MIN_DISTANCE_PX
 
-        // Ein klarer Swipe nach unten schließt die Zoomansicht auf Touch-Geräten.
+        // Swipe down is the explicit mobile exit from the zoomed image view.
         if (isFastEnough && isMostlyVertical && isSwipeDown) {
-          closeLightbox();
-          lastTap = now;
-          return;
+          closeLightbox()
+          lastTapTimestamp = now
+          return
         }
 
-        lbEnd(t.clientX, t.clientY);
+        finishLightboxSwipe(changedTouch.clientX, changedTouch.clientY)
       }
 
-      lastTap = now;
-    }
-  }, { passive: true });
+      lastTapTimestamp = now
+    },
+    { passive: true }
+  )
 
-  function isUpperAir(path) {
-    return path.includes('ico_500ht') || path.includes('ico_700rf') || path.includes('ico_850ht');
-  }
-
-  function getInfoText(path) {
-    if (path.includes('ico_500ht')) return '500 hPa (~5,5 km): Großwetterlage & Steuerung. Jets und Trog/Keil zeigen Entwicklung und Zugbahnen.';
-    if (path.includes('ico_700rf')) return '700 hPa (~3 km): Relative Feuchte. Gut für mittelhohe Bewölkung und Niederschlagstendenzen.';
-    if (path.includes('ico_850ht')) return '850 hPa (~1,5 km): Luftmasse und Temperatur/Advektion. Gut für Boden-Trends und Frontnähe.';
-    return '';
-  }
-
-  let pressTimer = null;
-  let longPressFired = false;
-
-  function showInfoOverlay(img) {
-    const text = getInfoText(img.dataset.path || '');
-    if (!text) return;
-    const card = img.closest('.card');
-    if (!card) return;
-
-    let overlay = card.querySelector('.info-overlay');
-    if (!overlay) {
-      overlay = document.createElement('div');
-      overlay.className = 'info-overlay';
-      card.appendChild(overlay);
-    }
-
-    overlay.textContent = text;
-    overlay.classList.add('show');
-    window.setTimeout(() => overlay.classList.remove('show'), INFO_SHOW_MS);
-  }
-
-  function startLongPress(img) {
-    const path = img.dataset.path || '';
-    if (!isUpperAir(path)) return;
-    longPressFired = false;
-    clearTimeout(pressTimer);
-    pressTimer = window.setTimeout(() => {
-      longPressFired = true;
-      showInfoOverlay(img);
-    }, LONG_PRESS_MS);
-  }
-
-  function cancelLongPress() { clearTimeout(pressTimer); }
-
-  imgsAll.forEach((img) => {
-    img.addEventListener('click', (e) => {
-      if (longPressFired) {
-        e.preventDefault();
-        e.stopPropagation();
-        longPressFired = false;
-        return;
+  viewportElement.addEventListener(
+    'touchstart',
+    event => {
+      if (isLightboxOpen) {
+        return
       }
-      openLightboxFrom(img);
-    });
 
-    img.addEventListener('touchstart', () => startLongPress(img), { passive: true });
-    img.addEventListener('touchend', cancelLongPress, { passive: true });
-    img.addEventListener('touchcancel', cancelLongPress, { passive: true });
-    img.addEventListener('mousedown', () => startLongPress(img));
-    img.addEventListener('mouseup', cancelLongPress);
-    img.addEventListener('mouseleave', cancelLongPress);
-  });
+      const changedTouch = event.changedTouches[0]
+      startPageSwipe(changedTouch.clientX, changedTouch.clientY)
+    },
+    { passive: true }
+  )
 
-  // Page swipe + edge tap
-  let x0 = null;
-  let y0 = null;
-  let t0 = 0;
+  viewportElement.addEventListener(
+    'touchend',
+    event => {
+      if (isLightboxOpen) {
+        return
+      }
 
-  function onStart(x, y) {
-    x0 = x;
-    y0 = y;
-    t0 = Date.now();
-  }
+      const changedTouch = event.changedTouches[0]
+      finishPageSwipe(changedTouch.clientX, changedTouch.clientY)
+    },
+    { passive: true }
+  )
 
-  function onEnd(x, y) {
-    if (x0 === null || y0 === null) return;
-    const dx = x - x0;
-    const dy = y - y0;
-    const dt = Date.now() - t0;
-    const MIN_DIST = 50;
-    const MAX_TIME = 800;
+  viewportElement.addEventListener(
+    'pointerup',
+    event => {
+      if (isLightboxOpen) {
+        return
+      }
 
-    if (dt <= MAX_TIME && Math.abs(dx) >= MIN_DIST && Math.abs(dx) > Math.abs(dy)) {
-      if (dx < 0) goTo(currentPage + 1);
-      else goTo(currentPage - 1);
+      if (event.pointerType === 'touch') {
+        handleEdgeTap(event.clientX)
+      }
+    },
+    { passive: true }
+  )
+
+  viewportElement.addEventListener('click', event => {
+    if (isLightboxOpen) {
+      return
     }
 
-    x0 = null;
-    y0 = null;
-  }
-
-  viewport.addEventListener('touchstart', (e) => {
-    if (lightboxOpen) return;
-    const t = e.changedTouches[0];
-    onStart(t.clientX, t.clientY);
-  }, { passive: true });
-
-  viewport.addEventListener('touchend', (e) => {
-    if (lightboxOpen) return;
-    const t = e.changedTouches[0];
-    onEnd(t.clientX, t.clientY);
-  }, { passive: true });
-
-  function handleEdgeTap(clientX) {
-    const w = window.innerWidth || 0;
-    if (clientX <= EDGE_TAP_ZONE) { goTo(currentPage - 1); return true; }
-    if (clientX >= (w - EDGE_TAP_ZONE)) { goTo(currentPage + 1); return true; }
-    return false;
-  }
-
-  viewport.addEventListener('pointerup', (e) => {
-    if (lightboxOpen) return;
-    if (e.pointerType === 'touch') handleEdgeTap(e.clientX);
-  }, { passive: true });
-
-  viewport.addEventListener('click', (e) => {
-    if (lightboxOpen) return;
-    if (e.target.closest('a, button')) return;
-    if (e.target.closest('img[data-base][data-path]')) return;
-    handleEdgeTap(e.clientX);
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && lightboxOpen) { closeLightbox(); return; }
-
-    if (lightboxOpen) {
-      if (e.key === 'ArrowLeft') { prevImage(); return; }
-      if (e.key === 'ArrowRight') { nextImage(); return; }
-      return;
+    if (event.target.closest('a, button')) {
+      return
     }
 
-    if (e.key === 'ArrowLeft') goTo(currentPage - 1);
-    if (e.key === 'ArrowRight') goTo(currentPage + 1);
-  });
+    if (event.target.closest('img[data-base][data-path]')) {
+      return
+    }
+
+    handleEdgeTap(event.clientX)
+  })
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && isLightboxOpen) {
+      closeLightbox()
+      return
+    }
+
+    if (isLightboxOpen) {
+      if (event.key === 'ArrowLeft') {
+        showPreviousLightboxImage()
+        return
+      }
+
+      if (event.key === 'ArrowRight') {
+        showNextLightboxImage()
+        return
+      }
+
+      return
+    }
+
+    if (event.key === 'ArrowLeft') {
+      goToPage(currentPageIndex - 1)
+    }
+
+    if (event.key === 'ArrowRight') {
+      goToPage(currentPageIndex + 1)
+    }
+  })
 
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./js/sw.js').catch(() => {
+        // Service worker support is optional for the app to work.
+      })
+    })
   }
 
-  initMode();
-  initInstallHint();
-  updateOfflineUI();
-  goTo(0);
-  refreshVisible();
+  initTheme()
+  initInstallHint()
+  updateOfflineUi()
+  goToPage(0)
+  refreshVisibleImages()
+
   window.setInterval(() => {
-    if (currentPage <= 2 && !lightboxOpen) refreshVisible();
-  }, REFRESH_MS);
-});
+    if (currentPageIndex <= 2 && !isLightboxOpen) {
+      refreshVisibleImages()
+    }
+  }, REFRESH_INTERVAL_MS)
+})
