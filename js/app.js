@@ -28,12 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const LAST_SUCCESSFUL_REFRESH_KEY = 'dwdLastSuccessfulRefresh'
   const THEME_STORAGE_KEY = 'dwdTheme'
 
-  const PAGE_NAMES = [
-    'Land',
-    'See / Seegang',
-    'HÃ¶henwetter',
-    'Seewetter Texte'
-  ]
+  const PAGE_NAMES = ['Land', 'See / Seegang', 'Höhenwetter', 'Seewetter Texte']
   const IMAGE_ELEMENTS = Array.from(
     document.querySelectorAll('img[data-base][data-path]')
   )
@@ -100,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function formatTimestamp (timestamp) {
     if (!timestamp) {
-      return 'â€”'
+      return '-'
     }
 
     try {
@@ -110,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         second: '2-digit'
       })
     } catch {
-      return 'â€”'
+      return '-'
     }
   }
 
@@ -181,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyTheme (theme) {
     document.documentElement.setAttribute('data-theme', theme)
 
-    const themeIcon = theme === 'day' ? 'â—' : theme === 'night' ? 'â˜¾' : 'â—‘'
+    const themeIcon = theme === 'day' ? '' : theme === 'night' ? 'â˜¾' : 'â—‘'
 
     if (themeButton) {
       themeButton.textContent = themeIcon
@@ -269,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (loadingCount > 0) {
-      pageSummaryElement.textContent = `${loadingCount} lÃ¤dt`
+      pageSummaryElement.textContent = `${loadingCount} lädt`
       return
     }
 
@@ -576,15 +571,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function getUpperAirInfoText (imagePath) {
     if (imagePath.includes('ico_500ht')) {
-      return '500 hPa (~5,5 km): GroÃŸwetterlage & Steuerung. Jets und Trog/Keil zeigen Entwicklung und Zugbahnen.'
+      return '500 hPa (~5,5 km): Großwetterlage & Steuerung. Jets und Trog/Keil zeigen Entwicklung und Zugbahnen.'
     }
 
     if (imagePath.includes('ico_700rf')) {
-      return '700 hPa (~3 km): Relative Feuchte. Gut fÃ¼r mittelhohe BewÃ¶lkung und Niederschlagstendenzen.'
+      return '700 hPa (~3 km): Relative Feuchte. Gut für mittelhohe Bewölkung und Niederschlagstendenzen.'
     }
 
     if (imagePath.includes('ico_850ht')) {
-      return '850 hPa (~1,5 km): Luftmasse und Temperatur/Advektion. Gut fÃ¼r Boden-Trends und FrontnÃ¤he.'
+      return '850 hPa (~1,5 km): Luftmasse und Temperatur/Advektion. Gut für Boden-Trends und Frontnähe.'
     }
 
     return ''

@@ -42,9 +42,8 @@
 .lightbox {
   position: fixed;
   inset: 0;
-  display: none;
 
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
 
@@ -52,10 +51,18 @@
   z-index: var(--z-lightbox);
   overflow: hidden;
   touch-action: none;
+
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s;
 }
 
 .lightbox.open {
   display: flex;
+  pointer-events: auto;
+  visibility: visible;
+  opacity: 1;
 }
 
 .lightbox img {
