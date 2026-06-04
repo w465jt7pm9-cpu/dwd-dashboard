@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyTheme (theme) {
     document.documentElement.setAttribute('data-theme', theme)
 
-    const themeIcon = theme === 'day' ? '' : theme === 'night' ? 'â˜¾' : 'â—‘'
+    const themeIcon = theme === 'day' ? '☀' : theme === 'night' ? '🌙' : '✨'
 
     if (themeButton) {
       themeButton.textContent = themeIcon
@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    pageSummaryElement.textContent = 'â€”'
+    pageSummaryElement.textContent = '—'
   }
 
   function setCardState (imageElement, state) {
@@ -288,15 +288,15 @@ document.addEventListener('DOMContentLoaded', () => {
       badgeElement.className = `card-status card-status--${state}`
 
       if (state === 'loading') {
-        badgeElement.textContent = 'â³'
+        badgeElement.textContent = '↻'
       }
 
       if (state === 'error') {
-        badgeElement.textContent = 'âœ•'
+        badgeElement.textContent = '✖'
       }
 
       if (state === 'offline') {
-        badgeElement.textContent = 'â—‹'
+        badgeElement.textContent = '•'
       }
     }
 

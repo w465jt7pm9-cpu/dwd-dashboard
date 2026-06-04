@@ -38,6 +38,29 @@
   pointer-events: none;
 }
 
+/* Status modifiers */
+.card-status--loading {
+  background: var(--color-loading);
+  color: #000;
+  animation: status-pulse 1.2s ease-in-out infinite;
+}
+
+.card-status--error {
+  background: var(--color-error);
+  color: #000;
+}
+
+.card-status--offline {
+  background: var(--color-offline);
+  color: #000;
+}
+
+@keyframes status-pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 /* LIGHTBOX */
 .lightbox {
   position: fixed;
