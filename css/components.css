@@ -157,12 +157,22 @@
   align-items: center;
   justify-content: center;
 
-  background: var(--color-control-bg);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: var(--radius-pill);
+  color: var(--color-fg);
+  font-size: var(--font-size-lightbox-nav);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 
   opacity: 0;
-  transition: opacity var(--transition-fast);
+  transition: opacity var(--transition-fast), transform var(--transition-fast), background-color var(--transition-fast);
   z-index: var(--z-lightbox-nav);
+}
+
+.lb-nav:hover,
+.lb-nav:focus-visible {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-50%) scale(1.05);
 }
 
 /* 🔥 FIX: horizontale Position */
