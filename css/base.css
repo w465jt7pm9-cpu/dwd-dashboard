@@ -1,0 +1,4 @@
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{display:flex;flex-direction:column;overflow:hidden;background:var(--color-bg);color:var(--color-fg);font-family:var(--font-family-base);-webkit-text-size-adjust:100%}
+a{color:inherit}button{font:inherit}

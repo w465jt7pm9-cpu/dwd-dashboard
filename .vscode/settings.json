@@ -1,0 +1,8 @@
+{
+  "editor.formatOnSave": true,
+  "files.autoSave": "afterDelay",
+  "editor.defaultFormatter": "numso.prettier-standard-vscode",
+  "editor.tabSize": 2,
+  "editor.minimap.enabled": false,
+  "editor.wordWrap": "on"
+}

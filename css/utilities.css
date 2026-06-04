@@ -1,0 +1,2 @@
+.is-hidden{display:none!important}.safe-top{padding-top:var(--safe-top)}.safe-bottom{padding-bottom:var(--safe-bottom)}
+@media (max-width:480px){.lb-nav{width:40px;height:40px;font-size:26px}.icon-btn{width:30px;height:30px}.topbar__actions{gap:4px}.topbar__summary{display:none}}
