@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Editor
+.vscode/
+
+# Logs / temporär
+*.log
+*.tmp
+*.bak
+
+# Optional (nur falls später genutzt)
+node_modules/
+dist/
+build/
+coverage/
+
+# Environment
+.env
+.env.local
+
+# Cache allgemein
+.cache/
+
+# System
+*.swo
+*.swp
