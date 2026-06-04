@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (currentPageIndex === TEXT_PAGE_INDEX) {
-      pageSummaryElement.textContent = ''
+      pageSummaryElement.classList.add('is-hidden')
       return
     }
 
@@ -279,22 +279,27 @@ document.addEventListener('DOMContentLoaded', () => {
       pageState => pageState.state === 'loading'
     ).length
 
+    // Show summary only when there is something to report
     if (offlineCount > 0) {
       pageSummaryElement.textContent = `${offlineCount} offline`
+      pageSummaryElement.classList.remove('is-hidden')
       return
     }
 
     if (errorCount > 0) {
       pageSummaryElement.textContent = `${errorCount} Fehler`
+      pageSummaryElement.classList.remove('is-hidden')
       return
     }
 
     if (loadingCount > 0) {
       pageSummaryElement.textContent = `${loadingCount} lädt`
+      pageSummaryElement.classList.remove('is-hidden')
       return
     }
 
-    pageSummaryElement.textContent = '—'
+    // Nothing to report -> hide the summary
+    pageSummaryElement.classList.add('is-hidden')
   }
 
   function setCardState (imageElement, state) {
