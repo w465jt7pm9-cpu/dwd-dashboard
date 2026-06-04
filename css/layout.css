@@ -1,6 +1,12 @@
-/* =========================
-   TOPBAR
-   ========================= */
+/* =========================================
+   LAYOUT SYSTEM
+   -----------------------------------------
+   Basis-Layoutregelung für App + Navigation
+   Enthält:
+   - Topbar
+   - Layout
+   - Mobile Fixes
+   ========================================= */
 
 .topbar {
   height: calc(var(--topbar-height) + var(--safe-top));
