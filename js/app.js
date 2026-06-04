@@ -173,6 +173,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function openExternalLink (url) {
+    if (!url) {
+      return
+    }
+
+    if (isStandaloneApp() && isiOSSafari()) {
+      window.open(url, '_blank')
+      return
+    }
+
+    window.location.href = url
+  }
+
+  function initExternalLinks () {
+    const linkButtons = document.querySelectorAll('a.link-btn')
+    linkButtons.forEach(link => {
+      link.addEventListener('click', event => {
+        if (isStandaloneApp() && isiOSSafari()) {
+          event.preventDefault()
+          openExternalLink(link.href)
+        }
+      })
+    })
+  }
+
   function applyTheme (theme) {
     document.documentElement.setAttribute('data-theme', theme)
 
@@ -1065,6 +1090,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initTheme()
   initInstallHint()
+  initExternalLinks()
   updateOfflineUi()
   goToPage(0)
   refreshVisibleImages()
