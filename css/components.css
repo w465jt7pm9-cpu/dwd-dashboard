@@ -51,6 +51,7 @@
   background: var(--color-lightbox);
   z-index: var(--z-lightbox);
   overflow: hidden;
+  touch-action: none;
 }
 
 .lightbox.open {
@@ -61,11 +62,10 @@
   max-width: 96vw;
   max-height: 96vh;
 
-  display: block;
-  width: auto;
-  height: auto;
+  transform-origin: center center;
 
-  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 /* NAV ARROWS */
