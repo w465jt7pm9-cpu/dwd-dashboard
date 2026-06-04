@@ -221,18 +221,19 @@ document.addEventListener('DOMContentLoaded', () => {
       theme = 'day'
     }
 
+    // Map legacy or unknown values to supported themes
+    if (theme === 'dim') {
+      theme = 'night'
+    }
+
     applyTheme(theme)
   }
 
   function toggleTheme () {
     const currentTheme =
       document.documentElement.getAttribute('data-theme') || 'day'
-    const nextTheme =
-      currentTheme === 'day'
-        ? 'night'
-        : currentTheme === 'night'
-        ? 'dim'
-        : 'day'
+    // Toggle only between day and night
+    const nextTheme = currentTheme === 'day' ? 'night' : 'day'
 
     try {
       localStorage.setItem(THEME_STORAGE_KEY, nextTheme)

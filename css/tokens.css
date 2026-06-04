@@ -87,24 +87,8 @@
   --color-link-border: rgba(80, 120, 255, 0.22);
 }
 
-/* Night theme: dark, low-glare palette for night driving */
+/* Night theme: warm, dim red palette for night driving (low glare) */
 :root[data-theme='night'] {
-  --color-bg: #000003;
-  --color-fg: #ffffff;
-  --color-glass: rgba(0, 0, 0, 0.55);
-  --color-overlay: rgba(0, 0, 0, 0.8);
-  --color-lightbox: rgba(0, 0, 0, 0.96);
-  --color-border-subtle: rgba(255, 255, 255, 0.08);
-  --color-control-bg: rgba(255, 255, 255, 0.04);
-  --color-control-hover: rgba(255, 255, 255, 0.08);
-  --color-summary: rgba(255, 255, 255, 0.06);
-  --color-link-bg: rgba(80, 120, 255, 0.18);
-  --color-link-border: rgba(150, 180, 255, 0.28);
-}
-
-/* Dim theme: intermediate darker-but-warm mode */
-:root[data-theme='dim'] {
-  /* Warm, dim red palette for night driving (low glare) */
   --color-bg: #070101; /* almost black with warm hint */
   --color-fg: #ffdccd; /* warm off-white for reduced glare */
   --color-glass: rgba(40, 8, 8, 0.55); /* warm translucent topbar */
@@ -116,3 +100,5 @@
   --color-summary: rgba(255, 200, 170, 0.06);
   --color-link-bg: rgba(180, 80, 60, 0.12);
   --color-link-border: rgba(180, 80, 60, 0.20);
+}
+

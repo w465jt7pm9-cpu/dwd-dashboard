@@ -20,6 +20,12 @@
   cursor: zoom-in;
 }
 
+/* Night-mode image tint: warm, slightly red, dimmed for low-glare night driving */
+:root[data-theme="night"] .card img,
+:root[data-theme="night"] .lightbox img {
+  filter: sepia(0.18) hue-rotate(-15deg) saturate(0.85) brightness(0.82) contrast(0.95);
+}
+
 /* STATUS BADGE */
 .card-status {
   position: absolute;
