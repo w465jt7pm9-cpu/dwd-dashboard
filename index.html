@@ -1,53 +1,474 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#000000">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Wetter">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="format-detection" content="telephone=no">
-  <title>DWD Wetterkarten – Dashboard</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" sizes="180x180" href="images/icon-180.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="images/icon-512.png">
-  <link rel="stylesheet" href="css/tokens.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/utilities.css">
-</head>
-<body>
-<header class="topbar safe-top" id="topbar">
-  <div class="topbar__left">
-    <div class="topbar__title-wrap">
-      <div class="topbar__title" id="pageTitle">Land</div>
-      <div class="topbar__meta" id="status">—</div>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Wetter" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <title>DWD Wetterkarten – Dashboard</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" sizes="180x180" href="images/icon-180.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="images/icon-192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="images/icon-512.png"
+    />
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/utilities.css" />
+  </head>
+  <body>
+    <header class="topbar safe-top" id="topbar">
+      <div class="topbar__left">
+        <div class="topbar__title-wrap">
+          <div class="topbar__title" id="pageTitle">Land</div>
+          <div class="topbar__meta" id="status">—</div>
+        </div>
+        <div class="topbar__summary" id="pageSummary" aria-live="polite">—</div>
+      </div>
+      <div class="topbar__actions">
+        <button
+          class="icon-btn"
+          id="prevBtn"
+          type="button"
+          aria-label="Vorherige Seite"
+          title="Vorherige Seite"
+        >
+          ‹
+        </button>
+        <button
+          class="icon-btn"
+          id="refreshBtn"
+          type="button"
+          aria-label="Aktualisieren"
+          title="Aktualisieren"
+        >
+          ↻
+        </button>
+        <button
+          class="icon-btn"
+          id="modeBtn"
+          type="button"
+          aria-label="Bordmodus"
+          title="Bordmodus"
+        >
+          ◐
+        </button>
+        <button
+          class="icon-btn"
+          id="nextBtn"
+          type="button"
+          aria-label="Nächste Seite"
+          title="Nächste Seite"
+        >
+          ›
+        </button>
+      </div>
+    </header>
+    <div
+      class="offline-banner is-hidden"
+      id="offlineBanner"
+      role="status"
+      aria-live="polite"
+    >
+      Offline · letzter Stand <span id="offlineStamp">—</span>
     </div>
-    <div class="topbar__summary" id="pageSummary" aria-live="polite">—</div>
-  </div>
-  <div class="topbar__actions">
-    <button class="icon-btn" id="prevBtn" type="button" aria-label="Vorherige Seite" title="Vorherige Seite">‹</button>
-    <button class="icon-btn" id="refreshBtn" type="button" aria-label="Aktualisieren" title="Aktualisieren">↻</button>
-    <button class="icon-btn" id="modeBtn" type="button" aria-label="Bordmodus" title="Bordmodus">◐</button>
-    <button class="icon-btn" id="nextBtn" type="button" aria-label="Nächste Seite" title="Nächste Seite">›</button>
-  </div>
-</header>
-<div class="offline-banner is-hidden" id="offlineBanner" role="status" aria-live="polite">Offline · letzter Stand <span id="offlineStamp">—</span></div>
-<div class="app-shell safe-bottom">
-  <div class="install-hint is-hidden" id="installHint" role="note" aria-live="polite"><span>Safari → Teilen → Zum Home-Bildschirm</span><button class="install-hint__close" id="installHintClose" type="button" aria-label="Hinweis schließen">×</button></div>
-  <div class="viewport" id="viewport"><div class="carousel" id="carousel">
-    <section class="page" data-page="0" aria-label="Land"><main class="dashboard"><section class="dashboard__top"><figure class="card"><img data-base="WX_URL" data-path="bwk_bodendruck_na_ana.png" alt="Bodenanalyse Europa"></figure><div class="dashboard__top-right"><figure class="card"><img data-base="WX_URL" data-path="ico_tkboden_na_v36.png" alt="Europa +36h (12 Uhr Vortag)"></figure><figure class="card"><img data-base="WX_URL" data-path="ico_tkboden_na_036.png" alt="Europa +36h (00 UTC)"></figure><figure class="card"><img data-base="WX_URL" data-path="ico_tkboden_na_048.png" alt="Europa +48h"></figure><figure class="card"><img data-base="WX_URL" data-path="ico_tkboden_na_060.png" alt="Europa +60h"></figure><!-- <figure class="card"><img data-base="WX_URL" data-path="ico_tkboden_na_084.png" alt="Europa +84h"></figure> --></div></section><section class="dashboard__bottom"><figure class="card"><img data-base="WX_ROOT" data-path="aktuell/deutschland/bilder/wx_brd_akt.jpg" alt="Deutschland aktuell"></figure><figure class="card"><img data-base="WX_ROOT" data-path="wv_allg/deutschland/bilder/vhs_brd_heutespaet.jpg" alt="Heute spät"></figure><figure class="card"><img data-base="WX_ROOT" data-path="wv_allg/deutschland/bilder/vhs_brd_morgenfrueh.jpg" alt="Morgen früh"></figure><figure class="card"><img data-base="WX_ROOT" data-path="wv_allg/deutschland/bilder/vhs_brd_morgenspaet.jpg" alt="Morgen spät"></figure><figure class="card"><img data-base="WX_ROOT" data-path="wv_allg/deutschland/bilder/vhs_brd_uebermorgenfrueh.jpg" alt="Übermorgen früh"></figure></section></main></section>
-    <section class="page" data-page="1" aria-label="See / Seegang"><main class="sea-grid"><section class="sea-row" aria-label="Ostatlantik"><figure class="card"><img data-base="WX_SEE" data-path="oantik_00.png" alt="Ostatlantik +00"></figure><figure class="card"><img data-base="WX_SEE" data-path="oantik_24.png" alt="Ostatlantik +24"></figure><figure class="card"><img data-base="WX_SEE" data-path="oantik_48.png" alt="Ostatlantik +48"></figure><figure class="card"><img data-base="WX_SEE" data-path="oantik_72.png" alt="Ostatlantik +72"></figure></section><section class="sea-row" aria-label="Westliches Mittelmeer"><figure class="card"><img data-base="WX_SEE" data-path="wmitme_00.png" alt="Westliches Mittelmeer +00"></figure><figure class="card"><img data-base="WX_SEE" data-path="wmitme_24.png" alt="Westliches Mittelmeer +24"></figure><figure class="card"><img data-base="WX_SEE" data-path="wmitme_48.png" alt="Westliches Mittelmeer +48"></figure><figure class="card"><img data-base="WX_SEE" data-path="wmitme_72.png" alt="Westliches Mittelmeer +72"></figure></section><section class="sea-row" aria-label="Östliches Mittelmeer"><figure class="card"><img data-base="WX_SEE" data-path="omitme_00.png" alt="Östliches Mittelmeer +00"></figure><figure class="card"><img data-base="WX_SEE" data-path="omitme_24.png" alt="Östliches Mittelmeer +24"></figure><figure class="card"><img data-base="WX_SEE" data-path="omitme_48.png" alt="Östliches Mittelmeer +48"></figure><figure class="card"><img data-base="WX_SEE" data-path="omitme_72.png" alt="Östliches Mittelmeer +72"></figure></section></main></section>
-    <section class="page" data-page="2" aria-label="Höhenwetter"><main class="upperair-grid"><section class="upper-row" aria-label="500 hPa"><figure class="card"><img data-base="WX_URL" data-path="ico_500ht_na_ana.png" alt="500 hPa Analyse"></figure><figure class="card"><img data-base="WX_URL" data-path="ico_500ht_na_024.png" alt="500 hPa +24"></figure><figure class="card"><img data-base="WX_URL" data-path="ico_500ht_na_048.png" alt="500 hPa +48"></figure><figure class="card"><img data-base="WX_URL" data-path="ico_500ht_na_072.png" alt="500 hPa +72"></figure></section><section class="upper-row" aria-label="700 hPa"><figure class="card"><img data-base="WX_URL" data-path="ico_700rf_na_ana.png" alt="700 hPa Analyse"></figure><figure class="card"><img data-base="WX_URL" data-path="ico_700rf_na_024.png" alt="700 hPa +24"></figure><figure class="card"><img data-base="WX_URL" data-path="ico_700rf_na_048.png" alt="700 hPa +48"></figure><figure class="card"><img data-base="WX_URL" data-path="ico_700rf_na_072.png" alt="700 hPa +72"></figure></section><section class="upper-row" aria-label="850 hPa"><figure class="card"><img data-base="WX_URL" data-path="ico_850ht_na_ana.png" alt="850 hPa Analyse"></figure><figure class="card"><img data-base="WX_URL" data-path="ico_850ht_na_024.png" alt="850 hPa +24"></figure><figure class="card"><img data-base="WX_URL" data-path="ico_850ht_na_048.png" alt="850 hPa +48"></figure><figure class="card"><img data-base="WX_URL" data-path="ico_850ht_na_072.png" alt="850 hPa +72"></figure></section></main></section>
-    <section class="page" data-page="3" aria-label="Seewetter Texte"><main class="links-page"><div class="links-title">Seewetter Texte</div><a class="link-btn" href="https://www.dwd.de/DE/leistungen/seewetternordostsee/seewetternordostsee.html" target="_blank" rel="noopener noreferrer">Nord-/Ostsee Bericht</a><a class="link-btn" href="https://www.dwd.de/DE/leistungen/kuestenseewetterbericht/kuestenseewetterbericht.html" target="_blank" rel="noopener noreferrer">Küstenseewetterbericht</a><a class="link-btn" href="https://www.dwd.de/DE/leistungen/mittelfristseewetterbericht/mittelfristseewetterbericht.html" target="_blank" rel="noopener noreferrer">Mittelfristseewetterbericht</a><a class="link-btn" href="https://dwd.de/DE/leistungen/seevorhersageostsee/seevorhersagenostsee.html" target="_blank" rel="noopener noreferrer">Ostsee 3 Tage</a><a class="link-btn" href="https://www.dwd.de/DE/leistungen/seevorhersagenordsee/seevorhersagennordsee.html" target="_blank" rel="noopener noreferrer">Nordsee 3 Tage</a><div class="links-hint">Tipp: Auf iPad/iPhone in Safari „Zum Home-Bildschirm“ nutzen.</div></main></section>
-  </div></div>
-</div>
-<nav class="thumbbar safe-bottom" aria-label="Schnellaktionen"><button class="thumbbar__btn" id="thumbPrev" type="button" aria-label="Vorherige Seite">‹</button><button class="thumbbar__btn" id="thumbRefresh" type="button" aria-label="Aktualisieren">↻</button><button class="thumbbar__btn" id="thumbMode" type="button" aria-label="Bordmodus">◐</button><button class="thumbbar__btn" id="thumbNext" type="button" aria-label="Nächste Seite">›</button></nav>
-<div class="lightbox" id="lightbox" aria-hidden="true"><img id="lightboxImg" alt="Vergrößerte Wetterkarte"><button class="lb-nav lb-prev" id="lbPrev" type="button" aria-label="Vorheriges Bild">‹</button><button class="lb-nav lb-next" id="lbNext" type="button" aria-label="Nächstes Bild">›</button></div>
-<div class="dim-overlay" id="dimOverlay" aria-hidden="true"></div>
-<script src="js/app.js"></script>
-</body>
+    <div class="app-shell safe-bottom">
+      <div
+        class="install-hint is-hidden"
+        id="installHint"
+        role="note"
+        aria-live="polite"
+      >
+        <span>Safari → Teilen → Zum Home-Bildschirm</span
+        ><button
+          class="install-hint__close"
+          id="installHintClose"
+          type="button"
+          aria-label="Hinweis schließen"
+        >
+          ×
+        </button>
+      </div>
+      <div class="viewport" id="viewport">
+        <div class="carousel" id="carousel">
+          <section class="page" data-page="0" aria-label="Land">
+            <main class="dashboard">
+              <section class="dashboard__top">
+                <figure class="card">
+                  <img
+                    data-base="WX_URL"
+                    data-path="bwk_bodendruck_na_ana.png"
+                    alt="Bodenanalyse Europa"
+                  />
+                </figure>
+                <div class="dashboard__top-right">
+                  <figure class="card">
+                    <img
+                      data-base="WX_URL"
+                      data-path="ico_tkboden_na_v36.png"
+                      alt="Europa +36h (12 Uhr Vortag)"
+                    />
+                  </figure>
+                  <figure class="card">
+                    <img
+                      data-base="WX_URL"
+                      data-path="ico_tkboden_na_036.png"
+                      alt="Europa +36h (00 UTC)"
+                    />
+                  </figure>
+                  <figure class="card">
+                    <img
+                      data-base="WX_URL"
+                      data-path="ico_tkboden_na_048.png"
+                      alt="Europa +48h"
+                    />
+                  </figure>
+                  <figure class="card">
+                    <img
+                      data-base="WX_URL"
+                      data-path="ico_tkboden_na_060.png"
+                      alt="Europa +60h"
+                    />
+                  </figure>
+                </div>
+              </section>
+              <section class="dashboard__bottom">
+                <figure class="card">
+                  <img
+                    data-base="WX_ROOT"
+                    data-path="aktuell/deutschland/bilder/wx_brd_akt.jpg"
+                    alt="Deutschland aktuell"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_ROOT"
+                    data-path="wv_allg/deutschland/bilder/vhs_brd_heutespaet.jpg"
+                    alt="Heute spät"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_ROOT"
+                    data-path="wv_allg/deutschland/bilder/vhs_brd_morgenfrueh.jpg"
+                    alt="Morgen früh"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_ROOT"
+                    data-path="wv_allg/deutschland/bilder/vhs_brd_morgenspaet.jpg"
+                    alt="Morgen spät"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_ROOT"
+                    data-path="wv_allg/deutschland/bilder/vhs_brd_uebermorgenfrueh.jpg"
+                    alt="Übermorgen früh"
+                  />
+                </figure>
+              </section>
+            </main>
+          </section>
+          <section class="page" data-page="1" aria-label="See / Seegang">
+            <main class="sea-grid">
+              <section class="sea-row" aria-label="Ostatlantik">
+                <figure class="card">
+                  <img
+                    data-base="WX_SEE"
+                    data-path="oantik_00.png"
+                    alt="Ostatlantik +00"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_SEE"
+                    data-path="oantik_24.png"
+                    alt="Ostatlantik +24"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_SEE"
+                    data-path="oantik_48.png"
+                    alt="Ostatlantik +48"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_SEE"
+                    data-path="oantik_72.png"
+                    alt="Ostatlantik +72"
+                  />
+                </figure>
+              </section>
+              <section class="sea-row" aria-label="Westliches Mittelmeer">
+                <figure class="card">
+                  <img
+                    data-base="WX_SEE"
+                    data-path="wmitme_00.png"
+                    alt="Westliches Mittelmeer +00"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_SEE"
+                    data-path="wmitme_24.png"
+                    alt="Westliches Mittelmeer +24"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_SEE"
+                    data-path="wmitme_48.png"
+                    alt="Westliches Mittelmeer +48"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_SEE"
+                    data-path="wmitme_72.png"
+                    alt="Westliches Mittelmeer +72"
+                  />
+                </figure>
+              </section>
+              <section class="sea-row" aria-label="Östliches Mittelmeer">
+                <figure class="card">
+                  <img
+                    data-base="WX_SEE"
+                    data-path="omitme_00.png"
+                    alt="Östliches Mittelmeer +00"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_SEE"
+                    data-path="omitme_24.png"
+                    alt="Östliches Mittelmeer +24"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_SEE"
+                    data-path="omitme_48.png"
+                    alt="Östliches Mittelmeer +48"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_SEE"
+                    data-path="omitme_72.png"
+                    alt="Östliches Mittelmeer +72"
+                  />
+                </figure>
+              </section>
+            </main>
+          </section>
+          <section class="page" data-page="2" aria-label="Höhenwetter">
+            <main class="upperair-grid">
+              <section class="upper-row" aria-label="500 hPa">
+                <figure class="card">
+                  <img
+                    data-base="WX_URL"
+                    data-path="ico_500ht_na_ana.png"
+                    alt="500 hPa Analyse"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_URL"
+                    data-path="ico_500ht_na_024.png"
+                    alt="500 hPa +24"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_URL"
+                    data-path="ico_500ht_na_048.png"
+                    alt="500 hPa +48"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_URL"
+                    data-path="ico_500ht_na_072.png"
+                    alt="500 hPa +72"
+                  />
+                </figure>
+              </section>
+              <section class="upper-row" aria-label="700 hPa">
+                <figure class="card">
+                  <img
+                    data-base="WX_URL"
+                    data-path="ico_700rf_na_ana.png"
+                    alt="700 hPa Analyse"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_URL"
+                    data-path="ico_700rf_na_024.png"
+                    alt="700 hPa +24"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_URL"
+                    data-path="ico_700rf_na_048.png"
+                    alt="700 hPa +48"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_URL"
+                    data-path="ico_700rf_na_072.png"
+                    alt="700 hPa +72"
+                  />
+                </figure>
+              </section>
+              <section class="upper-row" aria-label="850 hPa">
+                <figure class="card">
+                  <img
+                    data-base="WX_URL"
+                    data-path="ico_850ht_na_ana.png"
+                    alt="850 hPa Analyse"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_URL"
+                    data-path="ico_850ht_na_024.png"
+                    alt="850 hPa +24"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_URL"
+                    data-path="ico_850ht_na_048.png"
+                    alt="850 hPa +48"
+                  />
+                </figure>
+                <figure class="card">
+                  <img
+                    data-base="WX_URL"
+                    data-path="ico_850ht_na_072.png"
+                    alt="850 hPa +72"
+                  />
+                </figure>
+              </section>
+            </main>
+          </section>
+          <section class="page" data-page="3" aria-label="Seewetter Texte">
+            <main class="links-page">
+              <div class="links-title">Seewetter Texte</div>
+              <a
+                class="link-btn"
+                href="https://www.dwd.de/DE/leistungen/seewetternordostsee/seewetternordostsee.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Nord-/Ostsee Bericht</a
+              ><a
+                class="link-btn"
+                href="https://www.dwd.de/DE/leistungen/kuestenseewetterbericht/kuestenseewetterbericht.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Küstenseewetterbericht</a
+              ><a
+                class="link-btn"
+                href="https://www.dwd.de/DE/leistungen/mittelfristseewetterbericht/mittelfristseewetterbericht.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Mittelfristseewetterbericht</a
+              ><a
+                class="link-btn"
+                href="https://dwd.de/DE/leistungen/seevorhersageostsee/seevorhersagenostsee.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Ostsee 3 Tage</a
+              ><a
+                class="link-btn"
+                href="https://www.dwd.de/DE/leistungen/seevorhersagenordsee/seevorhersagennordsee.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Nordsee 3 Tage</a
+              >
+              <div class="links-hint">
+                Tipp: Auf iPad/iPhone in Safari „Zum Home-Bildschirm“ nutzen.
+              </div>
+            </main>
+          </section>
+        </div>
+      </div>
+    </div>
+    <nav class="thumbbar safe-bottom" aria-label="Schnellaktionen">
+      <button
+        class="thumbbar__btn"
+        id="thumbPrev"
+        type="button"
+        aria-label="Vorherige Seite"
+      >
+        ‹</button
+      ><button
+        class="thumbbar__btn"
+        id="thumbRefresh"
+        type="button"
+        aria-label="Aktualisieren"
+      >
+        ↻</button
+      ><button
+        class="thumbbar__btn"
+        id="thumbMode"
+        type="button"
+        aria-label="Bordmodus"
+      >
+        ◐</button
+      ><button
+        class="thumbbar__btn"
+        id="thumbNext"
+        type="button"
+        aria-label="Nächste Seite"
+      >
+        ›
+      </button>
+    </nav>
+    <div class="lightbox" id="lightbox" aria-hidden="true">
+      <img id="lightboxImg" alt="Vergrößerte Wetterkarte" /><button
+        class="lb-nav lb-prev"
+        id="lbPrev"
+        type="button"
+        aria-label="Vorheriges Bild"
+      >
+        ‹</button
+      ><button
+        class="lb-nav lb-next"
+        id="lbNext"
+        type="button"
+        aria-label="Nächstes Bild"
+      >
+        ›
+      </button>
+    </div>
+    <div class="dim-overlay" id="dimOverlay" aria-hidden="true"></div>
+    <script src="js/app.js"></script>
+  </body>
 </html>

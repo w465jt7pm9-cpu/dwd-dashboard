@@ -44,6 +44,7 @@
   inset: 0;
   display: none;
 
+  display: flex;
   align-items: center;
   justify-content: center;
 
@@ -82,6 +83,16 @@
 
   opacity: 0;
   transition: opacity var(--transition-fast);
+  z-index: var(--z-lightbox-nav);
+}
+
+/* 🔥 FIX: horizontale Position */
+.lb-prev {
+  left: 12px;
+}
+
+.lb-next {
+  right: 12px;
 }
 
 .lightbox.lb-show .lb-nav {
