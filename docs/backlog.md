@@ -196,6 +196,98 @@ Besonders kritisch:
 
 ---
 
+## 🎨 US-007 – Visuelle Qualität und ruhige Darstellung optimieren
+
+**Status:** TODO  
+**Priorität:** Hoch
+
+👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „UI-Polish / Visual Refinement“
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich eine ruhige, klare und visuell hochwertige Darstellung der Wetterkarten  
+damit ich die Inhalte schnell erfassen kann, ohne durch UI-Elemente oder harte Übergänge abgelenkt zu werden
+
+---
+
+### 🎯 Zielbild
+
+- maximale Fokussierung auf die Bilder
+- minimale, aber klare visuelle Rückmeldungen
+- konsistente und „ruhige“ Benutzeroberfläche
+
+---
+
+### ✅ Akzeptanzkriterien
+
+**Karten-Darstellung**
+
+- [ ] Karten haben abgerundete Ecken (z. B. Border-Radius)
+- [ ] Karten haben einen subtilen Schatten (Depth-Effekt)
+- [ ] Keine visuellen Artefakte beim Skalieren oder Wechseln
+
+---
+
+**Bild-Ladevorgang**
+
+- [ ] Bilder erscheinen weich (Fade-in statt hartem Laden)
+- [ ] Keine abrupten Layout-Sprünge
+- [ ] Ladezustände bleiben über Badge erkennbar
+
+---
+
+**Navigation / Animation**
+
+- [ ] Seitenwechsel erfolgt mit sanfter Animation
+- [ ] Keine ruckartigen Bewegungen
+- [ ] Verhalten konsistent auf Desktop und Touch
+
+---
+
+**Status-Badges**
+
+- [ ] Einheitliche Position (oben rechts auf Karten)
+- [ ] einheitlicher Stil (Größe, Farbe, Transparenz)
+- [ ] vorbereitet für zukünftige Zustände (z. B. ⚠, 🔴)
+
+---
+
+**Interaktion**
+
+- [ ] Dezente Hover-Effekte (nur Desktop)
+- [ ] Edge-Tap bleibt erhalten, optional mit leichtem visuellem Feedback
+- [ ] Keine zusätzlichen sichtbaren UI-Elemente
+
+---
+
+**Dark Mode**
+
+- [ ] Darstellung ist im hellen und dunklen Modus konsistent
+- [ ] Farben wirken in beiden Modi angenehm und nicht grell
+
+---
+
+### 🧠 Definition of Done
+
+- UI wirkt „ruhig“ und nicht technisch oder unruhig
+- Nutzer kann sich vollständig auf die Bilder konzentrieren
+- Übergänge und Interaktionen wirken flüssig
+- keine zusätzliche UI-Komplexität wurde eingeführt
+
+---
+
+### 💡 Nutzen
+
+- bessere Lesbarkeit der Wetterkarten
+- geringere kognitive Belastung
+- hochwertiger Gesamteindruck
+- ideale Grundlage für spätere „smarte“ Features (z. B. Wind-gegen-Strom)
+
+---
+
 # ✅ DONE (DETAILS / HISTORIE)
 
 _(hierher verschieben, wenn erledigt)_

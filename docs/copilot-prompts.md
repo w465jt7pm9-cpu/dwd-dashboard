@@ -322,7 +322,7 @@ Erkennen und visuelles Markieren von kritischen Seebedingungen, wenn Wind und Ge
 
 ## Copilot Prompt
 
-````text
+```text
 Implementiere eine minimal-invasive Erkennung von „Wind gegen Strom“-Situationen im bestehenden DWD Dashboard (Vanilla JavaScript).
 
 Kontext:
@@ -424,8 +424,117 @@ Vorgehen:
 
 Kurze Kommentare im Code hinzufügen.
 Keine unnötigen Refactorings durchführen.
+```
 
 ---
+
+---
+
+---
+
+# 🎨 Feature: UI-Polish / Visual Refinement
+
+## Ziel
+
+Verbesserung der visuellen Qualität und Wahrnehmung des Dashboards, ohne zusätzliche UI-Komplexität einzuführen.
+
+---
+
+## Copilot Prompt
+
+```text
+Verbessere die visuelle Darstellung des bestehenden DWD Dashboards minimal-invasiv.
+
+Kontext:
+- Vanilla JavaScript, kein Framework
+- Kartenstruktur basiert auf .card
+- Navigation über Carousel
+- bestehende Badge-Logik (.card-status)
+- Fokus liegt auf minimaler UI und Bilddarstellung
+
+Ziel:
+Das UI soll ruhiger, moderner und hochwertiger erscheinen, ohne zusätzliche Bedienelemente einzuführen.
+
+---
+
+1. Karten-Layout
+
+- Ergänze:
+  - border-radius (ca. 10–12px)
+  - subtiler box-shadow
+- keine Layout-Änderung
+
+---
+
+2. Bild-Laden (wichtig)
+
+- Implementiere Fade-in:
+  - initial opacity: 0
+  - nach load: opacity → 1
+- nutze vorhandene load-Events
+
+---
+
+3. Navigation
+
+- Ergänze CSS:
+  - transition für carousel transform
+- Dauer:
+  - ca. 200–300ms
+- easing: ease
+
+---
+
+4. Badge-System
+
+- Vereinheitliche:
+  - Position: oben rechts
+  - Hintergrund: leicht transparent (dunkel)
+  - Schrift: klar lesbar
+
+- bereite Erweiterungen vor:
+  - card-status--warning
+  - card-status--critical
+
+---
+
+5. Interaktion
+
+- Ergänze optional:
+  - leichter Hover-Effekt für .card (nur Desktop)
+- keine Animationen auf Touch erzwingen
+
+---
+
+6. Dark Mode
+
+- nutze prefers-color-scheme im CSS
+- keine komplexe JS-Logik nötig
+
+---
+
+7. Constraints
+
+- keine neuen Libraries
+- keine Änderungen an:
+  - Lightbox
+  - Navigation
+  - Datenlogik
+- nur visuelle Verbesserungen
+
+---
+
+Vorgehen:
+
+1. CSS minimal erweitern
+2. kleine JS-Ergänzungen für Fade-in
+3. keine strukturellen Änderungen
+
+Bitte kurz kommentieren, aber keine unnötigen Refactorings durchführen.
+```
+
+---
+
 ---
 
 # 6) Abschluss-Prompt: Code-Review, Regression Check und Testliste
@@ -450,7 +559,7 @@ Liefere:
 - eine manuelle Testcheckliste.
 
 Bitte noch keinen größeren Refactor durchführen, sondern nur Review + Empfehlungen liefern.
-````
+```
 
 ---
 
