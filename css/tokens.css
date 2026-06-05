@@ -61,8 +61,8 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
   --transition-fast: 0.15s ease;
-  --transition-normal: 0.2s ease;
-  --transition-carousel: 0.18s ease-out;
+  --transition-normal: 0.24s ease;
+  --transition-carousel: 0.24s ease;
 
   --z-lightbox: 9999;
   --z-lightbox-nav: 10000;

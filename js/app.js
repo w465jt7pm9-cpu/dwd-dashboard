@@ -713,6 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setCardState(imageElement, 'loading')
 
     imageElement.addEventListener('load', () => {
+      imageElement.classList.add('image-loaded')
       setCardState(imageElement, navigator.onLine ? 'ok' : 'offline')
     })
 
