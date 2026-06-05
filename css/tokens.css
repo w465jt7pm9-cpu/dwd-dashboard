@@ -90,15 +90,16 @@
 
 /* Night theme: warm, dim red palette for night driving (low glare) */
 :root[data-theme='night'] {
-  --color-bg: #070101; /* almost black with warm hint */
-  --color-fg: #ffdccd; /* warm off-white for reduced glare */
-  --color-glass: rgba(40, 8, 8, 0.55); /* warm translucent topbar */
-  --color-overlay: rgba(8, 2, 2, 0.85);
-  --color-lightbox: rgba(8, 2, 2, 0.96);
-  --color-border-subtle: rgba(255, 180, 150, 0.06);
-  --color-control-bg: rgba(255, 160, 120, 0.04);
-  --color-control-hover: rgba(255, 160, 120, 0.08);
-  --color-summary: rgba(255, 200, 170, 0.06);
-  --color-link-bg: rgba(180, 80, 60, 0.12);
-  --color-link-border: rgba(180, 80, 60, 0.2);
+  /* Keep same base background as day, but dim UI colors to reduce brightness */
+  --color-bg: #000;
+  --color-fg: rgba(255, 255, 255, 0.92);
+  --color-glass: rgba(0, 0, 0, 0.55);
+  --color-overlay: rgba(0, 0, 0, 0.72);
+  --color-lightbox: rgba(0, 0, 0, 0.95);
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-control-bg: rgba(255, 255, 255, 0.03);
+  --color-control-hover: rgba(255, 255, 255, 0.06);
+  --color-summary: rgba(255, 255, 255, 0.04);
+  --color-link-bg: rgba(80, 120, 255, 0.12);
+  --color-link-border: rgba(80, 120, 255, 0.18);
 }
