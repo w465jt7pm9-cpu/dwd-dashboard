@@ -74,8 +74,9 @@
 
 /* Day theme: lighter UI for daytime viewing */
 :root[data-theme='day'] {
-  --color-bg: #ffffff;
-  --color-fg: #0b0b0b;
+  /* Force dark background even in "day" theme to keep maps readable */
+  --color-bg: #000;
+  --color-fg: #ffffff;
   --color-glass: rgba(255, 255, 255, 0.85);
   --color-overlay: rgba(0, 0, 0, 0.06);
   --color-lightbox: rgba(255, 255, 255, 0.98);
