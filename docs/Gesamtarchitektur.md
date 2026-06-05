@@ -9,6 +9,8 @@ flowchart LR
     Carousel[Carousel / Pages]
     Lightbox[Lightbox]
     Gestures[Input Handling<br/>Touch / Wheel / Key]
+    Theme[Theme Manager<br/>Automatic Dark Mode]
+    Refresh[Pull-to-Refresh<br/>Touch / Trackpad]
   end
   subgraph External
     DWD[DWD Image Sources]
@@ -18,5 +20,7 @@ flowchart LR
   App --> Carousel
   App --> Lightbox
   App --> Gestures
+  App --> Theme
+  App --> Refresh
   App --> DWD
 ```

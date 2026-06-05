@@ -1,5 +1,8 @@
 ## Lightbox-Interaktionen
 
+> Im aktuellen Release bleibt die Lightbox-Funktionalität unverändert.
+> Die neuen Release-Features wirken sich nicht auf die Lightbox aus.
+
 ```mermaid
 flowchart TD
   Open[Open Lightbox] --> Zoom
