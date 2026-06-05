@@ -6,112 +6,24 @@
 
 ## 🟥 TODO
 
-- US-001 Menü entfernen
-- US-003 Pull-to-Refresh
-- US-004 Dark Mode automatisch
-- US-005 Metadaten entfernen
+- Siehe Ideen
 
 ## 🟨 DOING
 
-- US-002 Navigation über Gesten
+- (leer)
 
 ## ✅ DONE
 
-- (leer)
+- US-001 Menü entfernen
+- US-002 Navigation über Gesten
+- US-003 Pull-to-Refresh
+- US-004 Dark Mode automatisch
+- US-005 Metadaten entfernen
+- US-007 Visuelle Qualität und ruhige Darstellung optimieren
 
 ---
 
 # 📦 BACKLOG DETAILS
-
-## 🔴 US-001 – Menü vollständig entfernen
-
-**Status:** TODO  
-**Priorität:** Hoch
-
-👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 2 (Topbar + Thumbbar entfernen)
-
-**Beschreibung**  
-Als Nutzer möchte ich kein oberes Menü sehen, damit die Anzeige auf die Inhalte fokussiert bleibt.
-
-**Akzeptanzkriterien**
-
-- Menü wird nicht angezeigt
-- Keine Funktionen gehen verloren
-
----
-
-## 🔴 US-002 – Navigation über Gesten/Tasten
-
-**Status:** TODO  
-**Priorität:** Hoch
-
-👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 3 (Navigation zyklisch)
-
-**Beschreibung**  
-Als Nutzer möchte ich per Pfeiltasten (Desktop) und Swipe (Mobile) navigieren.
-
-**Akzeptanzkriterien**
-
-- Links-/Rechts-Tasten funktionieren am PC
-- Swipe funktioniert auf iPad/iPhone
-- Navigation ist zyklisch
-
----
-
-## 🟡 US-003 – Aktualisierung per Pull-to-Refresh
-
-**Status:** TODO  
-**Priorität:** Mittel
-
-👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 4 (Pull-to-Refresh)
-
-**Beschreibung**  
-Als Nutzer möchte ich durch Herunterziehen aktualisieren statt eines Buttons.
-
-**Akzeptanzkriterien**
-
-- Pull-to-Refresh funktioniert auf Touch-Geräten und Trackpad
-- Nur auf Seiten 0–2 aktiv
-- Nur im oberen Startzustand aktiv
-- Kein zusätzlicher visueller Hinweis
-
----
-
-## 🟡 US-004 – Dark Mode automatisch übernehmen
-
-**Status:** TODO  
-**Priorität:** Mittel
-
-👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 5 (Theme automatisch)
-
-**Beschreibung**  
-Als Nutzer möchte ich keinen Night-Mode-Schalter, sondern eine automatische Anpassung an das System.
-
-**Akzeptanzkriterien**
-
-- System-Dark-Mode wird erkannt
-- Live-Wechsel wird übernommen
-- Kein Toggle vorhanden
-
----
-
-## 🟢 US-005 – Metadaten entfernen
-
-**Status:** TODO  
-**Priorität:** Niedrig
-
-👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 6 (Statuslogik bereinigen)
-
-**Beschreibung**  
-Land, Höhe und Seegang sollen nicht mehr als Text dargestellt werden.
-
-**Akzeptanzkriterien**
-
-- Keine sichtbaren Titel (Land, See, Höhe)
-- Keine globale Statusanzeige
-- Bild bleibt alleinige Informationsquelle
-
----
 
 ## 🌊 US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 
@@ -196,9 +108,103 @@ Besonders kritisch:
 
 ---
 
+# ✅ DONE (DETAILS / HISTORIE)
+
+_(hierher verschieben, wenn erledigt)_
+
+## 🔴 US-001 – Menü vollständig entfernen
+
+**Status:** DONE  
+**Priorität:** Hoch
+
+👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 2 (Topbar + Thumbbar entfernen)
+
+**Beschreibung**  
+Als Nutzer möchte ich kein oberes Menü sehen, damit die Anzeige auf die Inhalte fokussiert bleibt.
+
+**Akzeptanzkriterien**
+
+- Menü wird nicht angezeigt
+- Keine Funktionen gehen verloren
+
+---
+
+## 🔴 US-002 – Navigation über Gesten/Tasten
+
+**Status:** DONE  
+**Priorität:** Hoch
+
+👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 3 (Navigation zyklisch)
+
+**Beschreibung**  
+Als Nutzer möchte ich per Pfeiltasten (Desktop) und Swipe (Mobile) navigieren.
+
+**Akzeptanzkriterien**
+
+- Links-/Rechts-Tasten funktionieren am PC
+- Swipe funktioniert auf iPad/iPhone
+- Navigation ist zyklisch
+
+---
+
+## 🟡 US-003 – Aktualisierung per Pull-to-Refresh
+
+**Status:** DONE  
+**Priorität:** Mittel
+
+👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 4 (Pull-to-Refresh)
+
+**Beschreibung**  
+Als Nutzer möchte ich durch Herunterziehen aktualisieren statt eines Buttons.
+
+**Akzeptanzkriterien**
+
+- Pull-to-Refresh funktioniert auf Touch-Geräten und Trackpad
+- Nur auf Seiten 0–2 aktiv
+- Nur im oberen Startzustand aktiv
+- Kein zusätzlicher visueller Hinweis
+
+---
+
+## 🟡 US-004 – Dark Mode automatisch übernehmen
+
+**Status:** DONE  
+**Priorität:** Mittel
+
+👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 5 (Theme automatisch)
+
+**Beschreibung**  
+Als Nutzer möchte ich keinen Night-Mode-Schalter, sondern eine automatische Anpassung an das System.
+
+**Akzeptanzkriterien**
+
+- System-Dark-Mode wird erkannt
+- Live-Wechsel wird übernommen
+- Kein Toggle vorhanden
+
+---
+
+## 🟢 US-005 – Metadaten entfernen
+
+**Status:** DONE  
+**Priorität:** Niedrig
+
+👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 6 (Statuslogik bereinigen)
+
+**Beschreibung**  
+Land, Höhe und Seegang sollen nicht mehr als Text dargestellt werden.
+
+**Akzeptanzkriterien**
+
+- Keine sichtbaren Titel (Land, See, Höhe)
+- Keine globale Statusanzeige
+- Bild bleibt alleinige Informationsquelle
+
+---
+
 ## 🎨 US-007 – Visuelle Qualität und ruhige Darstellung optimieren
 
-**Status:** TODO  
+**Status:** DONE  
 **Priorität:** Hoch
 
 👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „UI-Polish / Visual Refinement“
@@ -285,12 +291,6 @@ damit ich die Inhalte schnell erfassen kann, ohne durch UI-Elemente oder harte �
 - geringere kognitive Belastung
 - hochwertiger Gesamteindruck
 - ideale Grundlage für spätere „smarte“ Features (z. B. Wind-gegen-Strom)
-
----
-
-# ✅ DONE (DETAILS / HISTORIE)
-
-_(hierher verschieben, wenn erledigt)_
 
 ---
 
