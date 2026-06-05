@@ -31,8 +31,6 @@
   --font-family-base: system-ui, -apple-system, Segoe UI, Roboto, Arial,
     sans-serif;
 
-  --font-size-topbar-title: 14px;
-  --font-size-topbar-meta: 12px;
   --font-size-overlay: 13px;
   --font-size-status-badge: 11px;
   --font-size-summary: 11px;
@@ -48,7 +46,6 @@
   --space-6: 14px;
   --space-7: 18px;
 
-  --topbar-height: 40px;
   --nav-size: 44px;
   --icon-btn-size: 34px;
   --content-max-width: 520px;
@@ -66,7 +63,6 @@
 
   --z-lightbox: 9999;
   --z-lightbox-nav: 10000;
-  --z-thumbbar: 5000;
   --z-dim: 4000;
 }
 
