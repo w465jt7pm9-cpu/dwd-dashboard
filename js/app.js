@@ -36,21 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const viewportElement = document.getElementById('viewport')
   const carouselElement = document.getElementById('carousel')
-  const pageTitleElement = document.getElementById('pageTitle')
-  const statusElement = document.getElementById('status')
-  const pageSummaryElement = document.getElementById('pageSummary')
   const offlineBannerElement = document.getElementById('offlineBanner')
   const offlineStampElement = document.getElementById('offlineStamp')
   const installHintElement = document.getElementById('installHint')
   const installHintCloseButton = document.getElementById('installHintClose')
-  const refreshButton = document.getElementById('refreshBtn')
-  const previousPageButton = document.getElementById('prevBtn')
-  const nextPageButton = document.getElementById('nextBtn')
-  const themeButton = document.getElementById('modeBtn')
-  const thumbPreviousButton = document.getElementById('thumbPrev')
-  const thumbRefreshButton = document.getElementById('thumbRefresh')
-  const thumbThemeButton = document.getElementById('thumbMode')
-  const thumbNextButton = document.getElementById('thumbNext')
   const lightboxElement = document.getElementById('lightbox')
   const lightboxImageElement = document.getElementById('lightboxImg')
   const lightboxPreviousButton = document.getElementById('lbPrev')
@@ -109,12 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
       })
     } catch {
       return '-'
-    }
-  }
-
-  function setStatusLabel (text) {
-    if (statusElement) {
-      statusElement.textContent = text
     }
   }
 
@@ -233,52 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return badgeElement
   }
 
-  function updatePageSummary () {
-    if (!pageSummaryElement) {
-      return
-    }
-
-    if (currentPageIndex === TEXT_PAGE_INDEX) {
-      pageSummaryElement.classList.add('is-hidden')
-      return
-    }
-
-    const currentPageStates = [...PAGE_STATE_BY_IMAGE.values()].filter(
-      pageState => pageState.pageIndex === currentPageIndex
-    )
-    const errorCount = currentPageStates.filter(
-      pageState => pageState.state === 'error'
-    ).length
-    const offlineCount = currentPageStates.filter(
-      pageState => pageState.state === 'offline'
-    ).length
-    const loadingCount = currentPageStates.filter(
-      pageState => pageState.state === 'loading'
-    ).length
-
-    // Show summary only when there is something to report
-    if (offlineCount > 0) {
-      pageSummaryElement.textContent = `${offlineCount} offline`
-      pageSummaryElement.classList.remove('is-hidden')
-      return
-    }
-
-    if (errorCount > 0) {
-      pageSummaryElement.textContent = `${errorCount} Fehler`
-      pageSummaryElement.classList.remove('is-hidden')
-      return
-    }
-
-    if (loadingCount > 0) {
-      pageSummaryElement.textContent = `${loadingCount} lädt`
-      pageSummaryElement.classList.remove('is-hidden')
-      return
-    }
-
-    // Nothing to report -> hide the summary
-    pageSummaryElement.classList.add('is-hidden')
-  }
-
   function setCardState (imageElement, state) {
     const cardElement = imageElement.closest('.card')
     if (!cardElement) {
@@ -314,7 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
         pageIndex: Number(pageElement.dataset.page),
         state
       })
-      updatePageSummary()
     }
   }
 
@@ -332,7 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function refreshVisibleImages () {
     if (currentPageIndex === TEXT_PAGE_INDEX) {
       updateOfflineUi()
-      updatePageSummary()
       return
     }
 
@@ -364,7 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateOfflineUi()
-    updatePageSummary()
   }
 
   function goToPage (pageIndex) {
@@ -772,19 +706,6 @@ document.addEventListener('DOMContentLoaded', () => {
   installHintCloseButton?.addEventListener('click', () => {
     installHintElement.classList.add('is-hidden')
   })
-
-  previousPageButton?.addEventListener('click', () =>
-    goToPage(currentPageIndex - 1)
-  )
-  nextPageButton?.addEventListener('click', () =>
-    goToPage(currentPageIndex + 1)
-  )
-  thumbPreviousButton?.addEventListener('click', () =>
-    goToPage(currentPageIndex - 1)
-  )
-  thumbNextButton?.addEventListener('click', () =>
-    goToPage(currentPageIndex + 1)
-  )
 
   lightboxPreviousButton?.addEventListener('click', event => {
     event.stopPropagation()
