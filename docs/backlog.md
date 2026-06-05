@@ -113,6 +113,89 @@ Land, Höhe und Seegang sollen nicht mehr als Text dargestellt werden.
 
 ---
 
+## 🌊 US-006 – Wind-gegen-Strom Erkennung (Nordsee)
+
+**Status:** TODO  
+**Priorität:** Hoch
+
+👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Wind gegen Strom“
+
+---
+
+### 🧑‍✈️ Beschreibung
+
+Als erfahrener Skipper in der Nordsee  
+möchte ich erkennen, ob Wind und Gezeitenströmung gegeneinander laufen  
+damit ich kritische Seebedingungen (steile, kurze und brechende Wellen) frühzeitig einschätzen und vermeiden kann
+
+---
+
+### 🌊 Fachliche Idee
+
+Wetterkarten allein reichen nicht aus, um reale Seebedingungen zu bewerten.  
+Erst die Kombination aus Wind- und Strömungsrichtung ergibt ein realistisches Bild der See.
+
+Besonders kritisch:
+
+- Wind gegen Strom
+- starker Strom + mittlerer bis starker Wind
+- flache Bereiche (Küsten, Seegatten, Wattenmeer)
+
+---
+
+### ✅ Akzeptanzkriterien
+
+**Basis**
+
+- [ ] Windrichtung wird berücksichtigt
+- [ ] Strömungsrichtung wird berücksichtigt
+- [ ] Winkel zwischen beiden wird berechnet
+
+**Logik**
+
+- [ ] Unkritisch: Winkel < 90°
+- [ ] Erhöht: Winkel ≥ 120°
+- [ ] Kritisch: Winkel ≥ 150°
+
+- [ ] Bewertung berücksichtigt zusätzlich:
+  - Strömung > 0.5 kn
+  - Wind > 4 Bft
+
+**Darstellung**
+
+- [ ] Kein neues Menü
+- [ ] Darstellung als Badge oder Overlay
+- [ ] visuelle Zustände:
+  - ✅ ok
+  - ⚠ warning
+  - 🔴 kritisch
+
+**System**
+
+- [ ] Nur aktiv auf Seiten 0–2
+- [ ] Lightbox bleibt unbeeinflusst
+- [ ] Funktioniert auf Desktop und Touch
+
+---
+
+### 🧠 Definition of Done
+
+- Nutzer erkennt ohne Zusatzinfos:
+  👉 „Hier wird die See unangenehm“
+- Bewertung ist in < 2 Sekunden visuell erfassbar
+- Keine zusätzliche Interaktion erforderlich
+
+---
+
+### 💡 Nutzen
+
+- realistischere Einschätzung von Seegang
+- bessere Entscheidungsgrundlage für Navigation
+- erhöhter Sicherheitsaspekt  
+  ``
+
+---
+
 # ✅ DONE (DETAILS / HISTORIE)
 
 _(hierher verschieben, wenn erledigt)_

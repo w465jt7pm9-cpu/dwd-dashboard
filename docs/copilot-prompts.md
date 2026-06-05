@@ -1,6 +1,7 @@
 # GitHub Copilot Pro – Prompts für das DWD Dashboard
 
 Diese Prompts sind auf die vorhandenen Projektdateien zugeschnitten:
+
 - `README.md`: HTML, modularisiertes CSS, Vanilla JavaScript, Fokus auf Desktop + Touch, stabiles Touch-Verhalten, zuverlässige Navigation, robuste Lightbox.
 - `index.html`: sichtbare UI in `#topbar` und `.thumbbar`, `#viewport`, `#carousel`, `#lightbox`.
 - `app.js`: bestehende Logik für Seitennavigation, Swipe, Edge-Tap, Refresh, Theme, Lightbox und Auto-Refresh.
@@ -8,6 +9,7 @@ Diese Prompts sind auf die vorhandenen Projektdateien zugeschnitten:
 ## Arbeitsweise mit Copilot
 
 Empfohlener Ablauf in VS Code:
+
 1. Relevante Datei öffnen (`index.html` oder `app.js`).
 2. Den passenden Prompt unten in Copilot Chat einfügen.
 3. Zuerst immer **Analyse** ausführen lassen.
@@ -70,6 +72,7 @@ Bitte noch keinen Code schreiben.
 # 1) Prompt: Topbar + Thumbbar entfernen, sichtbare Redundanzen abbauen
 
 ## Ziel
+
 - `#topbar` entfernen bzw. nicht mehr sichtbar rendern.
 - `.thumbbar` entfernen bzw. nicht mehr sichtbar rendern.
 - Keine sichtbaren Titel (`pageTitle`) und keine sichtbaren Status-/Zusammenfassungsinfos (`status`, `pageSummary`) mehr.
@@ -118,6 +121,7 @@ Bitte führe die Änderung direkt im Code aus und kommentiere nur kurz die wirkl
 # 2) Prompt: Zyklische Navigation an den Grenzen
 
 ## Ziel
+
 - Navigation soll nicht mehr am ersten/letzten Screen stoppen.
 - Stattdessen zyklisch: letzte -> erste, erste -> letzte.
 - Gilt für ArrowLeft / ArrowRight, Swipe, Edge-Tap und bestehende Button-/Funktionspfade.
@@ -160,6 +164,7 @@ Bitte implementiere nur die minimal nötigen Änderungen in app.js.
 # 3) Prompt: Pull-to-Refresh statt Refresh-Buttons
 
 ## Ziel
+
 - Refresh-Buttons entfallen als Bedienkonzept.
 - Aktualisieren erfolgt per Pull-to-Refresh.
 - Gilt auf Touch-Geräten und für Desktop-Trackpad-Gesten.
@@ -218,6 +223,7 @@ Bitte implementiere die Änderung direkt im Code und erläutere kurz, welche Eve
 # 4) Prompt: Theme automatisch aus dem System ableiten und live nachführen
 
 ## Ziel
+
 - Kein manueller Theme-Schalter mehr.
 - Keine lokale Theme-Persistenz mehr als führende Quelle.
 - Theme folgt `prefers-color-scheme`.
@@ -262,6 +268,7 @@ Bitte implementiere die Änderung direkt in app.js und bereinige tote Theme-Logi
 # 5) Prompt: Bereinigung redundanter Statuslogik ohne Verlust der Badge-Logik
 
 ## Ziel
+
 - Globale sichtbare Metainformationen weg.
 - Pro-Karte-Badges bleiben.
 - Kein globaler sichtbarer Zeitstempel.
@@ -301,6 +308,126 @@ Technische Akzeptanzkriterien:
 
 ---
 
+---
+
+---
+
+# 🌊 Feature: Wind-gegen-Strom Erkennung
+
+## Ziel
+
+Erkennen und visuelles Markieren von kritischen Seebedingungen, wenn Wind und Gezeitenströmung gegeneinander laufen.
+
+---
+
+## Copilot Prompt
+
+````text
+Implementiere eine minimal-invasive Erkennung von „Wind gegen Strom“-Situationen im bestehenden DWD Dashboard (Vanilla JavaScript).
+
+Kontext:
+- HTML + CSS + Vanilla JS
+- bestehende Navigation (Swipe, Keyboard, Edge-Tap)
+- bestehende Kartenstruktur (.card)
+- bestehendes Badge-System (.card-status)
+- UI soll minimal bleiben (kein neues Menü!)
+
+Ziel:
+Ergänze eine Logik zur Bewertung von Seebedingungen basierend auf Wind- und Strömungsrichtung.
+
+---
+
+1. Daten (initial Mock)
+Erzeuge temporäre Testwerte:
+
+- windDirection (Grad 0–360)
+- windSpeed (Bft oder m/s)
+- currentDirection (Grad 0–360)
+- currentSpeed (kn)
+
+→ Diese später leicht austauschbar halten
+
+---
+
+2. Berechnung
+
+Implementiere:
+
+function getAngleDifference(a, b)
+
+→ Ergebnis: Winkel 0–180°
+
+---
+
+3. Bewertungslogik
+
+function evaluateSeaState(windDirection, windSpeed, currentDirection, currentSpeed)
+
+Regeln:
+
+- angleDiff < 90 → 'ok'
+- angleDiff ≥ 120 → 'warning'
+- angleDiff ≥ 150 → 'critical'
+
+Zusätzlich:
+- currentSpeed > 0.5 kn
+- windSpeed > 4 Bft
+
+Nur wenn beide erfüllt → Zustand aktiv
+
+---
+
+4. Integration
+
+- Nutze bestehende Karten (.card)
+- erweitere Badge-System:
+
+.card-status--warning
+.card-status--critical
+
+- kein neues UI-Element erstellen
+
+---
+
+5. Verhalten
+
+- nur aktiv auf Seiten 0–2
+- keine Änderung an:
+  - Lightbox
+  - Navigation
+  - Bildlogik
+
+---
+
+6. Visualisierung
+
+- 'warning' → ⚠
+- 'critical' → 🔴
+
+→ möglichst subtil
+
+---
+
+7. Constraints
+
+- keine neuen Libraries
+- minimal-invasive Änderungen
+- bestehende Struktur respektieren
+
+---
+
+Vorgehen:
+
+1. Analyse der bestehenden card-status Logik
+2. Implementierung der Bewertungsfunktion
+3. Integration in bestehende Kartenanzeige
+
+Kurze Kommentare im Code hinzufügen.
+Keine unnötigen Refactorings durchführen.
+
+---
+---
+
 # 6) Abschluss-Prompt: Code-Review, Regression Check und Testliste
 
 Diesen Prompt nach der Umsetzung verwenden.
@@ -323,7 +450,7 @@ Liefere:
 - eine manuelle Testcheckliste.
 
 Bitte noch keinen größeren Refactor durchführen, sondern nur Review + Empfehlungen liefern.
-```
+````
 
 ---
 
@@ -331,6 +458,7 @@ Bitte noch keinen größeren Refactor durchführen, sondern nur Review + Empfehl
 
 ```markdown
 ## Sichtbarkeit / UI
+
 - [ ] Topbar ist nicht sichtbar.
 - [ ] Thumbbar ist nicht sichtbar.
 - [ ] Kein sichtbarer Titel für Land / See / Höhenwetter.
@@ -338,6 +466,7 @@ Bitte noch keinen größeren Refactor durchführen, sondern nur Review + Empfehl
 - [ ] Bild-Badges oben rechts auf Karten funktionieren weiterhin.
 
 ## Navigation
+
 - [ ] ArrowLeft / ArrowRight wechseln Seiten.
 - [ ] Links von der ersten Seite führt auf die letzte Seite.
 - [ ] Rechts von der letzten Seite führt auf die erste Seite.
@@ -345,17 +474,20 @@ Bitte noch keinen größeren Refactor durchführen, sondern nur Review + Empfehl
 - [ ] Edge-Tap links/rechts funktioniert weiterhin.
 
 ## Refresh
+
 - [ ] Pull-to-Refresh funktioniert auf Seiten 0, 1 und 2.
 - [ ] Pull-to-Refresh funktioniert nicht auf der Textseite.
 - [ ] Pull-to-Refresh wird nur im oberen Startzustand ausgelöst.
 - [ ] Kein zusätzliches visuelles Refresh-Feedback erscheint.
 
 ## Theme
+
 - [ ] System dunkel -> App dunkel.
 - [ ] System hell -> App hell.
 - [ ] Wechsel des Systemthemes bei geöffneter App wird übernommen.
 
 ## Lightbox
+
 - [ ] Öffnen per Bildklick funktioniert.
 - [ ] Navigation in der Lightbox funktioniert.
 - [ ] Zoom / Pan / Double-Tap funktionieren.
