@@ -1,0 +1,379 @@
+# GitHub Copilot Pro – Prompts für das DWD Dashboard
+
+Diese Prompts sind auf die vorhandenen Projektdateien zugeschnitten:
+- `README.md`: HTML, modularisiertes CSS, Vanilla JavaScript, Fokus auf Desktop + Touch, stabiles Touch-Verhalten, zuverlässige Navigation, robuste Lightbox.
+- `index.html`: sichtbare UI in `#topbar` und `.thumbbar`, `#viewport`, `#carousel`, `#lightbox`.
+- `app.js`: bestehende Logik für Seitennavigation, Swipe, Edge-Tap, Refresh, Theme, Lightbox und Auto-Refresh.
+
+## Arbeitsweise mit Copilot
+
+Empfohlener Ablauf in VS Code:
+1. Relevante Datei öffnen (`index.html` oder `app.js`).
+2. Den passenden Prompt unten in Copilot Chat einfügen.
+3. Zuerst immer **Analyse** ausführen lassen.
+4. Danach erst die konkrete Änderung umsetzen lassen.
+5. Nach jeder Änderung kurz manuell testen.
+
+## Globale Randbedingungen für alle Prompts
+
+Nutze diese Randbedingungen in jedem Prompt oder referenziere auf diesen Abschnitt:
+
+```text
+Projektkontext:
+- Das Projekt ist eine Vanilla-JavaScript-Anwendung ohne Framework.
+- Der Tech Stack ist HTML + modularisiertes CSS + Vanilla JavaScript.
+- Die Anwendung ist für Desktop und Touch-Geräte optimiert.
+- Die bestehende Lightbox ist robust und darf nicht beschädigt werden.
+- Bestehende Bilddatenlogik und Bildquellen dürfen nicht verändert werden.
+- Bestehende Badge-Logik pro Karte (.card-status) soll erhalten bleiben.
+- Accessibility-Texte wie aria-label und alt sollen erhalten bleiben.
+- Änderungen bitte minimal-invasiv umsetzen.
+- Keine neuen Bibliotheken verwenden.
+- Keine unnötigen Refactorings.
+- Keine Änderungen an sw.js vornehmen, sofern nicht technisch zwingend erforderlich.
+```
+
+---
+
+# 0) Analyse-Prompt (immer zuerst verwenden)
+
+```text
+Analysiere die vorhandenen Dateien index.html und app.js und plane die Umsetzung der folgenden Anforderungen minimal-invasiv.
+
+Anforderungen:
+1. Das sichtbare obere Menü soll entfernt werden.
+2. Die sichtbare untere Thumbbar soll ebenfalls entfernt werden.
+3. Sichtbare Titel und sichtbare Status-/Zusammenfassungsinfos sollen entfallen, aber Accessibility-Texte wie aria-label und alt müssen erhalten bleiben.
+4. Edge-Tap-Navigation soll erhalten bleiben.
+5. Navigation per ArrowLeft / ArrowRight und per Swipe soll erhalten bleiben, aber an den Grenzen zyklisch werden.
+6. Aktualisieren soll über Pull-to-Refresh erfolgen:
+   - auf Touch-Geräten und Desktop-Trackpad-Gesten,
+   - nur auf Bildschirmseiten 0 bis 2,
+   - nur wenn die Ansicht am oberen Rand im Startzustand ist,
+   - ohne zusätzliches visuelles Feedback.
+7. Der manuelle Theme-/Nachtmodus-Schalter soll entfallen.
+8. Das Theme soll live auf Systemwechsel reagieren.
+9. Die bestehende Lightbox inkl. Zoom, Swipe und Navigation darf nicht regressiv beeinflusst werden.
+
+Bitte liefere zuerst nur eine Analyse mit:
+- den betroffenen DOM-Elementen,
+- den betroffenen Funktionen,
+- einer minimal-invasiven Änderungsstrategie pro Datei,
+- möglichen Risiken bzw. Regressionen,
+- einer kurzen Teststrategie.
+
+Bitte noch keinen Code schreiben.
+```
+
+---
+
+# 1) Prompt: Topbar + Thumbbar entfernen, sichtbare Redundanzen abbauen
+
+## Ziel
+- `#topbar` entfernen bzw. nicht mehr sichtbar rendern.
+- `.thumbbar` entfernen bzw. nicht mehr sichtbar rendern.
+- Keine sichtbaren Titel (`pageTitle`) und keine sichtbaren Status-/Zusammenfassungsinfos (`status`, `pageSummary`) mehr.
+- Accessibility-Texte (`aria-label`, `alt`) ausdrücklich erhalten.
+- Edge-Tap, Tastatur, Swipe und Lightbox dürfen weiter funktionieren.
+
+```text
+Bitte implementiere die folgende UI-Reduktion minimal-invasiv in index.html und app.js.
+
+Ziel:
+- Das sichtbare obere Menü mit id="topbar" soll entfernt oder vollständig unsichtbar gemacht werden.
+- Die sichtbare untere Thumbbar mit class="thumbbar" soll ebenfalls entfernt oder vollständig unsichtbar gemacht werden.
+- Die sichtbaren Elemente pageTitle, status und pageSummary sollen für Nutzer nicht mehr erscheinen.
+- Accessibility-Texte wie aria-label und alt müssen erhalten bleiben.
+- Die bestehende Navigation per Tastatur, Swipe und Edge-Tap muss weiter funktionieren.
+- Die bestehende Lightbox darf nicht beschädigt werden.
+
+Wichtige Hinweise aus dem Bestand:
+- In index.html existieren #topbar und .thumbbar als sichtbare Bedienelemente.
+- In app.js hängen Event-Listener an prevBtn, nextBtn, refreshBtn, modeBtn sowie thumbPrev, thumbNext, thumbRefresh, thumbMode.
+- pageTitle, status und pageSummary werden aktuell in app.js aktiv beschrieben.
+- Die eigentliche Seitennavigation läuft bereits über goToPage(), Tastatur-Handling, Swipe und Edge-Tap.
+
+Erwartete Umsetzung:
+1. Passe index.html so an, dass #topbar und .thumbbar nicht mehr als sichtbare Steuerleisten auftreten.
+2. Räume app.js so auf, dass entfernte bzw. nicht mehr vorhandene UI-Elemente keine Fehler verursachen.
+3. Entferne oder deaktiviere ausschließlich die sichtbare Redundanz, aber nicht die zugrunde liegende Bild- oder Navigationslogik.
+4. Lasse aria-label-, alt- und sonstige semantische Accessibility-Attribute unverändert.
+5. Lasse offlineBanner, installHint, viewport, carousel, lightbox und dimOverlay funktional intakt.
+
+Technische Akzeptanzkriterien:
+- #topbar ist nicht sichtbar.
+- .thumbbar ist nicht sichtbar.
+- pageTitle, status und pageSummary sind für Nutzer nicht sichtbar.
+- Es bleiben keine Laufzeitfehler durch fehlende Buttons zurück.
+- Edge-Tap funktioniert weiterhin.
+- ArrowLeft / ArrowRight funktionieren weiterhin.
+- Swipe zwischen Seiten funktioniert weiterhin.
+- Lightbox funktioniert unverändert.
+
+Bitte führe die Änderung direkt im Code aus und kommentiere nur kurz die wirklich wichtigen Stellen.
+```
+
+---
+
+# 2) Prompt: Zyklische Navigation an den Grenzen
+
+## Ziel
+- Navigation soll nicht mehr am ersten/letzten Screen stoppen.
+- Stattdessen zyklisch: letzte -> erste, erste -> letzte.
+- Gilt für ArrowLeft / ArrowRight, Swipe, Edge-Tap und bestehende Button-/Funktionspfade.
+- Lightbox-Navigation bleibt separat und unverändert.
+
+```text
+Bitte passe die Seitennavigation in app.js minimal-invasiv auf zyklisches Verhalten an.
+
+Aktuelles Verhalten:
+- goToPage(pageIndex) begrenzt den Index aktuell auf 0 bis PAGE_NAMES.length - 1.
+- Dadurch stoppt die Navigation an den Grenzen.
+
+Neues Verhalten:
+- Die Dashboard-Seiten sollen zyklisch navigierbar sein.
+- Wenn die Navigation über das letzte Dashboard hinausgeht, soll wieder die erste Seite angezeigt werden.
+- Wenn die Navigation vor die erste Dashboard-Seite geht, soll die letzte Seite angezeigt werden.
+
+Geltungsbereich:
+- ArrowLeft / ArrowRight auf Dokumentebene
+- Swipe-Navigation im viewport
+- Edge-Tap-Navigation
+- alle bestehenden Aufrufe von goToPage(currentPageIndex +/- 1)
+
+Wichtige Einschränkung:
+- Die Lightbox-Navigation (showPreviousLightboxImage / showNextLightboxImage) hat bereits eigene Logik und darf nicht verändert oder regressiv beeinflusst werden.
+
+Technische Akzeptanzkriterien:
+- Seitenwechsel ist überall zyklisch.
+- Kein Stoppen mehr an Index 0 oder PAGE_NAMES.length - 1.
+- Edge-Tap links am Anfang springt zur letzten Seite.
+- Edge-Tap rechts am Ende springt zur ersten Seite.
+- Keyboard und Swipe verhalten sich identisch.
+- Lightbox funktioniert unverändert.
+
+Bitte implementiere nur die minimal nötigen Änderungen in app.js.
+```
+
+---
+
+# 3) Prompt: Pull-to-Refresh statt Refresh-Buttons
+
+## Ziel
+- Refresh-Buttons entfallen als Bedienkonzept.
+- Aktualisieren erfolgt per Pull-to-Refresh.
+- Gilt auf Touch-Geräten und für Desktop-Trackpad-Gesten.
+- Nur auf Seiten 0 bis 2.
+- Nur wenn die Ansicht am oberen Rand im Startzustand ist.
+- Kein zusätzliches visuelles Feedback.
+- Lightbox darf nicht betroffen sein.
+
+```text
+Bitte ersetze das manuelle Aktualisieren per Buttons in app.js durch Pull-to-Refresh als primäres Bedienkonzept.
+
+Zielverhalten:
+- Refresh soll durch Pull-to-Refresh ausgelöst werden.
+- Das gilt für Touch-Geräte und Desktop-Trackpad-Gesten.
+- Pull-to-Refresh darf nur auf Seiten 0 bis 2 auslösen.
+- Pull-to-Refresh darf nur auslösen, wenn sich die Ansicht am oberen Rand im Startzustand befindet.
+- Es soll kein zusätzliches visuelles Feedback eingeführt werden.
+- Die bestehende Funktion refreshVisibleImages() soll wiederverwendet werden.
+- Die Lightbox darf davon nicht beeinflusst werden.
+
+Wichtige Hinweise aus dem Bestand:
+- refreshVisibleImages() existiert bereits und aktualisiert die sichtbaren Bilder.
+- Es gibt aktuell refreshBtn und thumbRefresh als Button-Auslöser.
+- Der viewport ist das zentrale Dashboard-Interaktionselement.
+- Es gibt bereits Touch-Gesten für Swipe-Navigation.
+- Die Lightbox hat eigene Touch-Logik.
+
+Bitte setze die Änderung so um:
+1. Entferne die Bedienabhängigkeit von refreshBtn und thumbRefresh.
+2. Implementiere eine Pull-to-Refresh-Erkennung für den normalen Dashboard-Zustand außerhalb der Lightbox.
+3. Die Erkennung soll nur aktiv sein, wenn currentPageIndex <= 2.
+4. Die Erkennung soll nur aktiv sein, wenn die Ansicht am oberen Rand / im Startzustand ist.
+5. Vertikale Geste zum Refresh darf horizontale Swipe-Navigation nicht unnötig stören.
+6. Kein Spinner, kein Overlay und kein sonstiges neues Feedback einführen.
+7. Bestehendes automatisches Refresh-Intervall unverändert lassen, sofern kein Konflikt entsteht.
+
+Wichtig:
+- Bitte prüfe, welches DOM-Element sich für die Geste am besten eignet, ohne Lightbox und bestehende Swipe-Navigation zu beschädigen.
+- Bitte verwende keine neue Bibliothek.
+- Bitte arbeite minimal-invasiv.
+
+Technische Akzeptanzkriterien:
+- Refresh-Buttons sind nicht mehr nötig.
+- Pull-to-Refresh löst refreshVisibleImages() korrekt aus.
+- Das funktioniert nur auf Seiten 0 bis 2.
+- Das funktioniert nur am oberen Rand im Startzustand.
+- Kein zusätzliches visuelles Feedback.
+- Horizontale Swipe-Navigation bleibt benutzbar.
+- Lightbox bleibt unverändert funktionsfähig.
+
+Bitte implementiere die Änderung direkt im Code und erläutere kurz, welche Event-Logik du ergänzt oder angepasst hast.
+```
+
+---
+
+# 4) Prompt: Theme automatisch aus dem System ableiten und live nachführen
+
+## Ziel
+- Kein manueller Theme-Schalter mehr.
+- Keine lokale Theme-Persistenz mehr als führende Quelle.
+- Theme folgt `prefers-color-scheme`.
+- Änderungen des Systemthemes sollen live übernommen werden.
+- Buttons `modeBtn` und `thumbMode` entfallen bzw. bleiben ungenutzt.
+
+```text
+Bitte stelle die Theme-Logik in app.js minimal-invasiv von manuellem Toggle auf automatische Systemerkennung um.
+
+Aktueller Zustand:
+- app.js verwendet THEME_STORAGE_KEY = 'dwdTheme'.
+- initTheme() liest aktuell den Theme-Wert aus localStorage.
+- toggleTheme() wechselt zwischen day und night.
+- applyTheme(theme) setzt data-theme auf document.documentElement und aktualisiert modeBtn / thumbMode.
+
+Neues Zielverhalten:
+- Es gibt keinen manuellen Theme-Schalter mehr.
+- Das Theme soll aus der Systempräferenz abgeleitet werden.
+- Die App soll live auf Systemwechsel reagieren, also auch während sie geöffnet ist.
+- Der bestehende Mechanismus über data-theme auf dem html-Element darf weiter genutzt werden, wenn das minimal-invasiv ist.
+
+Bitte so umsetzen:
+1. Entferne die Bedienlogik für modeBtn und thumbMode.
+2. Ersetze initTheme() so, dass das Theme aus window.matchMedia('(prefers-color-scheme: dark)') abgeleitet wird.
+3. Ergänze einen Listener, damit Theme-Wechsel des Betriebssystems live übernommen werden.
+4. Entferne lokale Theme-Persistenz als führende Quelle.
+5. Lasse applyTheme(theme) nur noch die notwendige Theme-Anwendung durchführen.
+6. Falls modeBtn und thumbMode im DOM entfernt wurden, darf app.js dadurch keine Fehler werfen.
+
+Technische Akzeptanzkriterien:
+- Kein manueller Theme-Toggle mehr.
+- Theme folgt der Systemeinstellung.
+- Live-Wechsel des Systemthemes wird übernommen.
+- Keine unnötigen zusätzlichen Zustände.
+- Keine Regression bei bestehender UI oder Lightbox.
+
+Bitte implementiere die Änderung direkt in app.js und bereinige tote Theme-Logik.
+```
+
+---
+
+# 5) Prompt: Bereinigung redundanter Statuslogik ohne Verlust der Badge-Logik
+
+## Ziel
+- Globale sichtbare Metainformationen weg.
+- Pro-Karte-Badges bleiben.
+- Kein globaler sichtbarer Zeitstempel.
+- Keine globale sichtbare Zusammenfassung "lädt / offline / Fehler".
+- Interne Logik darf bestehen bleiben, wenn sie technisch nützlich ist, aber soll nicht mehr sichtbar sein.
+
+```text
+Bitte bereinige in app.js die sichtbare Status- und Zusammenfassungslogik minimal-invasiv, ohne die bestehende Bild- und Badge-Logik zu verschlechtern.
+
+Ausgangslage:
+- setStatusLabel() schreibt in das Element status.
+- refreshVisibleImages() setzt z. B. 'Aktualisiert HH:MM:SS'.
+- updateOfflineUi() schreibt Offline-Status in status und offlineBanner/offlineStamp.
+- updatePageSummary() schreibt aggregierte Zustände wie 'offline', 'Fehler' oder 'lädt' in pageSummary.
+- setCardState() pflegt weiterhin die wichtigen Zustands-Badges pro Karte.
+
+Ziel:
+- Globale sichtbare Statusanzeige und globale sichtbare Zusammenfassung sollen für Nutzer entfallen.
+- Die pro Karte sichtbaren Badges (.card-status) sollen erhalten bleiben.
+- Die bestehende Offline-Funktionalität soll nicht kaputtgehen.
+- Accessibility und Robustheit sollen erhalten bleiben.
+
+Bitte analysiere zuerst kurz, ob es besser ist,
+- status / pageSummary gar nicht mehr zu beschreiben,
+- oder sie nur unsichtbar zu lassen,
+- oder die Logik teilweise als interne Logik beizubehalten.
+
+Danach bitte minimal-invasiv umsetzen.
+
+Technische Akzeptanzkriterien:
+- Kein global sichtbarer Zeitstempel für 'Aktualisiert ...'.
+- Keine global sichtbare Ladeanzahl / Zusammenfassung mehr.
+- card-status pro Bild bleibt erhalten.
+- Offline-Funktionalität bleibt stabil.
+- Keine Laufzeitfehler durch entfernte Status-Elemente.
+```
+
+---
+
+# 6) Abschluss-Prompt: Code-Review, Regression Check und Testliste
+
+Diesen Prompt nach der Umsetzung verwenden.
+
+```text
+Bitte prüfe die zuletzt umgesetzten Änderungen in index.html und app.js auf Konsistenz, tote Logik und mögliche Regressionen.
+
+Prüfe insbesondere:
+1. Wurden sichtbare Menüelemente entfernt, ohne dass Event-Listener oder DOM-Zugriffe fehlschlagen?
+2. Ist die Seitennavigation zyklisch und konsistent für ArrowLeft / ArrowRight, Swipe und Edge-Tap?
+3. Ist Pull-to-Refresh nur auf Seiten 0 bis 2 aktiv und nur im oberen Startzustand?
+4. Bleibt die Lightbox vollständig funktionsfähig?
+5. Reagiert das Theme live auf prefers-color-scheme-Wechsel?
+6. Sind alte Theme- und Refresh-Button-Pfade sauber entfernt oder defensiv abgesichert?
+7. Wurden keine unnötigen Refactorings eingeführt?
+
+Liefere:
+- eine kurze Liste mit gefundenen Risiken,
+- konkrete kleine Bereinigungsvorschläge,
+- eine manuelle Testcheckliste.
+
+Bitte noch keinen größeren Refactor durchführen, sondern nur Review + Empfehlungen liefern.
+```
+
+---
+
+# 7) Manuelle Test-Checkliste
+
+```markdown
+## Sichtbarkeit / UI
+- [ ] Topbar ist nicht sichtbar.
+- [ ] Thumbbar ist nicht sichtbar.
+- [ ] Kein sichtbarer Titel für Land / See / Höhenwetter.
+- [ ] Kein global sichtbarer Status / Zeitstempel / Summary.
+- [ ] Bild-Badges oben rechts auf Karten funktionieren weiterhin.
+
+## Navigation
+- [ ] ArrowLeft / ArrowRight wechseln Seiten.
+- [ ] Links von der ersten Seite führt auf die letzte Seite.
+- [ ] Rechts von der letzten Seite führt auf die erste Seite.
+- [ ] Horizontaler Swipe wechselt Seiten.
+- [ ] Edge-Tap links/rechts funktioniert weiterhin.
+
+## Refresh
+- [ ] Pull-to-Refresh funktioniert auf Seiten 0, 1 und 2.
+- [ ] Pull-to-Refresh funktioniert nicht auf der Textseite.
+- [ ] Pull-to-Refresh wird nur im oberen Startzustand ausgelöst.
+- [ ] Kein zusätzliches visuelles Refresh-Feedback erscheint.
+
+## Theme
+- [ ] System dunkel -> App dunkel.
+- [ ] System hell -> App hell.
+- [ ] Wechsel des Systemthemes bei geöffneter App wird übernommen.
+
+## Lightbox
+- [ ] Öffnen per Bildklick funktioniert.
+- [ ] Navigation in der Lightbox funktioniert.
+- [ ] Zoom / Pan / Double-Tap funktionieren.
+- [ ] Swipe down zum Schließen funktioniert weiterhin.
+```
+
+---
+
+# 8) Mein Rat für den effizientesten Einsatz in VS Code
+
+Arbeite nicht mit nur einem einzigen Mega-Prompt. Nutze stattdessen diese Reihenfolge:
+
+1. **Analyse-Prompt**
+2. **Topbar + Thumbbar entfernen**
+3. **Zyklische Navigation**
+4. **Pull-to-Refresh**
+5. **Theme-Automatik**
+6. **Statuslogik bereinigen**
+7. **Abschluss-Review**
+
+So steigt die Chance deutlich, dass Copilot präzise und minimal-invasiv arbeitet.
