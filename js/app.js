@@ -82,6 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let pageSwipeStartY = null
   let pageSwipeStartTimestamp = 0
 
+  let pullRefreshStartY = null
+  let pullRefreshStartTimestamp = 0
+
   let longPressTimerId = null
   let didTriggerLongPress = false
 
@@ -142,7 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isOffline) {
       offlineBannerElement.classList.remove('is-hidden')
       offlineStampElement.textContent = formatTimestamp(lastSuccessfulRefresh)
-      setStatusLabel(`Offline ${formatTimestamp(lastSuccessfulRefresh)}`)
       return
     }
 
@@ -200,48 +202,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function applyTheme (theme) {
     document.documentElement.setAttribute('data-theme', theme)
-
-    const themeIcon = theme === 'day' ? '☀' : theme === 'night' ? '🌙' : '✨'
-
-    if (themeButton) {
-      themeButton.textContent = themeIcon
-    }
-
-    if (thumbThemeButton) {
-      thumbThemeButton.textContent = themeIcon
-    }
   }
 
   function initTheme () {
-    let theme = 'day'
-
-    try {
-      theme = localStorage.getItem(THEME_STORAGE_KEY) || 'day'
-    } catch {
-      theme = 'day'
-    }
-
-    // Map legacy or unknown values to supported themes
-    if (theme === 'dim') {
-      theme = 'night'
-    }
-
+    // Derive theme from system preference
+    const prefersDark = window.matchMedia(
+      '(prefers-color-scheme: dark)'
+    ).matches
+    const theme = prefersDark ? 'night' : 'day'
     applyTheme(theme)
-  }
 
-  function toggleTheme () {
-    const currentTheme =
-      document.documentElement.getAttribute('data-theme') || 'day'
-    // Toggle only between day and night
-    const nextTheme = currentTheme === 'day' ? 'night' : 'day'
-
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, nextTheme)
-    } catch {
-      // localStorage is optional here.
-    }
-
-    applyTheme(nextTheme)
+    // Listen for system theme changes
+    window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', e => {
+        const newTheme = e.matches ? 'night' : 'day'
+        applyTheme(newTheme)
+      })
   }
 
   function ensureCardStatusElement (cardElement) {
@@ -384,7 +361,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (navigator.onLine && refreshedImageCount > 0) {
       setLastSuccessfulRefresh(Date.now())
-      setStatusLabel(`Aktualisiert ${getCurrentTimeLabel()}`)
     }
 
     updateOfflineUi()
@@ -392,20 +368,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function goToPage (pageIndex) {
-    const boundedPageIndex = Math.max(
-      0,
-      Math.min(PAGE_NAMES.length - 1, pageIndex)
-    )
+    // Cyclic navigation: wrap around at boundaries
+    currentPageIndex =
+      ((pageIndex % PAGE_NAMES.length) + PAGE_NAMES.length) % PAGE_NAMES.length
 
-    currentPageIndex = boundedPageIndex
     if (carouselElement) {
       carouselElement.style.transform = `translateX(${
         -currentPageIndex * 100
       }vw)`
-    }
-
-    if (pageTitleElement) {
-      pageTitleElement.textContent = PAGE_NAMES[currentPageIndex]
     }
 
     refreshVisibleImages()
@@ -706,6 +676,39 @@ document.addEventListener('DOMContentLoaded', () => {
     return false
   }
 
+  function startPullRefresh (clientY) {
+    // Only track pull-to-refresh if at top of viewport and on allowed pages
+    if (viewportElement.scrollTop === 0 && currentPageIndex <= 2) {
+      pullRefreshStartY = clientY
+      pullRefreshStartTimestamp = Date.now()
+    }
+  }
+
+  function finishPullRefresh (clientY) {
+    if (pullRefreshStartY === null) {
+      return
+    }
+
+    const deltaY = clientY - pullRefreshStartY
+    const gestureDurationMs = Date.now() - pullRefreshStartTimestamp
+    const PULL_REFRESH_MIN_DISTANCE_PX = 60
+    const PULL_REFRESH_MAX_DURATION_MS = 800
+
+    // Trigger refresh if pull was downward, fast, and at top
+    if (
+      deltaY >= PULL_REFRESH_MIN_DISTANCE_PX &&
+      gestureDurationMs <= PULL_REFRESH_MAX_DURATION_MS &&
+      viewportElement.scrollTop === 0 &&
+      currentPageIndex <= 2 &&
+      !isLightboxOpen
+    ) {
+      refreshVisibleImages()
+    }
+
+    pullRefreshStartY = null
+    pullRefreshStartTimestamp = 0
+  }
+
   IMAGE_ELEMENTS.forEach(imageElement => {
     setCardState(imageElement, 'loading')
 
@@ -769,10 +772,6 @@ document.addEventListener('DOMContentLoaded', () => {
     installHintElement.classList.add('is-hidden')
   })
 
-  themeButton?.addEventListener('click', toggleTheme)
-  thumbThemeButton?.addEventListener('click', toggleTheme)
-  refreshButton?.addEventListener('click', refreshVisibleImages)
-  thumbRefreshButton?.addEventListener('click', refreshVisibleImages)
   previousPageButton?.addEventListener('click', () =>
     goToPage(currentPageIndex - 1)
   )
@@ -1010,6 +1009,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const changedTouch = event.changedTouches[0]
       startPageSwipe(changedTouch.clientX, changedTouch.clientY)
+      startPullRefresh(changedTouch.clientY)
     },
     { passive: true }
   )
@@ -1023,6 +1023,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const changedTouch = event.changedTouches[0]
       finishPageSwipe(changedTouch.clientX, changedTouch.clientY)
+      finishPullRefresh(changedTouch.clientY)
     },
     { passive: true }
   )
