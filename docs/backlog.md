@@ -24,6 +24,102 @@
 ---
 
 # 📦 BACKLOG DETAILS
+---
+
+# 🔄 Feature: Datenzyklus & Cache-Optimierung
+
+## Ziel
+
+Vermeidung unnötiger Requests und Ermöglichung von Offline-Nutzung durch intelligente Nutzung des DWD-Update-Zyklus.
+
+---
+
+## Copilot Prompt
+
+```text
+Optimiere das bestehende DWD Dashboard hinsichtlich Datenverbrauch und Offline-Nutzung.
+
+Kontext:
+- Vanilla JavaScript
+- Bilder werden regelmäßig neu geladen
+- Service Worker ist bereits vorhanden (sw.js)
+- DWD-Daten werden nur zu festen Zeiten aktualisiert (00 und 12 UTC, Bereitstellung ca. 07 und 19 UTC)
+
+Ziel:
+- Vermeidung unnötiger Bild-Requests
+- Nutzung von Cache für Wiederverwendung
+- Offline-Funktionalität sicherstellen
+
+---
+
+1. Cache-Strategie
+
+- Nutze bestehende Service Worker Logik
+- Bilder sollen:
+  - zuerst aus Cache geladen werden
+  - nur bei Bedarf aktualisiert werden
+
+---
+
+2. Refresh-Logik anpassen
+
+Aktuell:
+- regelmäßiger Timer (REFRESH_INTERVAL_MS)
+
+Neu:
+- Prüfe:
+  - wann letzter erfolgreicher Refresh war
+  - aktuelle Zeit (UTC)
+- Nur refreshen wenn:
+  - nahe an bekannten Update-Zeiten (z. B. 07 oder 19 UTC)
+  - oder Nutzer manuell auslöst
+
+---
+
+3. Offline-Verhalten
+
+- Wenn navigator.onLine == false:
+  - keine neuen Requests senden
+  - ausschließlich Cache verwenden
+
+---
+
+4. Minimale Integration
+
+- beste Stelle:
+  - refreshVisibleImages()
+- erweitere dort Logik:
+  - optional skip refresh wenn Daten noch „frisch“
+
+---
+
+5. Optional (Bonus)
+
+- Speichere:
+  - lastModelRunTimestamp
+- einfache Regel:
+  - max. 2 echte Refreshs pro Tag
+
+---
+
+6. Constraints
+
+- keine neuen Libraries
+- bestehender Service Worker bleibt Grundlage
+- keine Änderung der Bildstruktur
+- minimal-invasive Änderungen
+
+---
+
+Vorgehen:
+
+1. Analyse der aktuellen Refresh-Logik
+2. Einbau einer Zeitprüfung
+3. Integration mit bestehendem Cache-System
+
+Keine unnötigen Refactorings durchführen.
+
+---
 
 ## 🌊 US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 
