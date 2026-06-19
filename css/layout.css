@@ -134,10 +134,28 @@
   grid-template-rows: repeat(3, 1fr);
 }
 
+.nordsea-grid {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+}
+
 .sea-row,
 .upper-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+}
+
+.nordsea-row {
+  display: grid;
+}
+
+.nordsea-row--two {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.nordsea-row--three {
+  grid-template-columns: repeat(3, 1fr);
 }
 
 /* =========================

@@ -6,6 +6,130 @@
 
 ## 🟥 TODO
 
+- (leer)
+
+## 🟨 DOING
+
+- (leer)
+
+## ✅ DONE
+
+- US-001 Menü entfernen
+- US-002 Navigation über Gesten
+- US-003 Pull-to-Refresh
+- US-004 Dark Mode automatisch
+- US-005 Metadaten entfernen
+- US-007 Visuelle Qualität und ruhige Darstellung optimieren
+- US-009 Zoom- und Navigationsverhalten im Bildmodus verbessern
+- US-010 Pan- und Zoom-Verhalten im Bildmodus verbessern (Elastic UX)
+- US-011 Seegangskarten Nordsee integrieren (3. Seite)
+
+---
+
+# 📦 BACKLOG DETAILS
+
+---
+
+---
+
+## 🌊 US-011 – Seegangskarten Nordsee integrieren (3. Seite)
+
+**Status:** DONE  
+**Priorität:** Hoch  
+
+👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Seegangskarten Nordsee“
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich eine eigene Seite mit Seegangskarten für die Nordsee sehen  
+damit ich Wellenentwicklung und Seegangsvorhersage übersichtlich und im gleichen Stil wie die anderen Karten interpretieren kann  
+
+---
+
+### 🎯 Zielbild
+
+- neue Seite im Dashboard (zusätzlich zu bestehenden Seiten)  
+- klare, strukturierte Darstellung der Vorhersagezeitpunkte  
+- visuell konsistent mit bestehendem Grid  
+
+---
+
+### ✅ Akzeptanzkriterien
+
+**Seitenintegration**
+- [x] Es gibt eine neue Seite im Carousel (Seite für „Seegang Nordsee“)
+- [x] Navigation per Swipe, Tastatur und Edge-Tap funktioniert wie auf den anderen Seiten
+- [x] Seite fügt sich ohne Layout-Brüche in das bestehende System ein
+
+---
+
+**Bildquellen**
+- [x] Bilder werden aus folgendem Pfad geladen: ./wv_spez/seewetter/nordsa_.png
+- [x] Unterstützte Zeitpunkte:
+  - 00
+  - 12
+  - 24
+  - 48
+  - 72
+
+---
+
+**Layout (zweizeilig)**
+- [x] Darstellung erfolgt in zwei Reihen:
+
+**Zeile 1:**
+- [x] nordsa_00.png
+- [x] nordsa_12.png
+
+**Zeile 2:**
+- [x] nordsa_24.png
+- [x] nordsa_48.png
+- [x] nordsa_72.png
+
+---
+
+**Visualisierung**
+- [x] Bilder werden gleichmäßig verteilt angezeigt
+- [x] Karten haben konsistente Größen und Abstände
+- [x] Layout ist responsive (Desktop / Tablet / Mobile)
+
+---
+
+**Aktualisierung**
+- [x] Seegangskarten werden nur zu sinnvollen Zeitpunkten aktualisiert (~07 UTC und ~19 UTC)
+- [x] Kein unnötiger Refresh zwischen den bekannten Veröffentlichungsfenstern
+- [x] Integration in bestehende Refresh-Logik (US-008)
+
+---
+
+**Integration mit bestehenden Features**
+- [x] Karten unterstützen:
+  - Zoom (US-009)
+  - Elastic Pan (US-010)
+- [x] Karten funktionieren im Offline-Modus (Cache-Strategie)
+- [x] Badge-Logik bleibt kompatibel
+
+---
+
+### 🧠 Definition of Done
+
+- Nutzer kann schnell alle relevanten Seegangsvorhersagen erfassen  
+- Struktur ist intuitiv (früh → spät von oben nach unten)  
+- Darstellung wirkt ruhig und konsistent mit bestehenden Seiten  
+- Navigation und Interaktion funktionieren identisch zu anderen Karten  
+
+---
+
+### 💡 Nutzen
+
+- Ergänzung der Wetteranalyse um Seegangsdaten  
+- bessere Einschätzung realer Bedingungen auf See  
+- logische Erweiterung der bestehenden Kartenstruktur  
+- Grundlage für spätere Verknüpfung mit Strom-/Windanalyse (US-006)
+
 ---
 
 ## 🧭 US-010 – Pan- und Zoom-Verhalten im Bildmodus verbessern (Elastic UX)
@@ -93,29 +217,6 @@ damit die Interaktion nicht blockierend wirkt und sich flüssig sowie intuitiv a
 - Vermeidung von Frustration durch blockierende Interaktion
 - natürlicheres Gefühl bei Touch-Gesten
 - Grundlage für erweitertes Zoom- und Navigationsverhalten
-
-## 🟨 DOING
-
-- (leer)
-
-## ✅ DONE
-
-- US-001 Menü entfernen
-- US-002 Navigation über Gesten
-- US-003 Pull-to-Refresh
-- US-004 Dark Mode automatisch
-- US-005 Metadaten entfernen
-- US-007 Visuelle Qualität und ruhige Darstellung optimieren
-- US-009 Zoom- und Navigationsverhalten im Bildmodus verbessern
-- US-010 Pan- und Zoom-Verhalten im Bildmodus verbessern (Elastic UX)
-
----
-
-# 📦 BACKLOG DETAILS
-
----
-
----
 
 ## 🔍 US-009 – Zoom- und Navigationsverhalten im Bildmodus verbessern
 

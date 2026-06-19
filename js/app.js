@@ -9,7 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const LONG_PRESS_DURATION_MS = 600
   const INFO_OVERLAY_DURATION_MS = 4500
   const EDGE_TAP_ZONE_PX = 26
-  const TEXT_PAGE_INDEX = 3
+  const NORDSEE_PAGE_INDEX = 3
+  const TEXT_PAGE_INDEX = 4
+  const NORDSEE_REFRESH_WINDOW_UTC_HOURS = [7, 19]
+  const NORDSEE_REFRESH_WINDOW_SPAN_MINUTES = 90
 
   const LIGHTBOX_MIN_SCALE = 1
   const LIGHTBOX_MAX_SCALE = 4
@@ -33,9 +36,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const PAGE_SWIPE_MAX_DURATION_MS = 800
 
   const LAST_SUCCESSFUL_REFRESH_KEY = 'dwdLastSuccessfulRefresh'
+  const NORDSEE_LAST_WINDOW_REFRESH_KEY = 'dwdNordseeLastWindowRefresh'
   const THEME_STORAGE_KEY = 'dwdTheme'
 
-  const PAGE_NAMES = ['Land', 'See / Seegang', 'Höhenwetter', 'Seewetter Texte']
+  const PAGE_NAMES = [
+    'Land',
+    'See / Seegang',
+    'Höhenwetter',
+    'Seegang Nordsee',
+    'Seewetter Texte'
+  ]
   const IMAGE_ELEMENTS = Array.from(
     document.querySelectorAll('img[data-base][data-path]')
   )
@@ -132,6 +142,65 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch {
       // localStorage is optional here.
     }
+  }
+
+  function getLastNordseeWindowRefresh () {
+    try {
+      return localStorage.getItem(NORDSEE_LAST_WINDOW_REFRESH_KEY)
+    } catch {
+      return null
+    }
+  }
+
+  function setLastNordseeWindowRefresh (windowId) {
+    try {
+      localStorage.setItem(NORDSEE_LAST_WINDOW_REFRESH_KEY, windowId)
+    } catch {
+      // localStorage is optional here.
+    }
+  }
+
+  function padTimePart (value) {
+    return String(value).padStart(2, '0')
+  }
+
+  function getActiveNordseeRefreshWindowId (now = new Date()) {
+    const utcYear = now.getUTCFullYear()
+    const utcMonth = now.getUTCMonth() + 1
+    const utcDate = now.getUTCDate()
+
+    for (const hour of NORDSEE_REFRESH_WINDOW_UTC_HOURS) {
+      const windowDate = new Date(
+        Date.UTC(utcYear, utcMonth - 1, utcDate, hour, 0, 0, 0)
+      )
+      const minutesDiff = Math.abs(now.getTime() - windowDate.getTime()) / 60000
+
+      if (minutesDiff <= NORDSEE_REFRESH_WINDOW_SPAN_MINUTES) {
+        return `${utcYear}-${padTimePart(utcMonth)}-${padTimePart(
+          utcDate
+        )}-${padTimePart(hour)}`
+      }
+    }
+
+    return null
+  }
+
+  function shouldSkipNordseeRefresh (pageImages) {
+    if (currentPageIndex !== NORDSEE_PAGE_INDEX) {
+      return false
+    }
+
+    const hasUnloadedImages = pageImages.some(imageElement => !imageElement.src)
+    if (hasUnloadedImages) {
+      return false
+    }
+
+    const activeWindowId = getActiveNordseeRefreshWindowId()
+    if (!activeWindowId) {
+      return true
+    }
+
+    return getLastNordseeWindowRefresh() === activeWindowId
   }
 
   function updateOfflineUi () {
@@ -288,19 +357,28 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
+    const currentPageImages = IMAGE_ELEMENTS.filter(imageElement => {
+      const pageElement = imageElement.closest('.page')
+      return (
+        pageElement && Number(pageElement.dataset.page) === currentPageIndex
+      )
+    })
+
+    if (!currentPageImages.length) {
+      updateOfflineUi()
+      return
+    }
+
+    if (shouldSkipNordseeRefresh(currentPageImages)) {
+      updateOfflineUi()
+      return
+    }
+
     const timestamp = Date.now()
     let refreshedImageCount = 0
+    const activeNordseeWindowId = getActiveNordseeRefreshWindowId()
 
-    IMAGE_ELEMENTS.forEach(imageElement => {
-      const pageElement = imageElement.closest('.page')
-      if (!pageElement) {
-        return
-      }
-
-      if (Number(pageElement.dataset.page) !== currentPageIndex) {
-        return
-      }
-
+    currentPageImages.forEach(imageElement => {
       refreshedImageCount += 1
       const imageUrl = buildImageUrl(imageElement, timestamp)
       if (!imageUrl) {
@@ -313,6 +391,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (navigator.onLine && refreshedImageCount > 0) {
       setLastSuccessfulRefresh(Date.now())
+
+      if (currentPageIndex === NORDSEE_PAGE_INDEX && activeNordseeWindowId) {
+        setLastNordseeWindowRefresh(activeNordseeWindowId)
+      }
     }
 
     updateOfflineUi()
@@ -1277,7 +1359,7 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshVisibleImages()
 
   window.setInterval(() => {
-    if (currentPageIndex <= 2 && !isLightboxOpen) {
+    if (currentPageIndex <= NORDSEE_PAGE_INDEX && !isLightboxOpen) {
       refreshVisibleImages()
     }
   }, REFRESH_INTERVAL_MS)

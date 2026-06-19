@@ -6,7 +6,7 @@ flowchart LR
   subgraph Browser
     UI[UI Layer<br/>HTML / CSS]
     App[App Controller<br/>app.js]
-    Carousel[Carousel / Pages]
+    Carousel[Carousel / Pages<br/>inkl. Nordsee-Seite]
     Lightbox[Lightbox<br/>Peek + Elastic Pan/Snap-Back + Cyclic Nav]
     Gestures[Input Handling<br/>Touch / Wheel / Key]
     Theme[Theme Manager<br/>Automatic Dark Mode]
