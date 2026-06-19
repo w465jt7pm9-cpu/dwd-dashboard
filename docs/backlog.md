@@ -6,7 +6,7 @@
 
 ## 🟥 TODO
 
-- Siehe Ideen
+- (leer)
 
 ## 🟨 DOING
 
@@ -20,11 +20,96 @@
 - US-004 Dark Mode automatisch
 - US-005 Metadaten entfernen
 - US-007 Visuelle Qualität und ruhige Darstellung optimieren
+- US-009 Zoom- und Navigationsverhalten im Bildmodus verbessern
+
 
 ---
 
 # 📦 BACKLOG DETAILS
 ---
+
+---
+
+## 🔍 US-009 – Zoom- und Navigationsverhalten im Bildmodus verbessern
+
+**Status:** DONE  
+**Priorität:** Mittel  
+
+👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Zoom & Peek Navigation“
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich ein Bild im Detailmodus vergrößert betrachten können und gleichzeitig die Nachbarbilder angedeutet sehen  
+damit ich Inhalte besser erkennen kann und stets die räumliche Orientierung innerhalb der Bildnavigation behalte  
+
+---
+
+### 🎯 Zielbild
+
+- Bild nutzt optimal die verfügbare Bildschirmhöhe  
+- benachbarte Bilder werden leicht angeschnitten sichtbar  
+- Navigation erfolgt fließend und nachvollziehbar  
+
+---
+
+### ✅ Akzeptanzkriterien
+
+**Zoom-Verhalten**
+- [x] Vergrößertes Bild richtet sich primär nach der verfügbaren Fensterhöhe (Viewport-Höhe)
+- [x] Das Bild bleibt vollständig sichtbar (kein ungewolltes Abschneiden)
+- [x] Seitenverhältnis bleibt erhalten (keine Verzerrung)
+- [x] Bild passt sich responsiv an verschiedene Geräte an
+
+---
+
+**Peek-Navigation (Orientierung)**
+- [x] Links und rechts vom aktuellen Bild sind angrenzende Bilder leicht angeschnitten sichtbar
+- [x] Die Vorschau ist visuell reduziert (z. B. geringere Opacity)
+- [x] Nutzer erkennt sofort, dass weitere Inhalte vorhanden sind
+
+---
+
+**Navigation**
+- [x] Wischen oder Pfeiltasten verschieben den Fokus fließend zum nächsten/vorherigen Bild
+- [x] Das aktuelle Bild gleitet animiert zur Seite, das nächste wird zentral
+- [x] Übergänge sind weich und nicht ruckartig
+
+---
+
+**Zyklisches Verhalten**
+- [x] Navigation ist endlos (letztes → erstes Bild, erstes → letztes Bild)
+- [x] Keine Sackgassen im Navigationsfluss
+
+---
+
+**Integration**
+- [x] Bestehende Lightbox-/Zoom-Logik wird erweitert oder ersetzt (keine Doppel-Logik)
+- [x] Funktion beeinflusst keine bestehenden Grid- oder Ladefunktionen
+- [x] Funktioniert auf Desktop und Touch-Geräten
+
+---
+
+### 🧠 Definition of Done
+
+- Nutzer erkennt intuitiv die Navigation ohne zusätzliche Hinweise  
+- Bilddarstellung wirkt ruhig, kontrolliert und hochwertig  
+- Navigation fühlt sich „natürlich“ und flüssig an  
+- Orientierung innerhalb der Bildfolge ist jederzeit gegeben  
+
+---
+
+### 💡 Nutzen
+
+- bessere Lesbarkeit der Wetterkarten  
+- deutlich verbesserte Benutzerführung  
+- Reduktion von „Verlorenheitsgefühl“ beim Navigieren  
+- Vorbereitung für spätere Features (z. B. Vergleich oder Analyse mehrerer Karten)
+``
+
+
 
 # 🔄 Feature: Datenzyklus & Cache-Optimierung
 

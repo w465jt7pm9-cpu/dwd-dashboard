@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const LIGHTBOX_PAGE_SWIPE_MAX_DURATION_MS = 800
   const LIGHTBOX_CLOSE_SWIPE_MIN_DISTANCE_PX = 80
   const LIGHTBOX_CLOSE_SWIPE_MAX_DURATION_MS = 700
+  const LIGHTBOX_IMAGE_SHIFT_PX = 18
+  const LIGHTBOX_IMAGE_SHIFT_DURATION_MS = 220
 
   const PAGE_SWIPE_MIN_DISTANCE_PX = 50
   const PAGE_SWIPE_MAX_DURATION_MS = 800
@@ -42,6 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const installHintCloseButton = document.getElementById('installHintClose')
   const lightboxElement = document.getElementById('lightbox')
   const lightboxImageElement = document.getElementById('lightboxImg')
+  const lightboxPeekPreviousElement = document.getElementById('lightboxPeekPrev')
+  const lightboxPeekNextElement = document.getElementById('lightboxPeekNext')
   const lightboxPreviousButton = document.getElementById('lbPrev')
   const lightboxNextButton = document.getElementById('lbNext')
 
@@ -66,6 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let lightboxSwipeStartX = null
   let lightboxSwipeStartY = null
   let lightboxSwipeStartTimestamp = 0
+  let lightboxImageShiftX = 0
+  let lightboxAnimationTimerId = null
 
   let pageSwipeStartX = null
   let pageSwipeStartY = null
@@ -349,6 +355,52 @@ document.addEventListener('DOMContentLoaded', () => {
     applyLightboxTransform()
   }
 
+  function getWrappedLightboxIndex (index) {
+    if (!lightboxImageList.length) {
+      return -1
+    }
+
+    return (index + lightboxImageList.length) % lightboxImageList.length
+  }
+
+  function setLightboxPeekImage (peekElement, listIndex) {
+    if (!peekElement || !lightboxImageList.length) {
+      return
+    }
+
+    const imageElement = lightboxImageList[getWrappedLightboxIndex(listIndex)]
+    const imageSource = imageElement?.src
+
+    if (!imageSource || lightboxImageList.length < 2) {
+      peekElement.classList.remove('is-visible')
+      peekElement.removeAttribute('src')
+      return
+    }
+
+    peekElement.src = imageSource
+    peekElement.classList.add('is-visible')
+  }
+
+  function updateLightboxPeekImages () {
+    if (!lightboxPeekPreviousElement || !lightboxPeekNextElement) {
+      return
+    }
+
+    if (!isLightboxOpen || !lightboxImageList.length) {
+      lightboxPeekPreviousElement.classList.remove('is-visible')
+      lightboxPeekPreviousElement.removeAttribute('src')
+      lightboxPeekNextElement.classList.remove('is-visible')
+      lightboxPeekNextElement.removeAttribute('src')
+      return
+    }
+
+    setLightboxPeekImage(
+      lightboxPeekPreviousElement,
+      currentLightboxImageIndex - 1
+    )
+    setLightboxPeekImage(lightboxPeekNextElement, currentLightboxImageIndex + 1)
+  }
+
   function getLightboxBounds () {
     const imageRect = lightboxImageElement.getBoundingClientRect()
     const renderedWidth = lightboxImageElement.offsetWidth || imageRect.width
@@ -380,9 +432,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function applyLightboxTransform () {
     clampLightboxPan()
-    lightboxImageElement.style.transform = `translate(${lightboxOffsetX}px, ${lightboxOffsetY}px) scale(${lightboxScale})`
+    lightboxImageElement.style.transform = `translate(${lightboxOffsetX + lightboxImageShiftX}px, ${lightboxOffsetY}px) scale(${lightboxScale})`
     lightboxImageElement.style.transformOrigin = 'center center'
     lightboxImageElement.style.cursor = lightboxScale > 1 ? 'grab' : 'zoom-out'
+
+    if (lightboxElement) {
+      lightboxElement.classList.toggle('lb-zoomed', lightboxScale > 1)
+    }
   }
 
   function showLightboxNavigationTemporarily () {
@@ -397,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, LIGHTBOX_NAV_HIDE_DELAY_MS)
   }
 
-  function showLightboxImageAt (nextIndex) {
+  function showLightboxImageAt (nextIndex, direction = 0) {
     if (!lightboxImageList.length) {
       return
     }
@@ -410,17 +466,37 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
+    clearTimeout(lightboxAnimationTimerId)
+    lightboxImageShiftX = 0
+    lightboxElement?.classList.remove('lb-animating')
+
     lightboxImageElement.src = imageElement.src
     resetLightboxZoom()
+
+    if (direction !== 0 && lightboxElement) {
+      lightboxElement.classList.add('lb-animating')
+      lightboxImageShiftX = direction > 0 ? -LIGHTBOX_IMAGE_SHIFT_PX : LIGHTBOX_IMAGE_SHIFT_PX
+      applyLightboxTransform()
+      window.requestAnimationFrame(() => {
+        lightboxImageShiftX = 0
+        applyLightboxTransform()
+      })
+
+      lightboxAnimationTimerId = window.setTimeout(() => {
+        lightboxElement.classList.remove('lb-animating')
+      }, LIGHTBOX_IMAGE_SHIFT_DURATION_MS)
+    }
+
+    updateLightboxPeekImages()
     showLightboxNavigationTemporarily()
   }
 
   function showPreviousLightboxImage () {
-    showLightboxImageAt(currentLightboxImageIndex - 1)
+    showLightboxImageAt(currentLightboxImageIndex - 1, -1)
   }
 
   function showNextLightboxImage () {
-    showLightboxImageAt(currentLightboxImageIndex + 1)
+    showLightboxImageAt(currentLightboxImageIndex + 1, 1)
   }
 
   function openLightboxForImage (imageElement) {
@@ -437,6 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxElement.classList.add('open', 'lb-show')
     lightboxElement.setAttribute('aria-hidden', 'false')
     isLightboxOpen = true
+    updateLightboxPeekImages()
     showLightboxNavigationTemporarily()
   }
 
@@ -444,10 +521,14 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxElement.classList.remove('open', 'lb-show')
     lightboxElement.setAttribute('aria-hidden', 'true')
     lightboxImageElement.src = ''
+    lightboxImageShiftX = 0
     lightboxImageList = []
     currentLightboxImageIndex = -1
     isLightboxOpen = false
     clearTimeout(lightboxHideTimerId)
+    clearTimeout(lightboxAnimationTimerId)
+    lightboxElement.classList.remove('lb-animating', 'lb-zoomed')
+    updateLightboxPeekImages()
     resetLightboxZoom()
   }
 
@@ -656,6 +737,13 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     imageElement.addEventListener('click', event => {
+      // Preserve edge navigation on desktop even when an image covers the edge.
+      if (!isLightboxOpen && handleEdgeTap(event.clientX)) {
+        event.preventDefault()
+        event.stopPropagation()
+        return
+      }
+
       if (didTriggerLongPress) {
         event.preventDefault()
         event.stopPropagation()
@@ -980,6 +1068,14 @@ document.addEventListener('DOMContentLoaded', () => {
     handleEdgeTap(event.clientX)
   })
 
+  function isArrowLeft (event) {
+    return event.key === 'ArrowLeft' || event.code === 'ArrowLeft'
+  }
+
+  function isArrowRight (event) {
+    return event.key === 'ArrowRight' || event.code === 'ArrowRight'
+  }
+
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && isLightboxOpen) {
       closeLightbox()
@@ -987,12 +1083,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (isLightboxOpen) {
-      if (event.key === 'ArrowLeft') {
+      if (isArrowLeft(event)) {
+        event.preventDefault()
         showPreviousLightboxImage()
         return
       }
 
-      if (event.key === 'ArrowRight') {
+      if (isArrowRight(event)) {
+        event.preventDefault()
         showNextLightboxImage()
         return
       }
@@ -1000,11 +1098,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    if (event.key === 'ArrowLeft') {
+    if (isArrowLeft(event)) {
+      event.preventDefault()
       goToPage(currentPageIndex - 1)
     }
 
-    if (event.key === 'ArrowRight') {
+    if (isArrowRight(event)) {
+      event.preventDefault()
       goToPage(currentPageIndex + 1)
     }
   })

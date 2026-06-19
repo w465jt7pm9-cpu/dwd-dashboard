@@ -379,7 +379,19 @@
       </div>
     </div>
     <div class="lightbox" id="lightbox" aria-hidden="true">
-      <img id="lightboxImg" alt="Vergrößerte Wetterkarte" /><button
+      <img
+        class="lightbox-peek lightbox-peek--prev"
+        id="lightboxPeekPrev"
+        alt=""
+        aria-hidden="true"
+      />
+      <img id="lightboxImg" class="lightbox-main" alt="Vergrößerte Wetterkarte" />
+      <img
+        class="lightbox-peek lightbox-peek--next"
+        id="lightboxPeekNext"
+        alt=""
+        aria-hidden="true"
+      /><button
         class="lb-nav lb-prev"
         id="lbPrev"
         type="button"
