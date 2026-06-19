@@ -253,6 +253,14 @@
   -webkit-user-drag: none;
 }
 
+.lightbox.lb-dragging .lightbox-main {
+  transition: none;
+}
+
+.lightbox.lb-snapback .lightbox-main {
+  transition: transform 0.18s ease-out, opacity 0.22s ease;
+}
+
 .lightbox.lb-animating .lightbox-main {
   opacity: 0.96;
 }

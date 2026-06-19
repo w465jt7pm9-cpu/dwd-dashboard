@@ -7,7 +7,7 @@ flowchart LR
     UI[UI Layer<br/>HTML / CSS]
     App[App Controller<br/>app.js]
     Carousel[Carousel / Pages]
-    Lightbox[Lightbox<br/>Peek + Zoom/Pan + Cyclic Nav]
+    Lightbox[Lightbox<br/>Peek + Elastic Pan/Snap-Back + Cyclic Nav]
     Gestures[Input Handling<br/>Touch / Wheel / Key]
     Theme[Theme Manager<br/>Automatic Dark Mode]
     Refresh[Pull-to-Refresh<br/>Touch / Trackpad]

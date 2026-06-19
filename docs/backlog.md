@@ -6,7 +6,93 @@
 
 ## 🟥 TODO
 
-- (leer)
+---
+
+## 🧭 US-010 – Pan- und Zoom-Verhalten im Bildmodus verbessern (Elastic UX)
+
+**Status:** DONE  
+**Priorität:** Mittel
+
+👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Elastic Pan & Clamp Verhalten“
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich Bilder im Zoom-Modus frei verschieben können und dabei ein natürliches, „physikalisches“ Verhalten erleben  
+damit die Interaktion nicht blockierend wirkt und sich flüssig sowie intuitiv anfühlt
+
+---
+
+### 🎯 Zielbild
+
+- Zoomen und Verschieben fühlt sich frei und natürlich an
+- Bewegungen werden nicht abrupt gestoppt
+- Bild kann leicht über den Rand hinaus verschoben werden
+- nach dem Loslassen kehrt es sanft in den gültigen Bereich zurück
+
+---
+
+### ✅ Akzeptanzkriterien
+
+**Pan-Verhalten**
+
+- [x] Bild kann nach dem Zoomen in alle Richtungen verschoben werden
+- [x] Bewegung wird nicht abrupt durch harte Grenzen gestoppt
+- [x] Leichte Überbewegung über den sichtbaren Bereich hinaus ist möglich
+
+---
+
+**Elastic / „Gummiband“-Effekt**
+
+- [x] Beim Ziehen über den Rand entsteht ein gedämpfter Widerstand
+- [x] Bewegung wird bei zunehmender Entfernung langsamer („Resistance“)
+- [x] Verhalten fühlt sich „weich“ statt technisch an
+
+---
+
+**Zurückspringen (Clamp)**
+
+- [x] Beim Loslassen kehrt das Bild automatisch in den gültigen Bereich zurück
+- [x] Rückbewegung erfolgt animiert (kein Sprung)
+- [x] Animation ist kurz, weich und nicht störend
+
+---
+
+**Zoom-Kombination**
+
+- [x] Verhalten funktioniert unabhängig davon, ob echtes Overflow vorhanden ist
+- [x] Auch bei Bildern, die vollständig in den Viewport passen, ist Bewegung möglich
+- [x] Zoom + Pan wirken als zusammenhängendes System
+
+---
+
+**Integration**
+
+- [x] Bestehende Lightbox-Struktur wird beibehalten
+- [x] Keine Beeinträchtigung von:
+  - Swipe-Navigation
+  - Zoom-Gesten (Pinch)
+- [x] Funktioniert auf Touch- und Desktop-Geräten
+
+---
+
+### 🧠 Definition of Done
+
+- Nutzer kann ein Bild intuitiv bewegen, ohne „gegen Grenzen zu kämpfen“
+- Interaktion wirkt flüssig und hochwertig
+- Übergang zwischen Ziehen und Zurückspringen ist visuell konsistent
+- Verhalten entspricht bekannten Mustern moderner Apps (z. B. Bilder-Viewer)
+
+---
+
+### 💡 Nutzen
+
+- deutlich bessere Benutzererfahrung im Zoom-Modus
+- Vermeidung von Frustration durch blockierende Interaktion
+- natürlicheres Gefühl bei Touch-Gesten
+- Grundlage für erweitertes Zoom- und Navigationsverhalten
 
 ## 🟨 DOING
 
@@ -21,11 +107,12 @@
 - US-005 Metadaten entfernen
 - US-007 Visuelle Qualität und ruhige Darstellung optimieren
 - US-009 Zoom- und Navigationsverhalten im Bildmodus verbessern
-
+- US-010 Pan- und Zoom-Verhalten im Bildmodus verbessern (Elastic UX)
 
 ---
 
 # 📦 BACKLOG DETAILS
+
 ---
 
 ---
@@ -33,7 +120,7 @@
 ## 🔍 US-009 – Zoom- und Navigationsverhalten im Bildmodus verbessern
 
 **Status:** DONE  
-**Priorität:** Mittel  
+**Priorität:** Mittel
 
 👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Zoom & Peek Navigation“
 
@@ -43,21 +130,22 @@
 
 Als Nutzer  
 möchte ich ein Bild im Detailmodus vergrößert betrachten können und gleichzeitig die Nachbarbilder angedeutet sehen  
-damit ich Inhalte besser erkennen kann und stets die räumliche Orientierung innerhalb der Bildnavigation behalte  
+damit ich Inhalte besser erkennen kann und stets die räumliche Orientierung innerhalb der Bildnavigation behalte
 
 ---
 
 ### 🎯 Zielbild
 
-- Bild nutzt optimal die verfügbare Bildschirmhöhe  
-- benachbarte Bilder werden leicht angeschnitten sichtbar  
-- Navigation erfolgt fließend und nachvollziehbar  
+- Bild nutzt optimal die verfügbare Bildschirmhöhe
+- benachbarte Bilder werden leicht angeschnitten sichtbar
+- Navigation erfolgt fließend und nachvollziehbar
 
 ---
 
 ### ✅ Akzeptanzkriterien
 
 **Zoom-Verhalten**
+
 - [x] Vergrößertes Bild richtet sich primär nach der verfügbaren Fensterhöhe (Viewport-Höhe)
 - [x] Das Bild bleibt vollständig sichtbar (kein ungewolltes Abschneiden)
 - [x] Seitenverhältnis bleibt erhalten (keine Verzerrung)
@@ -66,6 +154,7 @@ damit ich Inhalte besser erkennen kann und stets die räumliche Orientierung inn
 ---
 
 **Peek-Navigation (Orientierung)**
+
 - [x] Links und rechts vom aktuellen Bild sind angrenzende Bilder leicht angeschnitten sichtbar
 - [x] Die Vorschau ist visuell reduziert (z. B. geringere Opacity)
 - [x] Nutzer erkennt sofort, dass weitere Inhalte vorhanden sind
@@ -73,6 +162,7 @@ damit ich Inhalte besser erkennen kann und stets die räumliche Orientierung inn
 ---
 
 **Navigation**
+
 - [x] Wischen oder Pfeiltasten verschieben den Fokus fließend zum nächsten/vorherigen Bild
 - [x] Das aktuelle Bild gleitet animiert zur Seite, das nächste wird zentral
 - [x] Übergänge sind weich und nicht ruckartig
@@ -80,12 +170,14 @@ damit ich Inhalte besser erkennen kann und stets die räumliche Orientierung inn
 ---
 
 **Zyklisches Verhalten**
+
 - [x] Navigation ist endlos (letztes → erstes Bild, erstes → letztes Bild)
 - [x] Keine Sackgassen im Navigationsfluss
 
 ---
 
 **Integration**
+
 - [x] Bestehende Lightbox-/Zoom-Logik wird erweitert oder ersetzt (keine Doppel-Logik)
 - [x] Funktion beeinflusst keine bestehenden Grid- oder Ladefunktionen
 - [x] Funktioniert auf Desktop und Touch-Geräten
@@ -94,22 +186,20 @@ damit ich Inhalte besser erkennen kann und stets die räumliche Orientierung inn
 
 ### 🧠 Definition of Done
 
-- Nutzer erkennt intuitiv die Navigation ohne zusätzliche Hinweise  
-- Bilddarstellung wirkt ruhig, kontrolliert und hochwertig  
-- Navigation fühlt sich „natürlich“ und flüssig an  
-- Orientierung innerhalb der Bildfolge ist jederzeit gegeben  
+- Nutzer erkennt intuitiv die Navigation ohne zusätzliche Hinweise
+- Bilddarstellung wirkt ruhig, kontrolliert und hochwertig
+- Navigation fühlt sich „natürlich“ und flüssig an
+- Orientierung innerhalb der Bildfolge ist jederzeit gegeben
 
 ---
 
 ### 💡 Nutzen
 
-- bessere Lesbarkeit der Wetterkarten  
-- deutlich verbesserte Benutzerführung  
-- Reduktion von „Verlorenheitsgefühl“ beim Navigieren  
+- bessere Lesbarkeit der Wetterkarten
+- deutlich verbesserte Benutzerführung
+- Reduktion von „Verlorenheitsgefühl“ beim Navigieren
 - Vorbereitung für spätere Features (z. B. Vergleich oder Analyse mehrerer Karten)
-``
-
-
+  ``
 
 # 🔄 Feature: Datenzyklus & Cache-Optimierung
 
@@ -208,7 +298,7 @@ Keine unnötigen Refactorings durchführen.
 
 ## 🌊 US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 
-**Status:** TODO  
+**Status:** TODO
 **Priorität:** Hoch
 
 👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Wind gegen Strom“
@@ -217,15 +307,15 @@ Keine unnötigen Refactorings durchführen.
 
 ### 🧑‍✈️ Beschreibung
 
-Als erfahrener Skipper in der Nordsee  
-möchte ich erkennen, ob Wind und Gezeitenströmung gegeneinander laufen  
+Als erfahrener Skipper in der Nordsee
+möchte ich erkennen, ob Wind und Gezeitenströmung gegeneinander laufen
 damit ich kritische Seebedingungen (steile, kurze und brechende Wellen) frühzeitig einschätzen und vermeiden kann
 
 ---
 
 ### 🌊 Fachliche Idee
 
-Wetterkarten allein reichen nicht aus, um reale Seebedingungen zu bewerten.  
+Wetterkarten allein reichen nicht aus, um reale Seebedingungen zu bewerten.
 Erst die Kombination aus Wind- und Strömungsrichtung ergibt ein realistisches Bild der See.
 
 Besonders kritisch:
@@ -284,7 +374,7 @@ Besonders kritisch:
 
 - realistischere Einschätzung von Seegang
 - bessere Entscheidungsgrundlage für Navigation
-- erhöhter Sicherheitsaspekt  
+- erhöhter Sicherheitsaspekt
   ``
 
 ---
@@ -295,12 +385,12 @@ _(hierher verschieben, wenn erledigt)_
 
 ## 🔴 US-001 – Menü vollständig entfernen
 
-**Status:** DONE  
+**Status:** DONE
 **Priorität:** Hoch
 
 👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 2 (Topbar + Thumbbar entfernen)
 
-**Beschreibung**  
+**Beschreibung**
 Als Nutzer möchte ich kein oberes Menü sehen, damit die Anzeige auf die Inhalte fokussiert bleibt.
 
 **Akzeptanzkriterien**
@@ -312,12 +402,12 @@ Als Nutzer möchte ich kein oberes Menü sehen, damit die Anzeige auf die Inhalt
 
 ## 🔴 US-002 – Navigation über Gesten/Tasten
 
-**Status:** DONE  
+**Status:** DONE
 **Priorität:** Hoch
 
 👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 3 (Navigation zyklisch)
 
-**Beschreibung**  
+**Beschreibung**
 Als Nutzer möchte ich per Pfeiltasten (Desktop) und Swipe (Mobile) navigieren.
 
 **Akzeptanzkriterien**
@@ -330,12 +420,12 @@ Als Nutzer möchte ich per Pfeiltasten (Desktop) und Swipe (Mobile) navigieren.
 
 ## 🟡 US-003 – Aktualisierung per Pull-to-Refresh
 
-**Status:** DONE  
+**Status:** DONE
 **Priorität:** Mittel
 
 👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 4 (Pull-to-Refresh)
 
-**Beschreibung**  
+**Beschreibung**
 Als Nutzer möchte ich durch Herunterziehen aktualisieren statt eines Buttons.
 
 **Akzeptanzkriterien**
@@ -349,12 +439,12 @@ Als Nutzer möchte ich durch Herunterziehen aktualisieren statt eines Buttons.
 
 ## 🟡 US-004 – Dark Mode automatisch übernehmen
 
-**Status:** DONE  
+**Status:** DONE
 **Priorität:** Mittel
 
 👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 5 (Theme automatisch)
 
-**Beschreibung**  
+**Beschreibung**
 Als Nutzer möchte ich keinen Night-Mode-Schalter, sondern eine automatische Anpassung an das System.
 
 **Akzeptanzkriterien**
@@ -367,12 +457,12 @@ Als Nutzer möchte ich keinen Night-Mode-Schalter, sondern eine automatische Anp
 
 ## 🟢 US-005 – Metadaten entfernen
 
-**Status:** DONE  
+**Status:** DONE
 **Priorität:** Niedrig
 
 👉 **Umsetzung:** siehe `docs/copilot-checklist.md` → Abschnitt 6 (Statuslogik bereinigen)
 
-**Beschreibung**  
+**Beschreibung**
 Land, Höhe und Seegang sollen nicht mehr als Text dargestellt werden.
 
 **Akzeptanzkriterien**
@@ -385,7 +475,7 @@ Land, Höhe und Seegang sollen nicht mehr als Text dargestellt werden.
 
 ## 🎨 US-007 – Visuelle Qualität und ruhige Darstellung optimieren
 
-**Status:** DONE  
+**Status:** DONE
 **Priorität:** Hoch
 
 👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „UI-Polish / Visual Refinement“
@@ -394,8 +484,8 @@ Land, Höhe und Seegang sollen nicht mehr als Text dargestellt werden.
 
 ### 🧑‍💻 Beschreibung
 
-Als Nutzer  
-möchte ich eine ruhige, klare und visuell hochwertige Darstellung der Wetterkarten  
+Als Nutzer
+möchte ich eine ruhige, klare und visuell hochwertige Darstellung der Wetterkarten
 damit ich die Inhalte schnell erfassen kann, ohne durch UI-Elemente oder harte Übergänge abgelenkt zu werden
 
 ---
@@ -479,7 +569,7 @@ damit ich die Inhalte schnell erfassen kann, ohne durch UI-Elemente oder harte �
 
 ## 🔄 Refresh-Zyklus optimieren
 
-**Idee:**  
+**Idee:**
 Die DWD-Bilddaten werden in festen Intervallen aktualisiert. Zwischen diesen Intervallen liefern erneute Requests identische Inhalte. Der aktuelle Refresh-Mechanismus berücksichtigt diesen Veröffentlichungsrhythmus nicht.
 
 **Ziel:**
@@ -495,7 +585,7 @@ Die DWD-Bilddaten werden in festen Intervallen aktualisiert. Zwischen diesen Int
 
 ## 🌊 Gezeiten- und Stromdaten integrieren
 
-**Idee:**  
+**Idee:**
 Ergänzung des Dashboards um Gezeiten- und Strömungsdaten für die Nordsee zur besseren Bewertung von Wind-gegen-Strom-Situationen.
 
 **Ziel:**
@@ -518,3 +608,4 @@ Ergänzung des Dashboards um Gezeiten- und Strömungsdaten für die Nordsee zur 
 
 **Idee:** Offline-Nutzung verbessern
 👉 **Mögliche Umsetzung:** basiert auf bestehendem Service Worker (`sw.js`)
+```

@@ -2,6 +2,7 @@
 
 > Release 1.0: Fokus auf ruhige, bildschirmfüllende Wetterkarte ohne Menü, mit natürlicher Navigation und automatischem Dark Mode.
 > Update US-009: Lightbox zeigt subtile Peek-Nachbarn und nutzt zyklische, weiche Bildnavigation.
+> Update US-010: Zoom-Pan verhält sich elastisch mit weichem Snap-Back beim Loslassen.
 
 ```mermaid
 flowchart TD
@@ -15,6 +16,7 @@ flowchart TD
   Lightbox --> Image[Hauptbild - Zoomed]
   Lightbox --> Peek[Peek links/rechts]
   Lightbox --> Arrows[Pfeile dynamisch]
+  Lightbox --> Elastic[Elastic Pan + Soft Clamp]
   Lightbox --> Overlay[Hintergrund]
   App --> Gestures[Gesten / Pfeiltasten]
   App --> Theme[Automatischer Dark Mode]

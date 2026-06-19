@@ -23,6 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const LIGHTBOX_CLOSE_SWIPE_MAX_DURATION_MS = 700
   const LIGHTBOX_IMAGE_SHIFT_PX = 18
   const LIGHTBOX_IMAGE_SHIFT_DURATION_MS = 220
+  const LIGHTBOX_ELASTIC_MAX_PX = 36
+  const LIGHTBOX_ELASTIC_RESISTANCE = 0.35
+  const LIGHTBOX_SNAPBACK_DURATION_MS = 180
+  const LIGHTBOX_PAN_MIN_SCALE = 1.01
+  const LIGHTBOX_PAN_GESTURE_THRESHOLD_PX = 6
 
   const PAGE_SWIPE_MIN_DISTANCE_PX = 50
   const PAGE_SWIPE_MAX_DURATION_MS = 800
@@ -44,7 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const installHintCloseButton = document.getElementById('installHintClose')
   const lightboxElement = document.getElementById('lightbox')
   const lightboxImageElement = document.getElementById('lightboxImg')
-  const lightboxPeekPreviousElement = document.getElementById('lightboxPeekPrev')
+  const lightboxPeekPreviousElement =
+    document.getElementById('lightboxPeekPrev')
   const lightboxPeekNextElement = document.getElementById('lightboxPeekNext')
   const lightboxPreviousButton = document.getElementById('lbPrev')
   const lightboxNextButton = document.getElementById('lbNext')
@@ -72,6 +78,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let lightboxSwipeStartTimestamp = 0
   let lightboxImageShiftX = 0
   let lightboxAnimationTimerId = null
+  let lightboxSnapbackTimerId = null
+  let isLightboxPanning = false
+  let didLightboxPanInGesture = false
+  let lightboxPanStartX = 0
+  let lightboxPanStartY = 0
 
   let pageSwipeStartX = null
   let pageSwipeStartY = null
@@ -405,36 +416,143 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageRect = lightboxImageElement.getBoundingClientRect()
     const renderedWidth = lightboxImageElement.offsetWidth || imageRect.width
     const renderedHeight = lightboxImageElement.offsetHeight || imageRect.height
+    const overflowX = Math.max(0, renderedWidth * (lightboxScale - 1))
+    const overflowY = Math.max(0, renderedHeight * (lightboxScale - 1))
 
     return {
-      overflowX: Math.max(0, renderedWidth * (lightboxScale - 1)),
-      overflowY: Math.max(0, renderedHeight * (lightboxScale - 1))
+      minOffsetX: -overflowX / 2,
+      maxOffsetX: overflowX / 2,
+      minOffsetY: -overflowY / 2,
+      maxOffsetY: overflowY / 2
     }
   }
 
-  function clampLightboxPan () {
-    const { overflowX, overflowY } = getLightboxBounds()
+  function clampValue (value, min, max) {
+    return Math.min(max, Math.max(min, value))
+  }
 
-    const minOffsetX = -overflowX
-    const maxOffsetX = 0
-    const minOffsetY = -overflowY
-    const maxOffsetY = 0
+  function applyElasticResistance (value, min, max) {
+    if (value < min) {
+      const overflow = min - value
+      return (
+        min -
+        Math.min(
+          LIGHTBOX_ELASTIC_MAX_PX,
+          overflow * LIGHTBOX_ELASTIC_RESISTANCE
+        )
+      )
+    }
 
-    lightboxOffsetX = Math.min(
-      maxOffsetX,
-      Math.max(minOffsetX, lightboxOffsetX)
+    if (value > max) {
+      const overflow = value - max
+      return (
+        max +
+        Math.min(
+          LIGHTBOX_ELASTIC_MAX_PX,
+          overflow * LIGHTBOX_ELASTIC_RESISTANCE
+        )
+      )
+    }
+
+    return value
+  }
+
+  function clampLightboxPan (mode = 'strict') {
+    const bounds = getLightboxBounds()
+
+    if (mode === 'elastic') {
+      lightboxOffsetX = applyElasticResistance(
+        lightboxOffsetX,
+        bounds.minOffsetX,
+        bounds.maxOffsetX
+      )
+      lightboxOffsetY = applyElasticResistance(
+        lightboxOffsetY,
+        bounds.minOffsetY,
+        bounds.maxOffsetY
+      )
+      return
+    }
+
+    lightboxOffsetX = clampValue(
+      lightboxOffsetX,
+      bounds.minOffsetX,
+      bounds.maxOffsetX
     )
-    lightboxOffsetY = Math.min(
-      maxOffsetY,
-      Math.max(minOffsetY, lightboxOffsetY)
+    lightboxOffsetY = clampValue(
+      lightboxOffsetY,
+      bounds.minOffsetY,
+      bounds.maxOffsetY
     )
   }
 
-  function applyLightboxTransform () {
-    clampLightboxPan()
-    lightboxImageElement.style.transform = `translate(${lightboxOffsetX + lightboxImageShiftX}px, ${lightboxOffsetY}px) scale(${lightboxScale})`
+  function isLightboxPanOutsideBounds () {
+    const bounds = getLightboxBounds()
+
+    return (
+      lightboxOffsetX < bounds.minOffsetX ||
+      lightboxOffsetX > bounds.maxOffsetX ||
+      lightboxOffsetY < bounds.minOffsetY ||
+      lightboxOffsetY > bounds.maxOffsetY
+    )
+  }
+
+  function clearLightboxSnapbackState () {
+    clearTimeout(lightboxSnapbackTimerId)
+    lightboxElement?.classList.remove('lb-snapback')
+  }
+
+  function beginLightboxPanGesture (clientX, clientY) {
+    isLightboxPanning = true
+    didLightboxPanInGesture = false
+    lightboxPanStartX = clientX
+    lightboxPanStartY = clientY
+    clearLightboxSnapbackState()
+    lightboxElement?.classList.add('lb-dragging')
+  }
+
+  function markLightboxPanGesture (clientX, clientY) {
+    if (didLightboxPanInGesture) {
+      return
+    }
+
+    const deltaX = clientX - lightboxPanStartX
+    const deltaY = clientY - lightboxPanStartY
+    didLightboxPanInGesture =
+      Math.abs(deltaX) >= LIGHTBOX_PAN_GESTURE_THRESHOLD_PX ||
+      Math.abs(deltaY) >= LIGHTBOX_PAN_GESTURE_THRESHOLD_PX
+  }
+
+  function endLightboxPanGesture () {
+    if (!isLightboxPanning) {
+      return
+    }
+
+    isLightboxPanning = false
+    lightboxElement?.classList.remove('lb-dragging')
+
+    if (!isLightboxPanOutsideBounds()) {
+      return
+    }
+
+    lightboxElement?.classList.add('lb-snapback')
+    applyLightboxTransform('strict')
+    lightboxSnapbackTimerId = window.setTimeout(() => {
+      lightboxElement?.classList.remove('lb-snapback')
+    }, LIGHTBOX_SNAPBACK_DURATION_MS)
+  }
+
+  function applyLightboxTransform (mode = 'strict') {
+    clampLightboxPan(mode)
+    lightboxImageElement.style.transform = `translate(${
+      lightboxOffsetX + lightboxImageShiftX
+    }px, ${lightboxOffsetY}px) scale(${lightboxScale})`
     lightboxImageElement.style.transformOrigin = 'center center'
-    lightboxImageElement.style.cursor = lightboxScale > 1 ? 'grab' : 'zoom-out'
+    lightboxImageElement.style.cursor = isLightboxPanning
+      ? 'grabbing'
+      : lightboxScale > 1
+      ? 'grab'
+      : 'zoom-out'
 
     if (lightboxElement) {
       lightboxElement.classList.toggle('lb-zoomed', lightboxScale > 1)
@@ -475,7 +593,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (direction !== 0 && lightboxElement) {
       lightboxElement.classList.add('lb-animating')
-      lightboxImageShiftX = direction > 0 ? -LIGHTBOX_IMAGE_SHIFT_PX : LIGHTBOX_IMAGE_SHIFT_PX
+      lightboxImageShiftX =
+        direction > 0 ? -LIGHTBOX_IMAGE_SHIFT_PX : LIGHTBOX_IMAGE_SHIFT_PX
       applyLightboxTransform()
       window.requestAnimationFrame(() => {
         lightboxImageShiftX = 0
@@ -527,7 +646,10 @@ document.addEventListener('DOMContentLoaded', () => {
     isLightboxOpen = false
     clearTimeout(lightboxHideTimerId)
     clearTimeout(lightboxAnimationTimerId)
-    lightboxElement.classList.remove('lb-animating', 'lb-zoomed')
+    clearLightboxSnapbackState()
+    lightboxElement.classList.remove('lb-animating', 'lb-zoomed', 'lb-dragging')
+    isLightboxPanning = false
+    didLightboxPanInGesture = false
     updateLightboxPeekImages()
     resetLightboxZoom()
   }
@@ -839,18 +961,19 @@ document.addEventListener('DOMContentLoaded', () => {
         lightboxOffsetY = 0
       }
 
-      applyLightboxTransform()
+      applyLightboxTransform('strict')
       showLightboxNavigationTemporarily()
     },
     { passive: false }
   )
 
   lightboxImageElement.addEventListener('pointerdown', event => {
-    if (!isLightboxOpen || lightboxScale <= 1) {
+    if (!isLightboxOpen || lightboxScale < LIGHTBOX_PAN_MIN_SCALE) {
       return
     }
 
     isDraggingLightboxImage = true
+    beginLightboxPanGesture(event.clientX, event.clientY)
     dragOriginX = event.clientX - lightboxOffsetX
     dragOriginY = event.clientY - lightboxOffsetY
 
@@ -860,22 +983,29 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   lightboxImageElement.addEventListener('pointermove', event => {
-    if (!isLightboxOpen || !isDraggingLightboxImage || lightboxScale <= 1) {
+    if (
+      !isLightboxOpen ||
+      !isDraggingLightboxImage ||
+      lightboxScale < LIGHTBOX_PAN_MIN_SCALE
+    ) {
       return
     }
 
+    markLightboxPanGesture(event.clientX, event.clientY)
     lightboxOffsetX = event.clientX - dragOriginX
     lightboxOffsetY = event.clientY - dragOriginY
-    applyLightboxTransform()
+    applyLightboxTransform('elastic')
     event.preventDefault()
   })
 
   lightboxImageElement.addEventListener('pointerup', () => {
     isDraggingLightboxImage = false
+    endLightboxPanGesture()
   })
 
   lightboxImageElement.addEventListener('pointercancel', () => {
     isDraggingLightboxImage = false
+    endLightboxPanGesture()
   })
 
   lightboxImageElement.addEventListener(
@@ -892,9 +1022,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return
       }
 
-      if (event.touches.length === 1 && lightboxScale > 1) {
+      if (
+        event.touches.length === 1 &&
+        lightboxScale >= LIGHTBOX_PAN_MIN_SCALE
+      ) {
         panStartOffsetX = event.touches[0].clientX - lightboxOffsetX
         panStartOffsetY = event.touches[0].clientY - lightboxOffsetY
+        beginLightboxPanGesture(
+          event.touches[0].clientX,
+          event.touches[0].clientY
+        )
       }
 
       const changedTouch = event.changedTouches[0]
@@ -937,15 +1074,22 @@ document.addEventListener('DOMContentLoaded', () => {
           lightboxOffsetY = 0
         }
 
-        applyLightboxTransform()
+        applyLightboxTransform('elastic')
         event.preventDefault()
         return
       }
 
-      if (event.touches.length === 1 && lightboxScale > 1) {
+      if (
+        event.touches.length === 1 &&
+        lightboxScale >= LIGHTBOX_PAN_MIN_SCALE
+      ) {
+        markLightboxPanGesture(
+          event.touches[0].clientX,
+          event.touches[0].clientY
+        )
         lightboxOffsetX = event.touches[0].clientX - panStartOffsetX
         lightboxOffsetY = event.touches[0].clientY - panStartOffsetY
-        applyLightboxTransform()
+        applyLightboxTransform('elastic')
         event.preventDefault()
       }
     },
@@ -963,6 +1107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (didRunPinchGesture && event.touches.length === 0) {
         didRunPinchGesture = false
+        endLightboxPanGesture()
         if (lightboxScale < 1.02) {
           resetLightboxZoom()
         }
@@ -974,6 +1119,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const changedTouch = event.changedTouches[0]
+      endLightboxPanGesture()
 
       if (now - lastTapTimestamp < LIGHTBOX_DOUBLE_TAP_DELAY_MS) {
         if (lightboxScale > 1) {
@@ -994,6 +1140,12 @@ document.addEventListener('DOMContentLoaded', () => {
           gestureDurationMs <= LIGHTBOX_CLOSE_SWIPE_MAX_DURATION_MS
         const isMostlyVertical = Math.abs(deltaY) > Math.abs(deltaX)
         const isSwipeDown = deltaY > LIGHTBOX_CLOSE_SWIPE_MIN_DISTANCE_PX
+
+        if (didLightboxPanInGesture) {
+          didLightboxPanInGesture = false
+          lastTapTimestamp = now
+          return
+        }
 
         // Swipe down is the explicit mobile exit from the zoomed image view.
         if (isFastEnough && isMostlyVertical && isSwipeDown) {
