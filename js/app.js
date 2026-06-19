@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return String(value).padStart(2, '0')
   }
 
-  function getActiveNordseeRefreshWindowId (now = new Date()) {
+  function getActiveSeegangRefreshWindowId (now = new Date()) {
     const utcYear = now.getUTCFullYear()
     const utcMonth = now.getUTCMonth() + 1
     const utcDate = now.getUTCDate()
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return false
     }
 
-    const activeWindowId = getActiveNordseeRefreshWindowId()
+    const activeWindowId = getActiveSeegangRefreshWindowId()
     if (!activeWindowId) {
       return true
     }
@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const timestamp = Date.now()
     let refreshedImageCount = 0
-    const activeSeegangWindowId = getActiveNordseeRefreshWindowId()
+    const activeSeegangWindowId = getActiveSeegangRefreshWindowId()
 
     currentPageImages.forEach(imageElement => {
       refreshedImageCount += 1

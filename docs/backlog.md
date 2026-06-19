@@ -22,7 +22,7 @@
 - US-007 Visuelle Qualität und ruhige Darstellung optimieren
 - US-009 Zoom- und Navigationsverhalten im Bildmodus verbessern
 - US-010 Pan- und Zoom-Verhalten im Bildmodus verbessern (Elastic UX)
-- US-011 Seegangskarten Nordsee integrieren (3. Seite)
+- US-011 Seegangskarten Nordsee integrieren (dritte Seite)
 - US-012 Seegangskarten Ostsee integrieren (vierte Seite)
 
 ---
@@ -36,7 +36,7 @@
 ## 🌊 US-012 – Seegangskarten Ostsee integrieren (vierte Seite)
 
 **Status:** DONE  
-**Priorität:** Hoch  
+**Priorität:** Hoch
 
 👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Seegangskarten Ostsee“
 
@@ -46,21 +46,22 @@
 
 Als Nutzer  
 möchte ich zusätzlich zur Nordsee-Seite auch Seegangskarten für die Ostsee sehen  
-damit ich eine vollständige Übersicht über die Wellen- und Seegangsituation in beiden deutschen Seegebieten erhalte  
+damit ich eine vollständige Übersicht über die Wellen- und Seegangsituation in beiden deutschen Seegebieten erhalte
 
 ---
 
 ### 🎯 Zielbild
 
-- neue Seite direkt im Anschluss an die Nordsee-Seite  
-- identischer Aufbau und Bedienung wie bei den Nordsee-Seegangskarten  
-- kompakte Darstellung der relevanten Vorhersagezeitpunkte  
+- neue Seite direkt im Anschluss an die Nordsee-Seite
+- identischer Aufbau und Bedienung wie bei den Nordsee-Seegangskarten
+- kompakte Darstellung der relevanten Vorhersagezeitpunkte
 
 ---
 
 ### ✅ Akzeptanzkriterien
 
 **Seitenintegration**
+
 - [x] Es gibt eine neue Seite für „Seegang Ostsee“
 - [x] Seite folgt direkt auf die Nordsee-Seite im Carousel
 - [x] Navigation (Swipe, Tastatur, Edge-Tap) funktioniert identisch
@@ -68,8 +69,8 @@ damit ich eine vollständige Übersicht über die Wellen- und Seegangsituation i
 ---
 
 **Bildquellen**
-- [x] Bilder werden aus folgendem Pfad geladen:
-./ostsa_.png
+
+- [x] Bilder werden über `data-base=\"WX_SEE\"` plus `data-path=\"ostsa_..png\"` geladen
 
 - [x] Unterstützte Vorhersagezeiten:
   - 00
@@ -82,16 +83,19 @@ damit ich eine vollständige Übersicht über die Wellen- und Seegangsituation i
 **Layout (zweizeilig)**
 
 **Zeile 1:**
+
 - [x] ostsa_00.png
 - [x] ostsa_24.png
 
 **Zeile 2:**
+
 - [x] ostsa_48.png
 - [x] ostsa_72.png
 
 ---
 
 **Visualisierung**
+
 - [x] Gleichmäßige und ruhige Darstellung der Karten
 - [x] Konsistente Größen, Abstände und Darstellung wie bei der Nordsee-Seite
 - [x] Responsives Verhalten auf allen Geräten
@@ -99,6 +103,7 @@ damit ich eine vollständige Übersicht über die Wellen- und Seegangsituation i
 ---
 
 **Aktualisierung**
+
 - [x] Aktualisierung erfolgt nur in sinnvollen Zeitfenstern (~07 und ~19 UTC)
 - [x] Integration in bestehende Datenzyklus-Logik (US-008)
 - [x] Kein unnötiger Refresh zwischen Veröffentlichungen
@@ -106,6 +111,7 @@ damit ich eine vollständige Übersicht über die Wellen- und Seegangsituation i
 ---
 
 **Integration mit bestehenden Features**
+
 - [x] Unterstützung für:
   - Zoom (US-009)
   - Peek-Navigation (US-009)
@@ -117,26 +123,26 @@ damit ich eine vollständige Übersicht über die Wellen- und Seegangsituation i
 
 ### 🧠 Definition of Done
 
-- Nutzer kann Nordsee- und Ostsee-Seegang nahtlos vergleichen  
-- Seite wirkt konsistent mit der Nordsee-Seite  
-- Struktur ist intuitiv (früh → spät)  
-- Navigation und Interaktion verhalten sich identisch zu allen anderen Seiten  
+- Nutzer kann Nordsee- und Ostsee-Seegang nahtlos vergleichen
+- Seite wirkt konsistent mit der Nordsee-Seite
+- Struktur ist intuitiv (früh → spät)
+- Navigation und Interaktion verhalten sich identisch zu allen anderen Seiten
 
 ---
 
 ### 💡 Nutzen
 
-- vollständige Abdeckung der deutschen Seegebiete  
-- bessere Vergleichbarkeit von Seegang (Nordsee vs. Ostsee)  
-- logische Erweiterung der bestehenden Kartenstruktur  
+- vollständige Abdeckung der deutschen Seegebiete
+- bessere Vergleichbarkeit von Seegang (Nordsee vs. Ostsee)
+- logische Erweiterung der bestehenden Kartenstruktur
 - ideale Basis für kombinierte Analysen (z. B. Wind + Seegang + Strom)
 
 ---
 
-## 🌊 US-011 – Seegangskarten Nordsee integrieren (3. Seite)
+## 🌊 US-011 – Seegangskarten Nordsee integrieren (dritte Seite)
 
 **Status:** DONE  
-**Priorität:** Hoch  
+**Priorität:** Hoch
 
 👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Seegangskarten Nordsee“
 
@@ -146,21 +152,22 @@ damit ich eine vollständige Übersicht über die Wellen- und Seegangsituation i
 
 Als Nutzer  
 möchte ich eine eigene Seite mit Seegangskarten für die Nordsee sehen  
-damit ich Wellenentwicklung und Seegangsvorhersage übersichtlich und im gleichen Stil wie die anderen Karten interpretieren kann  
+damit ich Wellenentwicklung und Seegangsvorhersage übersichtlich und im gleichen Stil wie die anderen Karten interpretieren kann
 
 ---
 
 ### 🎯 Zielbild
 
-- neue Seite im Dashboard (zusätzlich zu bestehenden Seiten)  
-- klare, strukturierte Darstellung der Vorhersagezeitpunkte  
-- visuell konsistent mit bestehendem Grid  
+- neue Seite im Dashboard (zusätzlich zu bestehenden Seiten)
+- klare, strukturierte Darstellung der Vorhersagezeitpunkte
+- visuell konsistent mit bestehendem Grid
 
 ---
 
 ### ✅ Akzeptanzkriterien
 
 **Seitenintegration**
+
 - [x] Es gibt eine neue Seite im Carousel (Seite für „Seegang Nordsee“)
 - [x] Navigation per Swipe, Tastatur und Edge-Tap funktioniert wie auf den anderen Seiten
 - [x] Seite fügt sich ohne Layout-Brüche in das bestehende System ein
@@ -168,7 +175,8 @@ damit ich Wellenentwicklung und Seegangsvorhersage übersichtlich und im gleiche
 ---
 
 **Bildquellen**
-- [x] Bilder werden aus folgendem Pfad geladen: ./wv_spez/seewetter/nordsa_.png
+
+- [x] Bilder werden über `data-base=\"WX_SEE\"` plus `data-path=\"nordsa_..png\"` geladen
 - [x] Unterstützte Zeitpunkte:
   - 00
   - 12
@@ -179,13 +187,16 @@ damit ich Wellenentwicklung und Seegangsvorhersage übersichtlich und im gleiche
 ---
 
 **Layout (zweizeilig)**
+
 - [x] Darstellung erfolgt in zwei Reihen:
 
 **Zeile 1:**
+
 - [x] nordsa_00.png
 - [x] nordsa_12.png
 
 **Zeile 2:**
+
 - [x] nordsa_24.png
 - [x] nordsa_48.png
 - [x] nordsa_72.png
@@ -193,6 +204,7 @@ damit ich Wellenentwicklung und Seegangsvorhersage übersichtlich und im gleiche
 ---
 
 **Visualisierung**
+
 - [x] Bilder werden gleichmäßig verteilt angezeigt
 - [x] Karten haben konsistente Größen und Abstände
 - [x] Layout ist responsive (Desktop / Tablet / Mobile)
@@ -200,6 +212,7 @@ damit ich Wellenentwicklung und Seegangsvorhersage übersichtlich und im gleiche
 ---
 
 **Aktualisierung**
+
 - [x] Seegangskarten werden nur zu sinnvollen Zeitpunkten aktualisiert (~07 UTC und ~19 UTC)
 - [x] Kein unnötiger Refresh zwischen den bekannten Veröffentlichungsfenstern
 - [x] Integration in bestehende Refresh-Logik (US-008)
@@ -207,6 +220,7 @@ damit ich Wellenentwicklung und Seegangsvorhersage übersichtlich und im gleiche
 ---
 
 **Integration mit bestehenden Features**
+
 - [x] Karten unterstützen:
   - Zoom (US-009)
   - Elastic Pan (US-010)
@@ -217,18 +231,18 @@ damit ich Wellenentwicklung und Seegangsvorhersage übersichtlich und im gleiche
 
 ### 🧠 Definition of Done
 
-- Nutzer kann schnell alle relevanten Seegangsvorhersagen erfassen  
-- Struktur ist intuitiv (früh → spät von oben nach unten)  
-- Darstellung wirkt ruhig und konsistent mit bestehenden Seiten  
-- Navigation und Interaktion funktionieren identisch zu anderen Karten  
+- Nutzer kann schnell alle relevanten Seegangsvorhersagen erfassen
+- Struktur ist intuitiv (früh → spät von oben nach unten)
+- Darstellung wirkt ruhig und konsistent mit bestehenden Seiten
+- Navigation und Interaktion funktionieren identisch zu anderen Karten
 
 ---
 
 ### 💡 Nutzen
 
-- Ergänzung der Wetteranalyse um Seegangsdaten  
-- bessere Einschätzung realer Bedingungen auf See  
-- logische Erweiterung der bestehenden Kartenstruktur  
+- Ergänzung der Wetteranalyse um Seegangsdaten
+- bessere Einschätzung realer Bedingungen auf See
+- logische Erweiterung der bestehenden Kartenstruktur
 - Grundlage für spätere Verknüpfung mit Strom-/Windanalyse (US-006)
 
 ---
