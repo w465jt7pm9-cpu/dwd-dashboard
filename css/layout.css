@@ -140,6 +140,12 @@
   grid-template-rows: 1fr 1fr;
 }
 
+.ostsee-grid {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+}
+
 .sea-row,
 .upper-row {
   display: grid;
@@ -150,7 +156,15 @@
   display: grid;
 }
 
+.ostsee-row {
+  display: grid;
+}
+
 .nordsea-row--two {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.ostsee-row--two {
   grid-template-columns: repeat(2, 1fr);
 }
 

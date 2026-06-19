@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const INFO_OVERLAY_DURATION_MS = 4500
   const EDGE_TAP_ZONE_PX = 26
   const NORDSEE_PAGE_INDEX = 3
-  const TEXT_PAGE_INDEX = 4
+  const OSTSEE_PAGE_INDEX = 4
+  const TEXT_PAGE_INDEX = 5
+  const SEEGANG_PAGE_INDEXES = [NORDSEE_PAGE_INDEX, OSTSEE_PAGE_INDEX]
   const NORDSEE_REFRESH_WINDOW_UTC_HOURS = [7, 19]
   const NORDSEE_REFRESH_WINDOW_SPAN_MINUTES = 90
 
@@ -36,7 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const PAGE_SWIPE_MAX_DURATION_MS = 800
 
   const LAST_SUCCESSFUL_REFRESH_KEY = 'dwdLastSuccessfulRefresh'
-  const NORDSEE_LAST_WINDOW_REFRESH_KEY = 'dwdNordseeLastWindowRefresh'
+  const SEEGANG_LAST_WINDOW_REFRESH_KEY_BY_PAGE = {
+    [NORDSEE_PAGE_INDEX]: 'dwdNordseeLastWindowRefresh',
+    [OSTSEE_PAGE_INDEX]: 'dwdOstseeLastWindowRefresh'
+  }
   const THEME_STORAGE_KEY = 'dwdTheme'
 
   const PAGE_NAMES = [
@@ -44,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'See / Seegang',
     'Höhenwetter',
     'Seegang Nordsee',
+    'Seegang Ostsee',
     'Seewetter Texte'
   ]
   const IMAGE_ELEMENTS = Array.from(
@@ -144,17 +150,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function getLastNordseeWindowRefresh () {
+  function getLastSeegangWindowRefresh (pageIndex) {
+    const storageKey = SEEGANG_LAST_WINDOW_REFRESH_KEY_BY_PAGE[pageIndex]
+    if (!storageKey) {
+      return null
+    }
+
     try {
-      return localStorage.getItem(NORDSEE_LAST_WINDOW_REFRESH_KEY)
+      return localStorage.getItem(storageKey)
     } catch {
       return null
     }
   }
 
-  function setLastNordseeWindowRefresh (windowId) {
+  function setLastSeegangWindowRefresh (pageIndex, windowId) {
+    const storageKey = SEEGANG_LAST_WINDOW_REFRESH_KEY_BY_PAGE[pageIndex]
+    if (!storageKey) {
+      return
+    }
+
     try {
-      localStorage.setItem(NORDSEE_LAST_WINDOW_REFRESH_KEY, windowId)
+      localStorage.setItem(storageKey, windowId)
     } catch {
       // localStorage is optional here.
     }
@@ -185,8 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return null
   }
 
-  function shouldSkipNordseeRefresh (pageImages) {
-    if (currentPageIndex !== NORDSEE_PAGE_INDEX) {
+  function shouldSkipSeegangRefresh (pageImages) {
+    if (!SEEGANG_PAGE_INDEXES.includes(currentPageIndex)) {
       return false
     }
 
@@ -200,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return true
     }
 
-    return getLastNordseeWindowRefresh() === activeWindowId
+    return getLastSeegangWindowRefresh(currentPageIndex) === activeWindowId
   }
 
   function updateOfflineUi () {
@@ -369,14 +385,14 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    if (shouldSkipNordseeRefresh(currentPageImages)) {
+    if (shouldSkipSeegangRefresh(currentPageImages)) {
       updateOfflineUi()
       return
     }
 
     const timestamp = Date.now()
     let refreshedImageCount = 0
-    const activeNordseeWindowId = getActiveNordseeRefreshWindowId()
+    const activeSeegangWindowId = getActiveNordseeRefreshWindowId()
 
     currentPageImages.forEach(imageElement => {
       refreshedImageCount += 1
@@ -392,8 +408,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (navigator.onLine && refreshedImageCount > 0) {
       setLastSuccessfulRefresh(Date.now())
 
-      if (currentPageIndex === NORDSEE_PAGE_INDEX && activeNordseeWindowId) {
-        setLastNordseeWindowRefresh(activeNordseeWindowId)
+      if (
+        SEEGANG_PAGE_INDEXES.includes(currentPageIndex) &&
+        activeSeegangWindowId
+      ) {
+        setLastSeegangWindowRefresh(currentPageIndex, activeSeegangWindowId)
       }
     }
 
@@ -1359,7 +1378,7 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshVisibleImages()
 
   window.setInterval(() => {
-    if (currentPageIndex <= NORDSEE_PAGE_INDEX && !isLightboxOpen) {
+    if (currentPageIndex <= OSTSEE_PAGE_INDEX && !isLightboxOpen) {
       refreshVisibleImages()
     }
   }, REFRESH_INTERVAL_MS)

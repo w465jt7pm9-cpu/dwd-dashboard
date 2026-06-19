@@ -4,6 +4,7 @@
 > Update US-009: Lightbox zeigt subtile Peek-Nachbarn und nutzt zyklische, weiche Bildnavigation.
 > Update US-010: Zoom-Pan verhält sich elastisch mit weichem Snap-Back beim Loslassen.
 > Update US-011: Neue Carousel-Seite für Seegang Nordsee mit zweizeiligem Kartenlayout.
+> Update US-012: Zusätzliche Carousel-Seite für Seegang Ostsee im gleichen Interaktions- und Layoutprinzip.
 
 ```mermaid
 flowchart TD
@@ -12,6 +13,7 @@ flowchart TD
   Pages --> See[Seewetter]
   Pages --> Hoehenwetter[Höhenwetter]
   Pages --> Nordsee[Seegang Nordsee]
+  Pages --> Ostsee[Seegang Ostsee]
   Pages --> Texte[Info / Beschriftung]
   Pages --> Cards[Overlay Karten]
   Cards --> Lightbox[Lightbox]

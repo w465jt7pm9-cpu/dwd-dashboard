@@ -23,12 +23,113 @@
 - US-009 Zoom- und Navigationsverhalten im Bildmodus verbessern
 - US-010 Pan- und Zoom-Verhalten im Bildmodus verbessern (Elastic UX)
 - US-011 Seegangskarten Nordsee integrieren (3. Seite)
+- US-012 Seegangskarten Ostsee integrieren (vierte Seite)
 
 ---
 
 # 📦 BACKLOG DETAILS
 
 ---
+
+---
+
+## 🌊 US-012 – Seegangskarten Ostsee integrieren (vierte Seite)
+
+**Status:** DONE  
+**Priorität:** Hoch  
+
+👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Seegangskarten Ostsee“
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich zusätzlich zur Nordsee-Seite auch Seegangskarten für die Ostsee sehen  
+damit ich eine vollständige Übersicht über die Wellen- und Seegangsituation in beiden deutschen Seegebieten erhalte  
+
+---
+
+### 🎯 Zielbild
+
+- neue Seite direkt im Anschluss an die Nordsee-Seite  
+- identischer Aufbau und Bedienung wie bei den Nordsee-Seegangskarten  
+- kompakte Darstellung der relevanten Vorhersagezeitpunkte  
+
+---
+
+### ✅ Akzeptanzkriterien
+
+**Seitenintegration**
+- [x] Es gibt eine neue Seite für „Seegang Ostsee“
+- [x] Seite folgt direkt auf die Nordsee-Seite im Carousel
+- [x] Navigation (Swipe, Tastatur, Edge-Tap) funktioniert identisch
+
+---
+
+**Bildquellen**
+- [x] Bilder werden aus folgendem Pfad geladen:
+./ostsa_.png
+
+- [x] Unterstützte Vorhersagezeiten:
+  - 00
+  - 24
+  - 48
+  - 72
+
+---
+
+**Layout (zweizeilig)**
+
+**Zeile 1:**
+- [x] ostsa_00.png
+- [x] ostsa_24.png
+
+**Zeile 2:**
+- [x] ostsa_48.png
+- [x] ostsa_72.png
+
+---
+
+**Visualisierung**
+- [x] Gleichmäßige und ruhige Darstellung der Karten
+- [x] Konsistente Größen, Abstände und Darstellung wie bei der Nordsee-Seite
+- [x] Responsives Verhalten auf allen Geräten
+
+---
+
+**Aktualisierung**
+- [x] Aktualisierung erfolgt nur in sinnvollen Zeitfenstern (~07 und ~19 UTC)
+- [x] Integration in bestehende Datenzyklus-Logik (US-008)
+- [x] Kein unnötiger Refresh zwischen Veröffentlichungen
+
+---
+
+**Integration mit bestehenden Features**
+- [x] Unterstützung für:
+  - Zoom (US-009)
+  - Peek-Navigation (US-009)
+  - Elastic Pan (US-010)
+- [x] Kompatibel mit Cache- und Offline-Strategie
+- [x] Badge-Logik funktioniert identisch
+
+---
+
+### 🧠 Definition of Done
+
+- Nutzer kann Nordsee- und Ostsee-Seegang nahtlos vergleichen  
+- Seite wirkt konsistent mit der Nordsee-Seite  
+- Struktur ist intuitiv (früh → spät)  
+- Navigation und Interaktion verhalten sich identisch zu allen anderen Seiten  
+
+---
+
+### 💡 Nutzen
+
+- vollständige Abdeckung der deutschen Seegebiete  
+- bessere Vergleichbarkeit von Seegang (Nordsee vs. Ostsee)  
+- logische Erweiterung der bestehenden Kartenstruktur  
+- ideale Basis für kombinierte Analysen (z. B. Wind + Seegang + Strom)
 
 ---
 
