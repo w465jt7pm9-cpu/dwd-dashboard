@@ -3,7 +3,9 @@
 Interaktive Darstellung von DWD-Wetterkarten  
 optimiert für Desktop und Touch-Geräte.
 
-Release-Stand: 1.1
+Release-Stand: 1.2
+
+Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
 
 ## 🚀 Live
 

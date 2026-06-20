@@ -1,5 +1,7 @@
 ## Gesamtarchitektur
 
+> Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
+
 > Update US-013: Seegang-Refresh nutzt einen globalen Datenzyklus (~07/~19 UTC) fuer alle WX_SEE-Seiten.
 > Update US-014: Offline-Zugriff bleibt stabil durch lokale Persistenz des letzten erfolgreichen Bildstands je Karte.
 

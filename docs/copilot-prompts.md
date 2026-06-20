@@ -1,5 +1,7 @@
 # GitHub Copilot Pro – Prompts für das DWD Dashboard
 
+> Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
+
 Diese Prompts sind auf die vorhandenen Projektdateien zugeschnitten:
 
 - `README.md`: HTML, modularisiertes CSS, Vanilla JavaScript, Fokus auf Desktop + Touch, stabiles Touch-Verhalten, zuverlässige Navigation, robuste Lightbox.

@@ -1,5 +1,7 @@
 # Copilot Checklist – Kurzprompts für das DWD Dashboard
 
+> Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
+
 ## 1) Analyse zuerst
 ```text
 Analysiere index.html und app.js für diese Änderungen, aber schreibe noch keinen Code:

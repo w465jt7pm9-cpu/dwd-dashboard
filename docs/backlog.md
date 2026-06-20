@@ -1,5 +1,7 @@
 # 📊 DWD Dashboard – Mini Backlog
 
+> Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
+
 ---
 
 # 🧭 KANBAN ÜBERSICHT

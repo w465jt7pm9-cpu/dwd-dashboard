@@ -1,5 +1,7 @@
 # Copilot Session Plan – DWD Dashboard
 
+> Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
+
 ## Zweck
 Diese Datei ist ein kurzer Ablaufplan für die Arbeit mit GitHub Copilot in VS Code.
 Sie legt fest, **welcher Prompt in welcher Datei** am sinnvollsten ausgeführt wird.

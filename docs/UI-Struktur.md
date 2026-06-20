@@ -1,5 +1,7 @@
 ## UI-Struktur
 
+> Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
+
 > Release 1.0: Fokus auf ruhige, bildschirmfüllende Wetterkarte ohne Menü, mit natürlicher Navigation und automatischem Dark Mode.
 > Update US-009: Lightbox zeigt subtile Peek-Nachbarn und nutzt zyklische, weiche Bildnavigation.
 > Update US-010: Zoom-Pan verhält sich elastisch mit weichem Snap-Back beim Loslassen.

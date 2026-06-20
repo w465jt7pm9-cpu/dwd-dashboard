@@ -1,5 +1,7 @@
 # 📂 docs – Copilot & Arbeitsdokumentation
 
+> Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
+
 ## Zweck dieses Ordners
 
 Dieser Ordner enthält unterstützende Dokumente für die **Entwicklung und Weiterentwicklung des DWD Dashboards mit GitHub Copilot**.
