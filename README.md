@@ -3,6 +3,8 @@
 Interaktive Darstellung von DWD-Wetterkarten  
 optimiert für Desktop und Touch-Geräte.
 
+Release-Stand: 1.1
+
 ## 🚀 Live
 👉 https://dwd-dashboard.pages.dev
 
@@ -16,4 +18,15 @@ optimiert für Desktop und Touch-Geräte.
 - stabiles Touch-Verhalten
 - zuverlässige Navigation
 - robuste Lightbox
-``
+
+## ✅ Highlights (Release 1.1)
+- zyklische Navigation im Carousel (Swipe, Edge-Tap, Tastatur)
+- Lightbox mit Peek-Nachbarn, Zoom, Elastic Pan und Soft Snap-Back
+- Seegangskarten für Nordsee und Ostsee integriert
+- globaler Seegang-Datenzyklus (~07/~19 UTC) für alle WX_SEE-Seiten
+- verbesserte Offline-Nutzung mit Cache-Wiederverwendung und Reconnect-Refresh
+- stabiler Offline-Bildstand auch bei Resize/Orientierungswechsel
+
+## 🧭 Hinweise
+- Architektur-, UI- und Interaktionsdokumente liegen im Ordner `docs/`
+- User Stories und Umsetzungsstand: `docs/backlog.md`
