@@ -6,7 +6,34 @@
 
 ## 🟥 TODO
 
-### 🌊 US-014 – Offline-Unterstützung mit gecachtem Kartenzugriff optimieren
+- (leer)
+
+## 🟨 DOING
+
+- (leer)
+
+## ✅ DONE
+
+- US-014 Offline-Unterstützung mit gecachtem Kartenzugriff optimieren
+- US-013 Einheitlichen Aktualisierungszyklus für alle Seegangskarten anwenden
+- US-001 Menü entfernen
+- US-002 Navigation über Gesten
+- US-003 Pull-to-Refresh
+- US-004 Dark Mode automatisch
+- US-005 Metadaten entfernen
+- US-007 Visuelle Qualität und ruhige Darstellung optimieren
+- US-009 Zoom- und Navigationsverhalten im Bildmodus verbessern
+- US-010 Pan- und Zoom-Verhalten im Bildmodus verbessern (Elastic UX)
+- US-011 Seegangskarten Nordsee integrieren (dritte Seite)
+- US-012 Seegangskarten Ostsee integrieren (vierte Seite)
+
+---
+
+# 📦 BACKLOG DETAILS
+
+---
+
+## 🌊 US-014 – Offline-Unterstützung mit gecachtem Kartenzugriff optimieren
 
 **Status:** DONE  
 **Priorität:** Hoch
@@ -15,7 +42,7 @@
 
 ---
 
-#### 🧑‍💻 Beschreibung
+### 🧑‍💻 Beschreibung
 
 Als Segler/Schiffsführer  
 möchte ich die aktuell geladenen Wetterkarten auch im Offline-Modus (ohne Internetverbindung) weiterhin anschauen können  
@@ -23,7 +50,7 @@ damit ich z. B. bei Fahrt auf dem Wasser auf die zuletzt geladenen Daten zugreif
 
 ---
 
-#### 🧠 Fachlicher Hintergrund
+### 🧠 Fachlicher Hintergrund
 
 Nautischer Use-Case:
 
@@ -39,7 +66,7 @@ Technisch:
 
 ---
 
-#### 🎯 Zielbild
+### 🎯 Zielbild
 
 - Carousel funktioniert offline uneingeschränkt
 - Alle Seiten zeigen gecachte Bilder, auch wenn sie nicht manuell geladen wurden
@@ -48,7 +75,7 @@ Technisch:
 
 ---
 
-#### ✅ Akzeptanzkriterien
+### ✅ Akzeptanzkriterien
 
 **Offline-Navigation**
 
@@ -83,7 +110,7 @@ Technisch:
 
 ---
 
-#### 🧠 Definition of Done
+### 🧠 Definition of Done
 
 - [x] Alle Seiten bleiben navigierbar, auch offline
 - [x] Gecachte Karten bleiben sichtbar, auch nach Resize/Orientation-Change
@@ -92,37 +119,12 @@ Technisch:
 
 ---
 
-#### 💡 Nutzen
+### 💡 Nutzen
 
 - [x] bessere maritime Nutzung (Offline auf dem Wasser)
 - [x] Sicherheit: Zugriff auf letzte bekannte Bedingungen
 - [x] Reduktion von Frustration bei Connectivity-Problemen
 - [x] PWA-Stärke: echte Offline-Fähigkeit sichtbar machen
-
----
-
-## 🟨 DOING
-
-- (leer)
-
-## ✅ DONE
-
-- US-014 Offline-Unterstützung mit gecachtem Kartenzugriff optimieren
-- US-013 Einheitlichen Aktualisierungszyklus für alle Seegangskarten anwenden
-- US-001 Menü entfernen
-- US-002 Navigation über Gesten
-- US-003 Pull-to-Refresh
-- US-004 Dark Mode automatisch
-- US-005 Metadaten entfernen
-- US-007 Visuelle Qualität und ruhige Darstellung optimieren
-- US-009 Zoom- und Navigationsverhalten im Bildmodus verbessern
-- US-010 Pan- und Zoom-Verhalten im Bildmodus verbessern (Elastic UX)
-- US-011 Seegangskarten Nordsee integrieren (dritte Seite)
-- US-012 Seegangskarten Ostsee integrieren (vierte Seite)
-
----
-
-# 📦 BACKLOG DETAILS
 
 ---
 
