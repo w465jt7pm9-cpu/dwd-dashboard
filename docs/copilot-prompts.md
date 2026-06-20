@@ -360,6 +360,67 @@ Bitte fuehre die Aenderungen minimal-invasiv direkt im Code aus.
 
 ---
 
+# 5b) Prompt: Offline-Kartenzugriff mit gecachten Daten (US-014)
+
+## Ziel
+
+- Gecachte Karten auch offline anzeigen, auch auf Seiten, die noch nie explizit geladen wurden
+- Service Worker Cache richtig nutzen
+- Offline-Navigation bleibt flüssig
+
+```text
+Bitte erweitere app.js minimal-invasiv, um gecachte Bilder im Offline-Modus besser zu nutzen (US-014).
+
+Szenario:
+- Nutzer lädt im Hafen Wetterkarten (alle Seiten)
+- Geht Offline (Flugmodus/Schiff auf See)
+- Wechselt zu Seiten, die er noch nie manuell geöffnet hat
+- Problem: Diese Seiten zeigen leere/Fehler-Badges, obwohl die Bilder im Cache sind
+
+Ziel:
+- Seiten sollten gecachte Bilder anzeigen, auch offline
+- Service Worker liefert Images bereits korrekt
+- App.js sollte differenzieren: „nie geladen" vs. „offline, aber im Cache"
+
+Kontext:
+- Service Worker (sw.js) cached bereits Bilder mit Cache-First-Strategie
+- app.js ruft bei Seitenwechsel refreshVisibleImages() auf
+- Bei Resize/Orientation-Change im Offline-Modus dürfen vorhandene Bilder nicht durch neue Cache-Buster-URLs ersetzt werden
+- Stattdessen muss die letzte erfolgreiche Bild-URL pro Karte wiederverwendet werden
+
+Umsetzung:
+1. In refreshVisibleImages():
+   - Prüfe, ob navigator.onLine false ist
+   - Wenn offline: Versuche trotzdem, .src zu setzen (Service Worker wird liefern)
+   - Setze Badge auf 'offline' statt 'error'
+
+2. Unterscheidung:
+   - 'offline': Bild im Cache, aber kein Netzwerk
+   - 'error': Versuch fehlgeschlagen
+
+3. Beim Online-Event:
+   - Bilder, die offline waren, sollten neu geladen werden
+   - aber ohne Animationen (transparent)
+
+4. Keine Änderungen an:
+   - Service Worker
+   - Bildquellen-Logik
+   - Lightbox
+   - Navigation
+
+Technische Akzeptanzkriterien:
+- Offline-Seitenwechsel zeigt gecachte Bilder
+- Resize/Orientation-Change offline lässt bereits geladene Bilder sichtbar
+- Badges zeigen 'offline' (•), nicht 'error' (✖) für gecachte Bilder
+- Beim Online-Rückkehr aktualisieren sich Bilder automatisch
+- Keine Regressionen bei Lightbox oder Badge-System
+- Manuelle Testung: Hafen laden, Flugmodus, Seiten durchblättern, alles sichtbar
+
+Bitte fuehre die Aenderungen minimal-invasiv direkt im Code aus.
+```
+
+---
+
 # 🌊 Feature: Wind-gegen-Strom Erkennung
 
 ## Ziel

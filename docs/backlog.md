@@ -63,6 +63,7 @@ Technisch:
 - [x] Service Worker liefert gecachte Bilder im Offline-Modus
 - [x] App.js unterscheidet zwischen „nie geladen" (Error-Badge) und „offline, aber gecacht" (Offline-Badge)
 - [x] Keine Doppelanfragen beim Seitenwechsel offline
+- [x] Fenstergrößen-/Orientierungswechsel offline behalten den letzten Bildstand sichtbar
 
 ---
 
@@ -85,7 +86,7 @@ Technisch:
 #### 🧠 Definition of Done
 
 - [x] Alle Seiten bleiben navigierbar, auch offline
-- [x] Gecachte Karten bleiben sichtbar
+- [x] Gecachte Karten bleiben sichtbar, auch nach Resize/Orientation-Change
 - [x] Service Worker und App.js arbeiten nahtlos zusammen
 - [x] Keine Regressionen bei Online-Navigation oder Lightbox
 

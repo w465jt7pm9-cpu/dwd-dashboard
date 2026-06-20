@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const LAST_SUCCESSFUL_REFRESH_KEY = 'dwdLastSuccessfulRefresh'
   const SEEGANG_LAST_WINDOW_REFRESH_KEY = 'dwdSeegangLastWindowRefresh'
+  const LAST_KNOWN_IMAGE_URL_KEY_PREFIX = 'dwdImageLastKnownUrl:'
   const THEME_STORAGE_KEY = 'dwdTheme'
 
   const PAGE_NAMES = [
@@ -158,6 +159,42 @@ document.addEventListener('DOMContentLoaded', () => {
   function setLastSeegangWindowRefresh (windowId) {
     try {
       localStorage.setItem(SEEGANG_LAST_WINDOW_REFRESH_KEY, windowId)
+    } catch {
+      // localStorage is optional here.
+    }
+  }
+
+  function getLastKnownImageUrlStorageKey (imageElement) {
+    const baseKey = imageElement.dataset.base
+    const imagePath = imageElement.dataset.path
+    if (!baseKey || !imagePath) {
+      return null
+    }
+
+    return `${LAST_KNOWN_IMAGE_URL_KEY_PREFIX}${baseKey}:${imagePath}`
+  }
+
+  function getLastKnownImageUrl (imageElement) {
+    const storageKey = getLastKnownImageUrlStorageKey(imageElement)
+    if (!storageKey) {
+      return null
+    }
+
+    try {
+      return localStorage.getItem(storageKey)
+    } catch {
+      return null
+    }
+  }
+
+  function setLastKnownImageUrl (imageElement, imageUrl) {
+    const storageKey = getLastKnownImageUrlStorageKey(imageElement)
+    if (!storageKey || !imageUrl) {
+      return
+    }
+
+    try {
+      localStorage.setItem(storageKey, imageUrl)
     } catch {
       // localStorage is optional here.
     }
@@ -398,12 +435,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     currentPageImages.forEach(imageElement => {
       refreshedImageCount += 1
+
+      if (!navigator.onLine) {
+        const persistedImageUrl = getLastKnownImageUrl(imageElement)
+
+        if (imageElement.src) {
+          setCardState(imageElement, 'offline')
+          return
+        }
+
+        if (persistedImageUrl) {
+          setCardState(imageElement, 'offline')
+          imageElement.src = persistedImageUrl
+          return
+        }
+
+        const fallbackUrl = buildImageUrl(imageElement, timestamp)
+        if (!fallbackUrl) {
+          return
+        }
+
+        setCardState(imageElement, 'offline')
+        imageElement.src = fallbackUrl
+        return
+      }
+
       const imageUrl = buildImageUrl(imageElement, timestamp)
       if (!imageUrl) {
         return
       }
 
-      setCardState(imageElement, navigator.onLine ? 'loading' : 'offline')
+      setCardState(imageElement, 'loading')
       imageElement.src = imageUrl
     })
 
@@ -954,6 +1016,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     imageElement.addEventListener('load', () => {
       imageElement.classList.add('image-loaded')
+      setLastKnownImageUrl(
+        imageElement,
+        imageElement.currentSrc || imageElement.src || null
+      )
       setCardState(imageElement, navigator.onLine ? 'ok' : 'offline')
     })
 
@@ -961,7 +1027,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (navigator.onLine) {
         setCardState(imageElement, 'error')
       } else {
-        const hadPriorLoad = imageElement.classList.contains('image-loaded')
+        const hadPriorLoad =
+          imageElement.classList.contains('image-loaded') ||
+          Boolean(getLastKnownImageUrl(imageElement))
         setCardState(imageElement, hadPriorLoad ? 'offline' : 'error')
       }
     })
