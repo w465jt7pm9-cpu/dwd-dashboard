@@ -3,6 +3,7 @@
 > Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
 
 ## 1) Analyse zuerst
+
 ```text
 Analysiere index.html und app.js für diese Änderungen, aber schreibe noch keinen Code:
 - Topbar (#topbar) entfernen
@@ -24,6 +25,7 @@ Liefere nur:
 ```
 
 ## 2) Topbar + Thumbbar entfernen
+
 ```text
 Implementiere in index.html und app.js minimal-invasiv:
 - #topbar entfernen oder vollständig unsichtbar machen
@@ -37,6 +39,7 @@ Bitte direkt im Code umsetzen und nur kurz kommentieren.
 ```
 
 ## 3) Navigation zyklisch machen
+
 ```text
 Passe app.js minimal-invasiv an:
 - Dashboard-Seiten zyklisch navigierbar machen
@@ -49,6 +52,7 @@ Bitte nur die minimal nötigen Änderungen in app.js vornehmen.
 ```
 
 ## 4) Pull-to-Refresh statt Buttons
+
 ```text
 Ersetze in app.js das manuelle Aktualisieren per Buttons durch Pull-to-Refresh als primäres Bedienkonzept:
 - für Touch-Geräte und Desktop-Trackpad-Gesten
@@ -64,6 +68,7 @@ Bitte direkt im Code umsetzen und kurz erläutern, welche Event-Logik ergänzt w
 ```
 
 ## 5) Theme automatisch aus dem System
+
 ```text
 Stelle die Theme-Logik in app.js minimal-invasiv um:
 - kein manueller Theme-Schalter mehr
@@ -77,6 +82,7 @@ Bitte direkt im Code umsetzen und tote Theme-Logik bereinigen.
 ```
 
 ## 6) Redundante Statuslogik bereinigen
+
 ```text
 Bereinige in app.js die sichtbare Status- und Zusammenfassungslogik minimal-invasiv:
 - kein global sichtbarer Zeitstempel "Aktualisiert ..."
@@ -89,6 +95,7 @@ Analysiere kurz, ob status / pageSummary besser gar nicht mehr beschrieben oder 
 ```
 
 ## 7) Abschluss-Review
+
 ```text
 Prüfe die umgesetzten Änderungen in index.html und app.js auf Regressionen und Konsistenz:
 1. keine Fehler durch entfernte Menüelemente?
@@ -106,6 +113,7 @@ Liefere:
 ```
 
 ## 8) Reihenfolge in VS Code
+
 ```text
 1. Analyse
 2. Topbar + Thumbbar entfernen
