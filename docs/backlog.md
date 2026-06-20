@@ -6,14 +6,219 @@
 
 ## 🟥 TODO
 
-- (leer)
+---
+
+## 🔄 US-015 – Datenzyklus für Bodenwetter-Analyse- und Prognosekarten korrekt abbilden
+
+**Status:** DONE  
+**Priorität:** Hoch
+
+👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Bodenwetter-Datenzyklus“
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich, dass Bodenwetter-Analyse- und Prognosekarten entsprechend ihrem tatsächlichen Veröffentlichungs- und Modellzyklus behandelt werden  
+damit ich jederzeit die aktuellsten verfügbaren Daten sehe und keine unnötigen Aktualisierungen stattfinden
+
+---
+
+### 🧠 Fachlicher Hintergrund
+
+Die Bodenwetterkarten des Deutschen Wetterdienstes folgen einem festen meteorologischen Ablauf:
+
+- Analysekarten:
+
+  - werden nur zu den Hauptterminen aktualisiert:
+    - 00 UTC
+    - 12 UTC 【1-d9724f】
+
+- Prognosekarten:
+  - basieren auf Modellläufen (00 und 12 UTC)
+  - werden erst **mehrere Stunden nach Modellstart verfügbar**, typischerweise:
+    - ca. 07 UTC (für den 00 UTC Lauf)
+    - ca. 19 UTC (für den 12 UTC Lauf)
+  - Modellläufe liefern Vorhersagen mit festen Offsets (z. B. H+24, H+48 usw.)
+
+👉 Ein Modelllauf ist erst nach Abschluss der Berechnung verfügbar, was einige Stunden dauern kann 【2-fe6845】
+
+---
+
+### 🎯 Zielbild
+
+- Dashboard zeigt immer den neuesten verfügbaren Modelllauf
+- keine unnötigen Aktualisierungen zwischen Modellläufen
+- klare Trennung zwischen Analyse (Ist-Zustand) und Prognose (Vorhersage)
+
+---
+
+### ✅ Akzeptanzkriterien
+
+**Analyse vs. Prognose**
+
+- [x] Analysekarten werden ausschließlich zu 00 und 12 UTC als „neu“ erkannt
+- [x] Prognosekarten werden korrekt dem jeweiligen Modelllauf zugeordnet (00 oder 12 UTC)
+- [x] H+Werte werden als Stunden nach Modellstart interpretiert
+
+---
+
+**Verfügbarkeitslogik**
+
+- [x] Karten des 00 UTC Modelllaufs werden erst ab ca. 07 UTC geladen
+- [x] Karten des 12 UTC Modelllaufs werden erst ab ca. 19 UTC geladen
+- [x] Vor diesen Zeitpunkten erfolgt kein unnötiger Refresh
+
+---
+
+**Refresh-Verhalten**
+
+- [x] Automatische Aktualisierung erfolgt nur bei erwarteter neuer Datenverfügbarkeit
+- [x] Zwischen Modellläufen werden keine identischen Daten mehrfach geladen
+- [x] Manuelle Aktualisierung bleibt möglich
+
+---
+
+**Integration mit Cache (US-014 / US-008)**
+
+- [x] Cache-Gültigkeit richtet sich am Modelllauf (00/12 UTC)
+- [x] Daten bleiben mindestens bis zum nächsten Modelllauf gültig
+- [x] Alte Modellläufe werden automatisch ersetzt
+
+---
+
+**Einheitliche Zeitlogik**
+
+- [x] Analyse- und Prognosekarten verwenden eine gemeinsame Zeitlogik
+- [x] Zeitlogik ist zentral implementiert (keine Duplikate)
+- [x] Neue Kartentypen können diese Logik direkt übernehmen
+
+---
+
+### 🧠 Definition of Done
+
+- Dashboard zeigt stets den aktuell verfügbaren Modelllauf
+- keine veralteten Karten werden unnötig neu geladen
+- Aktualisierung erfolgt nur zu realen Veröffentlichungszeitpunkten
+- Zeitverhalten entspricht dem meteorologischen Workflow des DWD
+
+---
+
+### 💡 Nutzen
+
+- korrekte Interpretation der Wetterlage
+- geringerer Datenverbrauch
+- konsistente und verlässliche Darstellung
+- Grundlage für datengetriebene Features (z. B. Seegang, Wind-gegen-Strom)
+
+---
+
+## 🧭 US-016 – Wetterlage-Overlay mit Offline-Unterstützung integrieren
+
+**Status:** DONE  
+**Priorität:** Hoch
+
+👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Wetterlage-Overlay & Offline-Cache“
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich zur Bodenwetter-Analysekarte die aktuelle Wetterlage aus dem Seewetterbericht als Text eingeblendet bekommen – auch im Offline-Modus  
+damit ich die dargestellte Wetterkarte besser interpretieren kann und auch ohne Internetverbindung eine fundierte Einschätzung erhalte
+
+---
+
+### 🧠 Fachlicher Hintergrund
+
+Der Deutsche Wetterdienst stellt den Seewetterbericht als dedizierte Quelle bereit; ein Open-Data-Textfeed kann als Fallback genutzt werden. Dieser enthält u. a.:
+
+- Abschnitt „Wetterlage“
+- Zeitstempel (UTC)
+- regionale Vorhersagen
+
+Der Text wird nicht als strukturierte API (JSON), sondern als Klartext geliefert und muss:
+
+- dekodiert (Latin‑1)
+- geparst (z. B. Abschnitt „Wetterlage“)
+- und zwischengespeichert werden
+
+---
+
+### 🎯 Zielbild
+
+- Beim Zoom der Bodenanalysekarte wird die aktuelle Wetterlage als Overlay angezeigt
+- Darstellung ist dezent und beeinträchtigt nicht die Karteninterpretation
+- letzter verfügbarer Bericht bleibt offline verfügbar
+
+---
+
+### ✅ Akzeptanzkriterien
+
+**Datenabruf**
+
+- [x] Seewetterbericht wird aus der dedizierten DWD-Seewetterbericht-Quelle geladen
+- [x] Text wird korrekt dekodiert (Latin‑1 → UTF‑8 Darstellung)
+- [x] Abschnitt „Wetterlage“ wird zuverlässig extrahiert
+
+---
+
+**Overlay-Darstellung**
+
+- [x] Overlay wird im Zoom-Modus der Bodenwetterkarte angezeigt
+- [x] Darstellung ist dezent (halbtransparent, unten positioniert)
+- [x] Text ist scrollbar und gut lesbar
+- [x] Overlay beeinträchtigt Zoom- und Pan-Gesten nicht
+
+---
+
+**Offline-Unterstützung**
+
+- [x] Letzter geladener Seewetterbericht wird im Cache gespeichert
+- [x] Im Offline-Modus wird der zuletzt verfügbare Text angezeigt
+- [x] Wenn kein Cache vorhanden ist, wird ein sinnvoller Fallback angezeigt
+
+---
+
+**Aktualisierungslogik**
+
+- [x] Aktualisierung erfolgt nur zu sinnvollen Zeitpunkten (gemäß US-013 / US-015)
+- [x] Kein unnötiger erneuter Download desselben Berichts
+- [x] Cache wird pro Modelllauf überschrieben (kein Wachstum)
+
+---
+
+**Integration**
+
+- [x] Funktioniert nur bei relevanter Karte (z. B. Bodenanalyse)
+- [x] Integration in bestehende Lightbox-/Zoom-Logik
+- [x] Kompatibel mit Service Worker und Cache-Strategie (US-008 / US-014)
+
+---
+
+### 🧠 Definition of Done
+
+- Nutzer sieht zur Karte die passende meteorologische Einordnung
+- Wetterlage ist auch ohne Internet verfügbar
+- Darstellung ist intuitiv und nicht störend
+- keine unnötigen Netzwerkanfragen
+
+---
+
+### 💡 Nutzen
+
+- deutlich bessere Interpretation der Wetterkarten
+- Verbindung von visuellen und textlichen Informationen
+- Offline-Fähigkeit für realen Einsatz (z. B. auf See)
+- Aufwertung des Dashboards von „Anzeige“ zu „Entscheidungshilfe“
 
 ## 🟨 DOING
 
-- (leer)
-
 ## ✅ DONE
 
+- US-016 Wetterlage-Overlay mit Offline-Unterstützung integrieren
 - US-014 Offline-Unterstützung mit gecachtem Kartenzugriff optimieren
 - US-013 Einheitlichen Aktualisierungszyklus für alle Seegangskarten anwenden
 - US-001 Menü entfernen
@@ -26,6 +231,7 @@
 - US-010 Pan- und Zoom-Verhalten im Bildmodus verbessern (Elastic UX)
 - US-011 Seegangskarten Nordsee integrieren (dritte Seite)
 - US-012 Seegangskarten Ostsee integrieren (vierte Seite)
+- US-015 Datenzyklus für Bodenwetter-Analyse- und Prognosekarten korrekt abbilden
 
 ---
 

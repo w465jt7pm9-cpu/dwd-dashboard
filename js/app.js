@@ -14,6 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const TEXT_PAGE_INDEX = 5
   const SEEGANG_REFRESH_WINDOW_UTC_HOURS = [7, 19]
   const SEEGANG_REFRESH_WINDOW_SPAN_MINUTES = 90
+  const BODEN_ANALYSIS_CYCLE_UTC_HOURS = [0, 12]
+  const BODEN_FORECAST_RELEASE_UTC_HOURS = {
+    RUN_00: 7,
+    RUN_12: 19
+  }
+  const ENABLE_BODEN_UTC_SCENARIO_TEST =
+    new URLSearchParams(window.location.search).get('test') === 'us015-utc'
 
   const LIGHTBOX_MIN_SCALE = 1
   const LIGHTBOX_MAX_SCALE = 4
@@ -38,6 +45,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const LAST_SUCCESSFUL_REFRESH_KEY = 'dwdLastSuccessfulRefresh'
   const SEEGANG_LAST_WINDOW_REFRESH_KEY = 'dwdSeegangLastWindowRefresh'
+  const BODEN_LAST_ANALYSIS_REFRESH_KEY = 'dwdBodenLastAnalysisRefresh'
+  const BODEN_LAST_FORECAST_RUN_REFRESH_KEY = 'dwdBodenLastForecastRunRefresh'
+  const WETTERLAGE_TEXT_CACHE_KEY = 'dwdWetterlageText'
+  const WETTERLAGE_RUN_CACHE_KEY = 'dwdWetterlageModelRun'
+  const WETTERLAGE_SOURCE_CACHE_KEY = 'dwdWetterlageSource'
+  const WETTERLAGE_UPDATED_AT_CACHE_KEY = 'dwdWetterlageUpdatedAt'
+  const DWD_SEEWETTERBERICHT_URL =
+    'https://www.dwd.de/DE/leistungen/seewetternordostsee/seewetternordostsee.html'
+  const DWD_TEXT_FORECASTS_INDEX_URL =
+    'https://opendata.dwd.de/weather/text_forecasts/txt/'
+  const DWD_WETTERLAGE_FILE_REGEX = /href="(ber01-VHDL13_DWON_[^"]+-ia5)"/gi
   const LAST_KNOWN_IMAGE_URL_KEY_PREFIX = 'dwdImageLastKnownUrl:'
   const THEME_STORAGE_KEY = 'dwdTheme'
 
@@ -62,6 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const installHintCloseButton = document.getElementById('installHintClose')
   const lightboxElement = document.getElementById('lightbox')
   const lightboxImageElement = document.getElementById('lightboxImg')
+  const lightboxWeatherlageElement = document.getElementById(
+    'lightboxWeatherlage'
+  )
   const lightboxPeekPreviousElement =
     document.getElementById('lightboxPeekPrev')
   const lightboxPeekNextElement = document.getElementById('lightboxPeekNext')
@@ -164,6 +185,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function getLastBodenAnalysisRefresh () {
+    try {
+      return localStorage.getItem(BODEN_LAST_ANALYSIS_REFRESH_KEY)
+    } catch {
+      return null
+    }
+  }
+
+  function setLastBodenAnalysisRefresh (cycleId) {
+    try {
+      localStorage.setItem(BODEN_LAST_ANALYSIS_REFRESH_KEY, cycleId)
+    } catch {
+      // localStorage is optional here.
+    }
+  }
+
+  function getLastBodenForecastRunRefresh () {
+    try {
+      return localStorage.getItem(BODEN_LAST_FORECAST_RUN_REFRESH_KEY)
+    } catch {
+      return null
+    }
+  }
+
+  function setLastBodenForecastRunRefresh (runId) {
+    try {
+      localStorage.setItem(BODEN_LAST_FORECAST_RUN_REFRESH_KEY, runId)
+    } catch {
+      // localStorage is optional here.
+    }
+  }
+
+  function getCachedWetterlageText () {
+    try {
+      return localStorage.getItem(WETTERLAGE_TEXT_CACHE_KEY)
+    } catch {
+      return null
+    }
+  }
+
+  function getCachedWetterlageRun () {
+    try {
+      return localStorage.getItem(WETTERLAGE_RUN_CACHE_KEY)
+    } catch {
+      return null
+    }
+  }
+
+  function getCachedWetterlageUpdatedAt () {
+    try {
+      return localStorage.getItem(WETTERLAGE_UPDATED_AT_CACHE_KEY)
+    } catch {
+      return null
+    }
+  }
+
+  function setCachedWetterlagePayload (payload) {
+    try {
+      localStorage.setItem(WETTERLAGE_TEXT_CACHE_KEY, payload.text)
+      localStorage.setItem(WETTERLAGE_RUN_CACHE_KEY, payload.modelRunId)
+      localStorage.setItem(WETTERLAGE_SOURCE_CACHE_KEY, payload.sourceUrl)
+      localStorage.setItem(
+        WETTERLAGE_UPDATED_AT_CACHE_KEY,
+        String(payload.updatedAt)
+      )
+    } catch {
+      // localStorage is optional here.
+    }
+  }
+
   function getLastKnownImageUrlStorageKey (imageElement) {
     const baseKey = imageElement.dataset.base
     const imagePath = imageElement.dataset.path
@@ -258,6 +349,379 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     return getLastSeegangWindowRefresh() === activeWindowId
+  }
+
+  function getUtcDateId (dateValue) {
+    return `${dateValue.getUTCFullYear()}-${padTimePart(
+      dateValue.getUTCMonth() + 1
+    )}-${padTimePart(dateValue.getUTCDate())}`
+  }
+
+  function getActiveBodenAnalysisCycleId (now = new Date()) {
+    const cycleHour =
+      now.getUTCHours() >= BODEN_ANALYSIS_CYCLE_UTC_HOURS[1]
+        ? BODEN_ANALYSIS_CYCLE_UTC_HOURS[1]
+        : BODEN_ANALYSIS_CYCLE_UTC_HOURS[0]
+
+    return `${getUtcDateId(now)}-${padTimePart(cycleHour)}`
+  }
+
+  function getActiveBodenForecastRunId (now = new Date()) {
+    const currentUtcHour = now.getUTCHours()
+    const runDate = new Date(now.getTime())
+    let runHour = 12
+
+    if (currentUtcHour >= BODEN_FORECAST_RELEASE_UTC_HOURS.RUN_12) {
+      runHour = 12
+    } else if (currentUtcHour >= BODEN_FORECAST_RELEASE_UTC_HOURS.RUN_00) {
+      runHour = 0
+    } else {
+      runDate.setUTCDate(runDate.getUTCDate() - 1)
+      runHour = 12
+    }
+
+    return `${getUtcDateId(runDate)}-${padTimePart(runHour)}`
+  }
+
+  function getBodenRefreshKind (imageElement) {
+    const baseKey = imageElement.dataset.base
+    const imagePath = imageElement.dataset.path || ''
+
+    if (baseKey !== 'WX_URL') {
+      return null
+    }
+
+    if (imagePath === 'bwk_bodendruck_na_ana.png') {
+      return 'analysis'
+    }
+
+    if (imagePath.startsWith('ico_tkboden_na_')) {
+      return 'forecast'
+    }
+
+    return null
+  }
+
+  function shouldSkipBodenRefreshForImage (imageElement, activeCycles) {
+    const refreshKind = getBodenRefreshKind(imageElement)
+
+    if (!refreshKind || !imageElement.src) {
+      return false
+    }
+
+    if (refreshKind === 'analysis') {
+      return getLastBodenAnalysisRefresh() === activeCycles.analysisCycleId
+    }
+
+    if (refreshKind === 'forecast') {
+      return getLastBodenForecastRunRefresh() === activeCycles.forecastRunId
+    }
+
+    return false
+  }
+
+  function isBodenAnalysisImageElement (imageElement) {
+    return (
+      imageElement?.dataset?.base === 'WX_URL' &&
+      imageElement?.dataset?.path === 'bwk_bodendruck_na_ana.png'
+    )
+  }
+
+  function getCurrentLightboxImageElement () {
+    if (
+      !lightboxImageList.length ||
+      currentLightboxImageIndex < 0 ||
+      currentLightboxImageIndex >= lightboxImageList.length
+    ) {
+      return null
+    }
+
+    return lightboxImageList[currentLightboxImageIndex]
+  }
+
+  function renderWetterlageOverlay (message, { visible = false } = {}) {
+    if (!lightboxWeatherlageElement) {
+      return
+    }
+
+    if (!visible) {
+      lightboxWeatherlageElement.classList.add('is-hidden')
+      lightboxWeatherlageElement.textContent = ''
+      return
+    }
+
+    lightboxWeatherlageElement.textContent = message || ''
+    lightboxWeatherlageElement.classList.remove('is-hidden')
+  }
+
+  function normalizeWetterlageText (text) {
+    if (!text) {
+      return ''
+    }
+
+    return text
+      .replace(/\r/g, '')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+  }
+
+  function extractWetterlageSection (rawText) {
+    const normalizedText = normalizeWetterlageText(rawText)
+
+    const weatherlageMatch = normalizedText.match(
+      /(Aktuelle\s+Wetterlage|Wetterlage)\s*:?\s*([\s\S]*?)(?:\n\s*Vorhersage\b|$)/i
+    )
+    if (weatherlageMatch?.[2]) {
+      return normalizeWetterlageText(weatherlageMatch[2])
+    }
+
+    const fallbackMatch = normalizedText.match(
+      /Wetter-\s*und\s*Warnlage\s*:?\s*([\s\S]*?)(?:\n\s*GEWITTER\b|\n\s*Vorhersage\b|$)/i
+    )
+    if (fallbackMatch?.[1]) {
+      return normalizeWetterlageText(fallbackMatch[1])
+    }
+
+    return ''
+  }
+
+  function extractSeewetterberichtSection (rawHtml) {
+    if (!rawHtml) {
+      return ''
+    }
+
+    const parsedDocument = new DOMParser().parseFromString(rawHtml, 'text/html')
+    const pageText = normalizeWetterlageText(
+      parsedDocument.body?.textContent || ''
+    )
+
+    const fullSectionMatch = pageText.match(
+      /(Seewetterbericht\s+für\s+Nord-\s*und\s*Ostsee[\s\S]*?Aktuelle\s+Wetterlage\s*[\s\S]*?)(Vorhersage\s+für\s+[^\n]+)/i
+    )
+    if (fullSectionMatch?.[1] && fullSectionMatch?.[2]) {
+      return normalizeWetterlageText(
+        `${fullSectionMatch[1].trim()}\n\n${fullSectionMatch[2].trim()}`
+      )
+    }
+
+    const weatherlageOnlyMatch = pageText.match(
+      /(Aktuelle\s+Wetterlage\s*[\s\S]*?)(Vorhersage\s+für\s+[^\n]+)/i
+    )
+    if (weatherlageOnlyMatch?.[1] && weatherlageOnlyMatch?.[2]) {
+      return normalizeWetterlageText(
+        `${weatherlageOnlyMatch[1].trim()}\n\n${weatherlageOnlyMatch[2].trim()}`
+      )
+    }
+
+    return ''
+  }
+
+  async function resolveLatestWetterlageSourceUrl () {
+    const indexResponse = await fetch(DWD_TEXT_FORECASTS_INDEX_URL, {
+      cache: 'no-cache'
+    })
+    if (!indexResponse.ok) {
+      throw new Error('Wetterlage-Index nicht erreichbar')
+    }
+
+    const indexHtml = await indexResponse.text()
+    const candidates = []
+    let match
+    while ((match = DWD_WETTERLAGE_FILE_REGEX.exec(indexHtml)) !== null) {
+      candidates.push(match[1])
+    }
+
+    if (!candidates.length) {
+      throw new Error('Kein passender Wetterlage-Feed gefunden')
+    }
+
+    candidates.sort()
+    const latestFileName = candidates[candidates.length - 1]
+    return `${DWD_TEXT_FORECASTS_INDEX_URL}${latestFileName}`
+  }
+
+  async function fetchWetterlageFromFeed () {
+    const sourceUrl = await resolveLatestWetterlageSourceUrl()
+    const textResponse = await fetch(sourceUrl, { cache: 'no-cache' })
+    if (!textResponse.ok) {
+      throw new Error('Wetterlage-Feed nicht erreichbar')
+    }
+
+    const textBuffer = await textResponse.arrayBuffer()
+    const decodedText = new TextDecoder('latin1').decode(textBuffer)
+    const weatherlageText = extractWetterlageSection(decodedText)
+    if (!weatherlageText) {
+      throw new Error('Abschnitt Wetterlage konnte nicht extrahiert werden')
+    }
+
+    return {
+      text: weatherlageText,
+      sourceUrl
+    }
+  }
+
+  async function fetchWetterlageFromSeewetterbericht () {
+    const response = await fetch(DWD_SEEWETTERBERICHT_URL, {
+      cache: 'no-cache'
+    })
+    if (!response.ok) {
+      throw new Error('Seewetterbericht nicht erreichbar')
+    }
+
+    const htmlText = await response.text()
+    const weatherlageText = extractSeewetterberichtSection(htmlText)
+    if (!weatherlageText) {
+      throw new Error('Aktuelle Wetterlage im Seewetterbericht nicht gefunden')
+    }
+
+    return {
+      text: weatherlageText,
+      sourceUrl: DWD_SEEWETTERBERICHT_URL
+    }
+  }
+
+  async function fetchRelevantWetterlage () {
+    try {
+      return await fetchWetterlageFromSeewetterbericht()
+    } catch {
+      return fetchWetterlageFromFeed()
+    }
+  }
+
+  async function ensureWetterlageOverlayContent () {
+    const activeModelRunId = getActiveBodenForecastRunId()
+    const cachedText = getCachedWetterlageText()
+    const cachedRunId = getCachedWetterlageRun()
+    const cachedUpdatedAt = getCachedWetterlageUpdatedAt()
+
+    if (cachedText) {
+      const updatedLabel = formatTimestamp(cachedUpdatedAt)
+      renderWetterlageOverlay(
+        `${cachedText}\n\nStand: ${updatedLabel} UTC-basiert`,
+        { visible: true }
+      )
+    } else {
+      renderWetterlageOverlay('Wetterlage wird geladen ...', { visible: true })
+    }
+
+    const shouldFetch = navigator.onLine && activeModelRunId !== cachedRunId
+    if (!shouldFetch) {
+      if (!navigator.onLine && !cachedText) {
+        renderWetterlageOverlay(
+          'Offline: Keine gespeicherte Wetterlage verfügbar.',
+          { visible: true }
+        )
+      }
+      return
+    }
+
+    try {
+      const payload = await fetchRelevantWetterlage()
+      const cachePayload = {
+        text: payload.text,
+        modelRunId: activeModelRunId,
+        sourceUrl: payload.sourceUrl,
+        updatedAt: Date.now()
+      }
+      setCachedWetterlagePayload(cachePayload)
+
+      if (!isLightboxOpen) {
+        return
+      }
+
+      const currentImageElement = getCurrentLightboxImageElement()
+      if (!isBodenAnalysisImageElement(currentImageElement)) {
+        return
+      }
+
+      const updatedLabel = formatTimestamp(cachePayload.updatedAt)
+      renderWetterlageOverlay(
+        `${cachePayload.text}\n\nStand: ${updatedLabel} UTC-basiert`,
+        { visible: true }
+      )
+    } catch {
+      if (!cachedText) {
+        renderWetterlageOverlay(
+          'Wetterlage derzeit nicht verfügbar. Bitte später erneut versuchen.',
+          { visible: true }
+        )
+      }
+    }
+  }
+
+  function updateWetterlageOverlayForCurrentLightboxImage () {
+    if (!isLightboxOpen) {
+      renderWetterlageOverlay('', { visible: false })
+      return
+    }
+
+    const currentImageElement = getCurrentLightboxImageElement()
+    if (!isBodenAnalysisImageElement(currentImageElement)) {
+      renderWetterlageOverlay('', { visible: false })
+      return
+    }
+
+    void ensureWetterlageOverlayContent()
+  }
+
+  function runBodenUtcScenarioTest () {
+    const utcScenarios = [
+      {
+        at: '2026-06-20T00:05:00Z',
+        expectedAnalysis: '2026-06-20-00',
+        expectedForecast: '2026-06-19-12'
+      },
+      {
+        at: '2026-06-20T06:59:00Z',
+        expectedAnalysis: '2026-06-20-00',
+        expectedForecast: '2026-06-19-12'
+      },
+      {
+        at: '2026-06-20T07:01:00Z',
+        expectedAnalysis: '2026-06-20-00',
+        expectedForecast: '2026-06-20-00'
+      },
+      {
+        at: '2026-06-20T12:05:00Z',
+        expectedAnalysis: '2026-06-20-12',
+        expectedForecast: '2026-06-20-00'
+      },
+      {
+        at: '2026-06-20T19:01:00Z',
+        expectedAnalysis: '2026-06-20-12',
+        expectedForecast: '2026-06-20-12'
+      }
+    ]
+
+    const results = utcScenarios.map(scenario => {
+      const now = new Date(scenario.at)
+      const analysisCycleId = getActiveBodenAnalysisCycleId(now)
+      const forecastRunId = getActiveBodenForecastRunId(now)
+      const analysisPass = analysisCycleId === scenario.expectedAnalysis
+      const forecastPass = forecastRunId === scenario.expectedForecast
+
+      return {
+        at: scenario.at,
+        analysisCycleId,
+        expectedAnalysis: scenario.expectedAnalysis,
+        analysisPass,
+        forecastRunId,
+        expectedForecast: scenario.expectedForecast,
+        forecastPass,
+        pass: analysisPass && forecastPass
+      }
+    })
+
+    const allPassed = results.every(result => result.pass)
+    console.group('US-015 UTC Szenario-Test')
+    console.table(results)
+    if (allPassed) {
+      console.info('US-015 UTC Szenario-Test: OK')
+    } else {
+      console.warn('US-015 UTC Szenario-Test: FEHLER')
+    }
+    console.groupEnd()
   }
 
   function updateOfflineUi () {
@@ -431,10 +895,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const timestamp = Date.now()
     let refreshedImageCount = 0
+    let refreshedBodenAnalysisCount = 0
+    let refreshedBodenForecastCount = 0
     const activeSeegangWindowId = getActiveSeegangRefreshWindowId()
+    const activeBodenCycles = {
+      analysisCycleId: getActiveBodenAnalysisCycleId(),
+      forecastRunId: getActiveBodenForecastRunId()
+    }
 
     currentPageImages.forEach(imageElement => {
+      const shouldSkipBodenRefresh =
+        !force &&
+        shouldSkipBodenRefreshForImage(imageElement, activeBodenCycles)
+
+      if (shouldSkipBodenRefresh) {
+        if (!navigator.onLine) {
+          setCardState(imageElement, 'offline')
+        }
+        return
+      }
+
+      const bodenRefreshKind = getBodenRefreshKind(imageElement)
+
       refreshedImageCount += 1
+      if (bodenRefreshKind === 'analysis') {
+        refreshedBodenAnalysisCount += 1
+      }
+      if (bodenRefreshKind === 'forecast') {
+        refreshedBodenForecastCount += 1
+      }
 
       if (!navigator.onLine) {
         const persistedImageUrl = getLastKnownImageUrl(imageElement)
@@ -474,6 +963,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (isSeegangPage(currentPageIndex) && activeSeegangWindowId) {
         setLastSeegangWindowRefresh(activeSeegangWindowId)
+      }
+
+      if (refreshedBodenAnalysisCount > 0) {
+        setLastBodenAnalysisRefresh(activeBodenCycles.analysisCycleId)
+      }
+
+      if (refreshedBodenForecastCount > 0) {
+        setLastBodenForecastRunRefresh(activeBodenCycles.forecastRunId)
       }
     }
 
@@ -770,6 +1267,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateLightboxPeekImages()
     showLightboxNavigationTemporarily()
+    updateWetterlageOverlayForCurrentLightboxImage()
   }
 
   function showPreviousLightboxImage () {
@@ -796,6 +1294,7 @@ document.addEventListener('DOMContentLoaded', () => {
     isLightboxOpen = true
     updateLightboxPeekImages()
     showLightboxNavigationTemporarily()
+    updateWetterlageOverlayForCurrentLightboxImage()
   }
 
   function closeLightbox () {
@@ -813,6 +1312,7 @@ document.addEventListener('DOMContentLoaded', () => {
     isLightboxPanning = false
     didLightboxPanInGesture = false
     updateLightboxPeekImages()
+    renderWetterlageOverlay('', { visible: false })
     resetLightboxZoom()
   }
 
@@ -1128,6 +1628,26 @@ document.addEventListener('DOMContentLoaded', () => {
       closeLightbox()
     }
   })
+
+  lightboxWeatherlageElement?.addEventListener('click', event => {
+    event.stopPropagation()
+  })
+
+  lightboxWeatherlageElement?.addEventListener(
+    'touchstart',
+    event => {
+      event.stopPropagation()
+    },
+    { passive: true }
+  )
+
+  lightboxWeatherlageElement?.addEventListener(
+    'wheel',
+    event => {
+      event.stopPropagation()
+    },
+    { passive: true }
+  )
 
   lightboxImageElement.addEventListener('click', event => {
     event.stopPropagation()
@@ -1468,6 +1988,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme()
   initInstallHint()
   initExternalLinks()
+
+  if (ENABLE_BODEN_UTC_SCENARIO_TEST) {
+    runBodenUtcScenarioTest()
+  }
+
   updateOfflineUi()
   goToPage(0)
   refreshVisibleImages()

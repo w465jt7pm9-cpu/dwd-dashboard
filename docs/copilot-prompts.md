@@ -727,3 +727,243 @@ Arbeite nicht mit nur einem einzigen Mega-Prompt. Nutze stattdessen diese Reihen
 7. **Abschluss-Review**
 
 So steigt die Chance deutlich, dass Copilot präzise und minimal-invasiv arbeitet.
+
+---
+
+# 🌍 Feature: Bodenwetter-Datenzyklus (Analyse & Prognose)
+
+## Ziel
+
+Sicherstellen, dass Bodenwetter-Analyse- und Prognosekarten nur dann aktualisiert werden, wenn tatsächlich neue Daten aus dem Modelllauf verfügbar sind.
+
+---
+
+## Copilot Prompt
+
+````text
+Optimiere das bestehende DWD Dashboard (Vanilla JavaScript) so, dass Bodenwetter-Analyse- und Prognosekarten entsprechend ihres tatsächlichen Modell- und Veröffentlichungszyklus behandelt werden.
+
+Kontext:
+- Dashboard lädt regelmäßig Wetterkarten (Analyse + Prognose)
+- Aktuell werden Bilder ggf. zu häufig neu geladen
+- DWD-Daten haben feste Aktualisierungszeiten und Modellläufe (00 und 12 UTC)
+
+Ziel:
+- Vermeidung unnötiger Requests
+- Nur Aktualisierung bei tatsächlich neuen Daten
+- klare Trennung zwischen Analyse und Prognose
+
+---
+
+1. Zeitmodell implementieren
+
+- Modellläufe:
+  - 00 UTC
+  - 12 UTC
+
+- Verfügbarkeit:
+  - 00 UTC Lauf → verfügbar ab ca. 07 UTC
+  - 12 UTC Lauf → verfügbar ab ca. 19 UTC
+
+---
+
+2. Analysekarten
+
+- gelten als „neu“ nur zu:
+  - 00 UTC
+  - 12 UTC
+- außerhalb dieser Zeiten:
+  → keine Aktualisierung durchführen
+
+---
+
+3. Prognosekarten
+
+- gehören zu einem Modelllauf (00 oder 12 UTC)
+- Vorhersagezeiten:
+  - H+24, H+36, H+48 etc.
+- Interpretation:
+  - H+X = Stunden relativ zum Modellstart
+
+---
+
+4. Refresh-Logik anpassen
+
+- prüfe aktuelle UTC-Zeit
+- bestimme gültigen Modelllauf:
+  - zwischen 07–19 UTC → 00 UTC Lauf
+  - zwischen 19–07 UTC → 12 UTC Lauf
+
+- nur neu laden wenn:
+  - neuer Modelllauf verfügbar
+  - oder manuell ausgelöst
+
+---
+
+5. Integration mit bestehender Logik
+
+- Integration in:
+  - refreshVisibleImages()
+  - bestehende Timer-Logik
+
+- keine Änderung an:
+  - Bild-URLs
+  - DOM-Struktur
+  - Navigation
+
+---
+
+6. Cache-Verhalten
+
+- speichere:
+  - lastModelRun (00 oder 12)
+- wenn Modelllauf unverändert:
+  - keine neuen Requests senden
+
+---
+
+7. Constraints
+
+- keine neuen Libraries
+- minimal-invasive Änderungen
+- bestehende Architektur beibehalten
+- Kompatibilität mit Service Worker sicherstellen
+
+---
+
+Vorgehen:
+
+1. Analyse der aktuellen Refresh-Implementierung
+2. Einbau einer zentralen Zeitentscheidung (UTC-basiert)
+3. Verknüpfung mit Cache-Zustand
+4. Tests mit verschiedenen Tageszeiten
+
+Keine unnötigen Refactorings durchführen.
+
+```text
+Behandle Zeit immer in UTC (nicht lokale Zeit)
+
+
+---
+
+# 🧭 Feature: Wetterlage-Overlay & Offline-Cache
+
+## Ziel
+
+Einblendung der aktuellen Wetterlage aus dem DWD-Seewetterbericht im Zoom-Modus der Bodenwetterkarte, inklusive Offline-Unterstützung durch Caching.
+
+---
+
+## Copilot Prompt
+
+```text
+Erweitere das bestehende DWD Dashboard um ein Wetterlage-Overlay im Zoom-Modus der Bodenwetter-Analysekarte.
+
+Kontext:
+- bestehende Lightbox / Zoom-Ansicht
+- bestehender Service Worker mit Cache-Strategie
+- Bilder werden bereits gecacht
+- Dashboard nutzt Vanilla JavaScript
+
+Ziel:
+- Anzeige der aktuellen Wetterlage (Text) über der Karte
+- Offline-Verfügbarkeit des letzten Berichts
+- minimale UI-Erweiterung
+
+---
+
+1. Datenquelle
+
+Verwende den dedizierten DWD-Seewetterbericht als Primärquelle:
+- https://www.dwd.de/DE/leistungen/seewetternordostsee/seewetternordostsee.html
+- optionaler technischer Fallback: Open-Data-Textfeed
+
+Wichtig:
+- Response ist NICHT UTF-8
+- Verwende:
+  - response.arrayBuffer()
+  - TextDecoder('latin1')
+
+---
+
+2. Parsing
+
+- Extrahiere ausschließlich den Abschnitt:
+  "Aktuelle Wetterlage"
+- Ende:
+  - bei "Vorhersage für ..."
+- Rückgabe als String
+
+---
+
+3. Overlay (Integration)
+
+- erweitere bestehende Lightbox:
+  - Overlay am unteren Rand
+- Eigenschaften:
+  - halbtransparent
+  - scrollbar
+  - nicht störend
+
+- kein neues Menü oder Navigation hinzufügen
+
+---
+
+4. Anzeige-Logik
+
+- Overlay nur anzeigen:
+  - bei Bodenwetter-Analysekarte
+  - im Zoom-Modus
+
+- Overlay automatisch befüllen beim Öffnen der Lightbox
+
+---
+
+5. Offline-Unterstützung (wichtig)
+
+Integration in bestehenden Service Worker:
+
+Strategie:
+- Cache First für Wetterlage-Text
+
+Verhalten:
+- wenn im Cache:
+  - zeige den letzten gespeicherten Wetterlage-Text
+  - markiere optional als „letzter Stand"
+- wenn offline und kein Cache vorhanden:
+  - zeige Fallback-Text: „Keine Wetterlage offline verfügbar"
+
+---
+
+6. Aktualisierungslogik
+
+- orientiere den Fetch an bestehender Datenzyklus-Logik (US-013 / US-015)
+- kein erneuter Download, wenn Modelllauf unverändert
+- Cache-Eintrag pro Modelllauf überschreiben (kein Wachstum)
+
+---
+
+7. Constraints
+
+- keine neuen Libraries
+- bestehende Architektur beibehalten
+- Lightbox-Interaktionen (Zoom, Pan, Swipe) nicht beeinträchtigen
+- minimal-invasive Änderungen
+
+---
+
+Vorgehen:
+
+1. Analyse der bestehenden Lightbox-Integration
+2. Einbau von Fetch + Latin‑1 Decoding + Parser
+3. Overlay-Rendern nur für Bodenanalyse im Zoom
+4. Cache-First Verhalten mit Offline-Fallback
+
+Keine unnötigen Refactorings durchführen.
+```
+
+## Hinweis zum Umsetzungsstand
+
+- Die aktuelle Implementierung verwendet den dedizierten DWD-Seewetterbericht als Primärquelle, extrahiert den Abschnitt „Aktuelle Wetterlage“ bis „Vorhersage für ...“ und zeigt ihn als Overlay an.
+- Ein Open-Data-Textfeed bleibt als technische Rückfallebene aktiv, inklusive Latin‑1-Decoding und bestehendem Offline-Cache-Verhalten.
+````

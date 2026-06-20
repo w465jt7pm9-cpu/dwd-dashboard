@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dwd-dashboard-release-1.1'
+const CACHE_VERSION = 'dwd-dashboard-release-1.2'
 
 const APP_SHELL_ASSETS = [
   './',
@@ -39,6 +39,11 @@ self.addEventListener('fetch', event => {
     return
   }
 
+  if (isTextForecastRequest(request)) {
+    event.respondWith(handleTextForecastRequest(request))
+    return
+  }
+
   event.respondWith(handleStaticRequest(request))
 })
 
@@ -71,6 +76,28 @@ function isImageRequest (request) {
   return /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(requestUrl.pathname)
 }
 
+function isTextForecastRequest (request) {
+  const requestUrl = new URL(request.url)
+
+  if (
+    requestUrl.origin === 'https://www.dwd.de' &&
+    requestUrl.pathname ===
+      '/DE/leistungen/seewetternordostsee/seewetternordostsee.html'
+  ) {
+    return true
+  }
+
+  if (requestUrl.origin !== 'https://opendata.dwd.de') {
+    return false
+  }
+
+  if (!requestUrl.pathname.includes('/weather/text_forecasts/txt/')) {
+    return false
+  }
+
+  return !requestUrl.pathname.endsWith('/txt/')
+}
+
 async function handleNavigationRequest (request) {
   try {
     const networkResponse = await fetch(request)
@@ -93,6 +120,21 @@ async function handleImageRequest (request) {
     .catch(() => cachedResponse)
 
   return cachedResponse || networkRequest
+}
+
+async function handleTextForecastRequest (request) {
+  const cachedResponse = await caches.match(request)
+  if (cachedResponse) {
+    return cachedResponse
+  }
+
+  try {
+    const networkResponse = await fetch(request)
+    await cacheResponse(request, networkResponse)
+    return networkResponse
+  } catch {
+    return cachedResponse
+  }
 }
 
 async function handleStaticRequest (request) {

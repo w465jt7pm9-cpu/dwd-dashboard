@@ -305,6 +305,34 @@
   visibility: hidden;
 }
 
+.lightbox-weatherlage {
+  position: absolute;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(92vw, 860px);
+  max-height: min(36vh, 220px);
+  overflow: auto;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(8, 16, 28, 0.56);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(244, 248, 255, 0.96);
+  font-size: 0.88rem;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  z-index: calc(var(--z-lightbox-nav) - 1);
+  -webkit-overflow-scrolling: touch;
+}
+
+.lightbox-weatherlage.is-hidden {
+  display: none;
+}
+
+.lightbox.lb-zoomed .lightbox-weatherlage {
+  opacity: 0.94;
+}
+
 /* NAV ARROWS */
 .lb-nav {
   position: absolute;
