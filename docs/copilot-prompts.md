@@ -312,6 +312,54 @@ Technische Akzeptanzkriterien:
 
 ---
 
+# 5a) Prompt: Globaler Seegang-Datenzyklus (US-013)
+
+## Ziel
+
+- Einheitlicher Aktualisierungszyklus fuer alle Seegangskarten (alle WX_SEE-Gebiete)
+- Zentrale Zeitlogik mit den bekannten Fenstern um ca. 07 und 19 UTC
+- Keine gebiets- oder seitenbezogene Sonderlogik
+- Manuelle Aktualisierung bleibt moeglich
+
+```text
+Bitte erweitere die bestehende Refresh-Logik in app.js minimal-invasiv fuer US-013
+(globaler Seegang-Datenzyklus).
+
+Ziel:
+- Alle Seegangskarten (alle Bilder mit data-base="WX_SEE") nutzen dieselbe Zeitlogik.
+- Aktualisierung fuer Seegang erfolgt automatisch nur in den bekannten Fenstern
+  um ca. 07 und 19 UTC.
+- Zwischen den Fenstern werden fuer Seegang keine unnoetigen Requests ausgeloest.
+- Manuelle Aktualisierung soll weiterhin moeglich bleiben.
+
+Kontext aus dem Bestand:
+- Es gibt bereits eine Zeitfenster-Logik fuer Seegang in app.js.
+- Es existieren mehrere Seegang-Seiten (Nordsee, Ostsee, weitere Seegebiete).
+- Refresh laeuft ueber refreshVisibleImages() und Interaktionen ueber Pull-to-Refresh.
+
+Umsetzung:
+1. Ersetze seitenbezogene Seegang-Sonderbehandlung durch eine globale Erkennung:
+  - Seegang-Seite = Seite enthaelt mindestens ein Bild mit data-base="WX_SEE".
+2. Halte Zeitfenster zentral (07/19 UTC, tolerantes Fenster wie im Bestand).
+3. Speichere den letzten Seegang-Refresh pro aktivem Zeitfenster global,
+  nicht pro Gebiet/Seite.
+4. Lass automatische Refreshes ausserhalb der Seegang-Fenster aus.
+5. Erlaube weiterhin manuelles Refresh (Force-Refresh), auch wenn kein
+  Seegang-Fenster aktiv ist.
+6. Keine Aenderungen an Bildquellen, Lightbox, Navigation und Badge-System.
+
+Technische Akzeptanzkriterien:
+- Alle WX_SEE-Karten folgen derselben Zeitlogik.
+- Keine Duplikation der Zeitlogik pro Gebiet.
+- Neue Seegang-Gebiete funktionieren ohne Anpassung der Zeitlogik.
+- Pull-to-Refresh bleibt fuer Karten-Seiten verfuegbar.
+- Keine Regressionen bei Lightbox, Swipe, Edge-Tap und Keyboard-Navigation.
+
+Bitte fuehre die Aenderungen minimal-invasiv direkt im Code aus.
+```
+
+---
+
 # 🌊 Feature: Wind-gegen-Strom Erkennung
 
 ## Ziel

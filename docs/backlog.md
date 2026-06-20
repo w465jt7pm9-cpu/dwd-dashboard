@@ -6,7 +6,108 @@
 
 ## 🟥 TODO
 
-- (leer)
+---
+
+## 🔄 US-013 – Einheitlichen Aktualisierungszyklus für alle Seegangskarten anwenden
+
+**Status:** DONE  
+**Priorität:** Hoch
+
+👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Globaler Seegang-Datenzyklus“
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich, dass alle Seegangsvorhersagekarten unabhängig vom Gebiet konsistent aktualisiert werden  
+damit ich mich auf eine einheitliche und verlässliche Datenbasis verlassen kann und keine unnötigen Aktualisierungen stattfinden
+
+---
+
+### 🧠 Fachlicher Hintergrund
+
+Die Seegangsvorhersagekarten des Deutschen Wetterdienstes für europäische Seegebiete unterliegen einem gemeinsamen Zyklus:
+
+- Gebiete:
+
+  - Nordsee
+  - Ostsee
+  - Mittelmeer
+  - Ostatlantik
+
+- Aktualisierung:
+
+  - ca. 07 UTC
+  - ca. 19 UTC
+
+- Vorhersagezeiten:
+  - 00
+    (- 12)
+  - 24
+  - 48
+  - 72 Stunden 【1-9e913b】
+
+---
+
+### 🎯 Zielbild
+
+- Einheitliche Behandlung aller Seegangskarten
+- zentral gesteuerte Refresh-Logik
+- keine gebietsspezifische Sonderbehandlung mehr
+
+---
+
+### ✅ Akzeptanzkriterien
+
+**Einheitlicher Datenzyklus**
+
+- [x] Alle Seegangskarten verwenden denselben Aktualisierungszeitplan (~07 und ~19 UTC)
+- [x] Es wird keine separate Refresh-Logik pro Seegebiet implementiert
+- [x] Neue Seegebiete können ohne Anpassung der Zeitlogik ergänzt werden
+
+---
+
+**Refresh-Verhalten**
+
+- [x] Automatische Aktualisierung erfolgt nur in den bekannten Zeitfenstern
+- [x] Zwischen den Zeitfenstern werden keine unnötigen Requests ausgelöst
+- [x] Manuelle Aktualisierung bleibt möglich
+
+---
+
+**Integration mit Cache-Strategie (US-008)**
+
+- [x] Cache-Gültigkeit orientiert sich am globalen Seegang-Zyklus
+- [x] Daten werden maximal bis zum nächsten erwarteten Update verwendet
+- [x] Veraltete Karten werden automatisch ersetzt
+
+---
+
+**Skalierbarkeit**
+
+- [x] Struktur erlaubt einfache Erweiterung um:
+  - Mittelmeer
+  - Ostatlantik
+- [x] Keine Duplikation von Zeitlogik in mehreren Komponenten
+
+---
+
+### 🧠 Definition of Done
+
+- Alle Seegangskarten verhalten sich zeitlich identisch
+- Aktualisierung erfolgt nur bei real verfügbaren neuen Daten
+- System ist erweiterbar ohne Anpassung der Refresh-Logik
+- Keine redundanten Netzwerkaufrufe mehr
+
+---
+
+### 💡 Nutzen
+
+- konsistente Nutzererfahrung
+- reduzierte Komplexität im Code
+- geringerer Datenverbrauch
+- Grundlage für skalierbares Seegang-Modul über mehrere Regionen hinweg
 
 ## 🟨 DOING
 
@@ -14,6 +115,7 @@
 
 ## ✅ DONE
 
+- US-013 Einheitlichen Aktualisierungszyklus für alle Seegangskarten anwenden
 - US-001 Menü entfernen
 - US-002 Navigation über Gesten
 - US-003 Pull-to-Refresh

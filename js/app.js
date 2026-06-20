@@ -12,9 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const NORDSEE_PAGE_INDEX = 3
   const OSTSEE_PAGE_INDEX = 4
   const TEXT_PAGE_INDEX = 5
-  const SEEGANG_PAGE_INDEXES = [NORDSEE_PAGE_INDEX, OSTSEE_PAGE_INDEX]
-  const NORDSEE_REFRESH_WINDOW_UTC_HOURS = [7, 19]
-  const NORDSEE_REFRESH_WINDOW_SPAN_MINUTES = 90
+  const SEEGANG_REFRESH_WINDOW_UTC_HOURS = [7, 19]
+  const SEEGANG_REFRESH_WINDOW_SPAN_MINUTES = 90
 
   const LIGHTBOX_MIN_SCALE = 1
   const LIGHTBOX_MAX_SCALE = 4
@@ -38,10 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const PAGE_SWIPE_MAX_DURATION_MS = 800
 
   const LAST_SUCCESSFUL_REFRESH_KEY = 'dwdLastSuccessfulRefresh'
-  const SEEGANG_LAST_WINDOW_REFRESH_KEY_BY_PAGE = {
-    [NORDSEE_PAGE_INDEX]: 'dwdNordseeLastWindowRefresh',
-    [OSTSEE_PAGE_INDEX]: 'dwdOstseeLastWindowRefresh'
-  }
+  const SEEGANG_LAST_WINDOW_REFRESH_KEY = 'dwdSeegangLastWindowRefresh'
   const THEME_STORAGE_KEY = 'dwdTheme'
 
   const PAGE_NAMES = [
@@ -150,30 +146,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function getLastSeegangWindowRefresh (pageIndex) {
-    const storageKey = SEEGANG_LAST_WINDOW_REFRESH_KEY_BY_PAGE[pageIndex]
-    if (!storageKey) {
-      return null
-    }
-
+  function getLastSeegangWindowRefresh () {
     try {
-      return localStorage.getItem(storageKey)
+      return localStorage.getItem(SEEGANG_LAST_WINDOW_REFRESH_KEY)
     } catch {
       return null
     }
   }
 
-  function setLastSeegangWindowRefresh (pageIndex, windowId) {
-    const storageKey = SEEGANG_LAST_WINDOW_REFRESH_KEY_BY_PAGE[pageIndex]
-    if (!storageKey) {
-      return
-    }
-
+  function setLastSeegangWindowRefresh (windowId) {
     try {
-      localStorage.setItem(storageKey, windowId)
+      localStorage.setItem(SEEGANG_LAST_WINDOW_REFRESH_KEY, windowId)
     } catch {
       // localStorage is optional here.
     }
+  }
+
+  function getPageImages (pageIndex) {
+    return IMAGE_ELEMENTS.filter(imageElement => {
+      const pageElement = imageElement.closest('.page')
+      return pageElement && Number(pageElement.dataset.page) === pageIndex
+    })
+  }
+
+  function isSeegangPage (pageIndex) {
+    return getPageImages(pageIndex).some(
+      imageElement => imageElement.dataset.base === 'WX_SEE'
+    )
+  }
+
+  function isPullToRefreshEnabledPage (pageIndex) {
+    return pageIndex !== TEXT_PAGE_INDEX && getPageImages(pageIndex).length > 0
   }
 
   function padTimePart (value) {
@@ -185,13 +188,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const utcMonth = now.getUTCMonth() + 1
     const utcDate = now.getUTCDate()
 
-    for (const hour of NORDSEE_REFRESH_WINDOW_UTC_HOURS) {
+    for (const hour of SEEGANG_REFRESH_WINDOW_UTC_HOURS) {
       const windowDate = new Date(
         Date.UTC(utcYear, utcMonth - 1, utcDate, hour, 0, 0, 0)
       )
       const minutesDiff = Math.abs(now.getTime() - windowDate.getTime()) / 60000
 
-      if (minutesDiff <= NORDSEE_REFRESH_WINDOW_SPAN_MINUTES) {
+      if (minutesDiff <= SEEGANG_REFRESH_WINDOW_SPAN_MINUTES) {
         return `${utcYear}-${padTimePart(utcMonth)}-${padTimePart(
           utcDate
         )}-${padTimePart(hour)}`
@@ -201,8 +204,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return null
   }
 
-  function shouldSkipSeegangRefresh (pageImages) {
-    if (!SEEGANG_PAGE_INDEXES.includes(currentPageIndex)) {
+  function shouldSkipSeegangRefresh (pageIndex, pageImages) {
+    if (!isSeegangPage(pageIndex)) {
       return false
     }
 
@@ -216,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return true
     }
 
-    return getLastSeegangWindowRefresh(currentPageIndex) === activeWindowId
+    return getLastSeegangWindowRefresh() === activeWindowId
   }
 
   function updateOfflineUi () {
@@ -367,25 +370,23 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${baseUrl}/${imagePath}?t=${timestamp}`
   }
 
-  function refreshVisibleImages () {
+  function refreshVisibleImages (force = false) {
     if (currentPageIndex === TEXT_PAGE_INDEX) {
       updateOfflineUi()
       return
     }
 
-    const currentPageImages = IMAGE_ELEMENTS.filter(imageElement => {
-      const pageElement = imageElement.closest('.page')
-      return (
-        pageElement && Number(pageElement.dataset.page) === currentPageIndex
-      )
-    })
+    const currentPageImages = getPageImages(currentPageIndex)
 
     if (!currentPageImages.length) {
       updateOfflineUi()
       return
     }
 
-    if (shouldSkipSeegangRefresh(currentPageImages)) {
+    if (
+      !force &&
+      shouldSkipSeegangRefresh(currentPageIndex, currentPageImages)
+    ) {
       updateOfflineUi()
       return
     }
@@ -408,11 +409,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (navigator.onLine && refreshedImageCount > 0) {
       setLastSuccessfulRefresh(Date.now())
 
-      if (
-        SEEGANG_PAGE_INDEXES.includes(currentPageIndex) &&
-        activeSeegangWindowId
-      ) {
-        setLastSeegangWindowRefresh(currentPageIndex, activeSeegangWindowId)
+      if (isSeegangPage(currentPageIndex) && activeSeegangWindowId) {
+        setLastSeegangWindowRefresh(activeSeegangWindowId)
       }
     }
 
@@ -916,7 +914,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function startPullRefresh (clientY) {
     // Only track pull-to-refresh if at top of viewport and on allowed pages
-    if (viewportElement.scrollTop === 0 && currentPageIndex <= 2) {
+    if (
+      viewportElement.scrollTop === 0 &&
+      isPullToRefreshEnabledPage(currentPageIndex)
+    ) {
       pullRefreshStartY = clientY
       pullRefreshStartTimestamp = Date.now()
     }
@@ -937,10 +938,10 @@ document.addEventListener('DOMContentLoaded', () => {
       deltaY >= PULL_REFRESH_MIN_DISTANCE_PX &&
       gestureDurationMs <= PULL_REFRESH_MAX_DURATION_MS &&
       viewportElement.scrollTop === 0 &&
-      currentPageIndex <= 2 &&
+      isPullToRefreshEnabledPage(currentPageIndex) &&
       !isLightboxOpen
     ) {
-      refreshVisibleImages()
+      refreshVisibleImages(true)
     }
 
     pullRefreshStartY = null
@@ -1378,7 +1379,11 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshVisibleImages()
 
   window.setInterval(() => {
-    if (currentPageIndex <= OSTSEE_PAGE_INDEX && !isLightboxOpen) {
+    if (
+      !isLightboxOpen &&
+      currentPageIndex !== TEXT_PAGE_INDEX &&
+      getPageImages(currentPageIndex).length > 0
+    ) {
       refreshVisibleImages()
     }
   }, REFRESH_INTERVAL_MS)
