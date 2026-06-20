@@ -8,6 +8,30 @@
   display: none !important;
 }
 
+/* Offline banner: centered at top, avoids system clock/icons */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  
+  padding: var(--space-2) var(--space-3);
+  margin-top: var(--safe-top);
+  
+  background: var(--color-offline);
+  color: #000;
+  font-size: var(--font-size-summary);
+  font-weight: 600;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+  pointer-events: none;
+  
+  transition: opacity 0.2s ease;
+}
+
 .safe-top {
   padding-top: var(--safe-top);
 }
