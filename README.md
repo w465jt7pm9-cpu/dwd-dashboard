@@ -6,20 +6,24 @@ optimiert für Desktop und Touch-Geräte.
 Release-Stand: 1.1
 
 ## 🚀 Live
+
 👉 https://dwd-dashboard.pages.dev
 
 ## 🧱 Tech Stack
+
 - HTML
 - CSS (modular strukturiert)
 - Vanilla JavaScript
 - Cloudflare Pages (Deployment)
 
 ## 📱 Fokus
+
 - stabiles Touch-Verhalten
 - zuverlässige Navigation
 - robuste Lightbox
 
 ## ✅ Highlights (Release 1.1)
+
 - zyklische Navigation im Carousel (Swipe, Edge-Tap, Tastatur)
 - Lightbox mit Peek-Nachbarn, Zoom, Elastic Pan und Soft Snap-Back
 - Seegangskarten für Nordsee und Ostsee integriert
@@ -28,5 +32,6 @@ Release-Stand: 1.1
 - stabiler Offline-Bildstand auch bei Resize/Orientierungswechsel
 
 ## 🧭 Hinweise
+
 - Architektur-, UI- und Interaktionsdokumente liegen im Ordner `docs/`
 - User Stories und Umsetzungsstand: `docs/backlog.md`
