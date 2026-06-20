@@ -6,6 +6,123 @@
 
 ## 🟥 TODO
 
+### 🌊 US-014 – Offline-Unterstützung mit gecachtem Kartenzugriff optimieren
+
+**Status:** DONE  
+**Priorität:** Hoch
+
+👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Offline-Kartenzugriff mit gecachten Daten"
+
+---
+
+#### 🧑‍💻 Beschreibung
+
+Als Segler/Schiffsführer  
+möchte ich die aktuell geladenen Wetterkarten auch im Offline-Modus (ohne Internetverbindung) weiterhin anschauen können  
+damit ich z. B. bei Fahrt auf dem Wasser auf die zuletzt geladenen Daten zugreifen kann, ohne dass die Anzeige abbricht
+
+---
+
+#### 🧠 Fachlicher Hintergrund
+
+Nautischer Use-Case:
+
+- Im Hafen: Wetterkarten aktuell laden (alle Seiten durchblättern, damit sie gecacht sind)
+- Ablegen: Flugmodus/Offline-Modus aktivieren
+- Auf See: Karten zu allen Seiten sollten weiterhin angezeigt werden, nicht leer sein
+- Im nächsten Hafen: Internet wieder aktiv, Karten werden dann neu aktualisiert
+
+Technisch:
+
+- Service Worker cached Bilder bereits korrekt
+- Verbesserung: `app.js`-Logik unterscheidet jetzt zwischen "gecacht aber offline" und "echtem Fehler"
+
+---
+
+#### 🎯 Zielbild
+
+- Carousel funktioniert offline uneingeschränkt
+- Alle Seiten zeigen gecachte Bilder, auch wenn sie nicht manuell geladen wurden
+- Badge-System markiert Offline-Status deutlich sichtbar
+- Beim Zurückkommen online aktualisieren sich die Karten transparent
+
+---
+
+#### ✅ Akzeptanzkriterien
+
+**Offline-Navigation**
+
+- [x] Seitenwechsel (Swipe, Tastatur, Edge-Tap) funktioniert offline
+- [x] Gecachte Bilder werden angezeigt, auch wenn Seite offline nie explizit geladen wurde
+- [x] Kein leeres „Fehler" oder „offline"-Badge für Bilder im Cache
+
+---
+
+**Cache-Strategie**
+
+- [x] Service Worker liefert gecachte Bilder im Offline-Modus
+- [x] App.js unterscheidet zwischen „nie geladen" (Error-Badge) und „offline, aber gecacht" (Offline-Badge)
+- [x] Keine Doppelanfragen beim Seitenwechsel offline
+
+---
+
+**Rückkehr online**
+
+- [x] Beim Zurückkommen online werden Bilder mit Offline/Error-Badges automatisch neu geladen
+- [x] Badges ändern sich von Offline/Error zu Loading, dann zu OK
+- [x] Transparent ohne unnötige Reload-Animationen
+
+---
+
+**Offline-Banner**
+
+- [x] Banner bleibt sichtbar während Offline
+- [x] Zeitstempel des letzten erfolgreichen Refreshes wird angezeigt
+- [x] Klare Mitteilung: „Offline · letzter Stand HH:MM:SS"
+
+---
+
+#### 🧠 Definition of Done
+
+- [x] Alle Seiten bleiben navigierbar, auch offline
+- [x] Gecachte Karten bleiben sichtbar
+- [x] Service Worker und App.js arbeiten nahtlos zusammen
+- [x] Keine Regressionen bei Online-Navigation oder Lightbox
+
+---
+
+#### 💡 Nutzen
+
+- [x] bessere maritime Nutzung (Offline auf dem Wasser)
+- [x] Sicherheit: Zugriff auf letzte bekannte Bedingungen
+- [x] Reduktion von Frustration bei Connectivity-Problemen
+- [x] PWA-Stärke: echte Offline-Fähigkeit sichtbar machen
+
+---
+
+## 🟨 DOING
+
+- (leer)
+
+## ✅ DONE
+
+- US-014 Offline-Unterstützung mit gecachtem Kartenzugriff optimieren
+- US-013 Einheitlichen Aktualisierungszyklus für alle Seegangskarten anwenden
+- US-001 Menü entfernen
+- US-002 Navigation über Gesten
+- US-003 Pull-to-Refresh
+- US-004 Dark Mode automatisch
+- US-005 Metadaten entfernen
+- US-007 Visuelle Qualität und ruhige Darstellung optimieren
+- US-009 Zoom- und Navigationsverhalten im Bildmodus verbessern
+- US-010 Pan- und Zoom-Verhalten im Bildmodus verbessern (Elastic UX)
+- US-011 Seegangskarten Nordsee integrieren (dritte Seite)
+- US-012 Seegangskarten Ostsee integrieren (vierte Seite)
+
+---
+
+# 📦 BACKLOG DETAILS
+
 ---
 
 ## 🔄 US-013 – Einheitlichen Aktualisierungszyklus für alle Seegangskarten anwenden
@@ -108,32 +225,6 @@ Die Seegangsvorhersagekarten des Deutschen Wetterdienstes für europäische Seeg
 - reduzierte Komplexität im Code
 - geringerer Datenverbrauch
 - Grundlage für skalierbares Seegang-Modul über mehrere Regionen hinweg
-
-## 🟨 DOING
-
-- (leer)
-
-## ✅ DONE
-
-- US-013 Einheitlichen Aktualisierungszyklus für alle Seegangskarten anwenden
-- US-001 Menü entfernen
-- US-002 Navigation über Gesten
-- US-003 Pull-to-Refresh
-- US-004 Dark Mode automatisch
-- US-005 Metadaten entfernen
-- US-007 Visuelle Qualität und ruhige Darstellung optimieren
-- US-009 Zoom- und Navigationsverhalten im Bildmodus verbessern
-- US-010 Pan- und Zoom-Verhalten im Bildmodus verbessern (Elastic UX)
-- US-011 Seegangskarten Nordsee integrieren (dritte Seite)
-- US-012 Seegangskarten Ostsee integrieren (vierte Seite)
-
----
-
-# 📦 BACKLOG DETAILS
-
----
-
----
 
 ## 🌊 US-012 – Seegangskarten Ostsee integrieren (vierte Seite)
 

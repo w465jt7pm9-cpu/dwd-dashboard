@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let longPressTimerId = null
   let didTriggerLongPress = false
+  let lastImageStatesBeforeOffline = new Map()
 
   function getCurrentTimeLabel () {
     return new Date().toLocaleTimeString(undefined, {
@@ -957,7 +958,12 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     imageElement.addEventListener('error', () => {
-      setCardState(imageElement, navigator.onLine ? 'error' : 'offline')
+      if (navigator.onLine) {
+        setCardState(imageElement, 'error')
+      } else {
+        const hadPriorLoad = imageElement.classList.contains('image-loaded')
+        setCardState(imageElement, hadPriorLoad ? 'offline' : 'error')
+      }
     })
 
     imageElement.addEventListener('click', event => {
@@ -998,11 +1004,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('online', () => {
     updateOfflineUi()
+    IMAGE_ELEMENTS.forEach(imageElement => {
+      const cardElement = imageElement.closest('.card')
+      const statusBadge = cardElement?.querySelector('.card-status')
+      const hadError = statusBadge?.classList.contains('card-status--error')
+      const wasOffline = statusBadge?.classList.contains('card-status--offline')
+      if (hadError || wasOffline) {
+        setCardState(imageElement, 'loading')
+        const timestamp = Date.now()
+        const imageUrl = buildImageUrl(imageElement, timestamp)
+        if (imageUrl) {
+          imageElement.src = imageUrl
+        }
+      }
+    })
     refreshVisibleImages()
   })
 
   window.addEventListener('offline', () => {
     updateOfflineUi()
+    lastImageStatesBeforeOffline.clear()
 
     IMAGE_ELEMENTS.forEach(imageElement => {
       const pageElement = imageElement.closest('.page')
@@ -1010,6 +1031,11 @@ document.addEventListener('DOMContentLoaded', () => {
         pageElement &&
         Number(pageElement.dataset.page) === currentPageIndex
       ) {
+        const cardElement = imageElement.closest('.card')
+        const statusBadge = cardElement?.querySelector('.card-status')
+        if (statusBadge) {
+          lastImageStatesBeforeOffline.set(imageElement, statusBadge.className)
+        }
         setCardState(imageElement, 'offline')
       }
     })
