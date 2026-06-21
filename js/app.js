@@ -598,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cachedText) {
       const updatedLabel = formatTimestamp(cachedUpdatedAt)
       renderWetterlageOverlay(
-        `${cachedText}\n\nStand: ${updatedLabel} UTC-basiert`,
+        `${cachedText}\n\nStand: ${updatedLabel}`,
         { visible: true }
       )
     } else {
@@ -637,7 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const updatedLabel = formatTimestamp(cachePayload.updatedAt)
       renderWetterlageOverlay(
-        `${cachePayload.text}\n\nStand: ${updatedLabel} UTC-basiert`,
+        `${cachePayload.text}\n\nStand: ${updatedLabel}`,
         { visible: true }
       )
     } catch {

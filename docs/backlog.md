@@ -10,6 +10,85 @@
 
 ---
 
+## 🌍 US-017 – UI-Texte für Internationalisierung strukturieren
+
+**Status:** TODO  
+**Priorität:** Mittel
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich, dass alle sichtbaren UI-Texte zentral und sprachabhängig gepflegt werden  
+damit das Dashboard später ohne Code-Duplikate auf weitere Sprachen erweitert werden kann
+
+---
+
+### 🎯 Zielbild
+
+- Alle UI-Texte liegen zentral in sprachspezifischen Ressourcen
+- HTML- und JS-Texte werden über stabile i18n-Keys aufgelöst
+- Accessibility-Texte (alt, aria-label) sind vollständig enthalten
+- Bestehende Karten-, Refresh-, Cache- und Lightbox-Logik bleibt unverändert
+
+---
+
+### ✅ Akzeptanzkriterien
+
+- [ ] Es existiert eine zentrale Struktur für Übersetzungen (mindestens de, optional en als Platzhalter)
+- [ ] Sichtbare Texte in HTML sind nicht mehr hart kodiert, sondern über Keys referenziert
+- [ ] Laufzeittexte in JS (Overlay, Fehlermeldungen, Hinweise) werden über i18n-Keys aufgelöst
+- [ ] alt- und aria-label-Texte sind in derselben i18n-Quelle gepflegt
+- [ ] Fallback-Verhalten ist definiert (fehlender Key, fehlende Sprache)
+- [ ] Kein Einfluss auf Datenquellen, Bildpfade, Refresh-Zyklen, SW-Strategie und Badge-Logik
+
+---
+
+### 🔀 Alternativen (Abwägung vor Umsetzung)
+
+**Option A – Leichtgewichtiges eigenes i18n-Modul (empfohlen)**
+
+- Ansatz: kleine t()-Funktion, Sprachdateien (z. B. locales/de.json), data-i18n-Attribute in HTML
+- Vorteile: minimal-invasiv, kein Dependency-Risiko, passt zu Vanilla-JS-Stack
+- Nachteile: mehr manuelle Disziplin bei Keys/Struktur
+
+**Option B – Reines JS-Dictionary ohne data-i18n (Render im Code)**
+
+- Ansatz: Texte nur in JS-Objekten, DOM-Texte werden programmatisch gesetzt
+- Vorteile: keine Anpassung an HTML-Attributen nötig
+- Nachteile: schlechtere Trennung von Struktur und Inhalt, tendenziell unübersichtlicher
+
+**Option C – Externe i18n-Bibliothek (z. B. i18next)**
+
+- Ansatz: vollständiges i18n-Framework mit Interpolation/Pluralisierung
+- Vorteile: sehr mächtig, langfristig gut skalierbar
+- Nachteile: zusätzliche Abhängigkeit, mehr Setup, für aktuellen Umfang vermutlich überdimensioniert
+
+---
+
+### 🧭 Entscheidungspunkt (Product)
+
+Vor Implementierung wird eine Option verbindlich festgelegt:
+
+- [ ] Option A umsetzen
+- [ ] Option B umsetzen
+- [ ] Option C umsetzen
+- [ ] Vertagen / nur Textinventar erstellen
+
+**Empfehlung aktuell:** Option A (beste Balance aus Aufwand, Wartbarkeit, geringer Invasivität).
+
+---
+
+### 🚫 Nicht im Scope dieser US
+
+- Automatische Übersetzung der Inhalte
+- Fachliche Änderung von Wettertexten oder Bildbeschreibungen
+- Umbau der bestehenden Daten- und Cache-Logik
+- UI-Redesign
+
+---
+
 ## 🔄 US-015 – Datenzyklus für Bodenwetter-Analyse- und Prognosekarten korrekt abbilden
 
 **Status:** DONE  

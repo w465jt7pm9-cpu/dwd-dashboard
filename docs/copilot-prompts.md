@@ -836,7 +836,7 @@ Ziel:
 Vorgehen:
 
 1. Analyse der aktuellen Refresh-Implementierung
-2. Einbau einer zentralen Zeitentscheidung (UTC-basiert)
+2. Einbau einer zentralen Zeitentscheidung (UTC)
 3. Verknüpfung mit Cache-Zustand
 4. Tests mit verschiedenen Tageszeiten
 
