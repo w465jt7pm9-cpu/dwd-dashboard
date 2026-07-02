@@ -528,9 +528,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderedLines = textBody
       .split('\n')
-      .map(line => {
+      .map((line, index, lines) => {
         const trimmedLine = line.trim()
         if (!trimmedLine) {
+          const nextLine = lines[index + 1] || ''
+          if (/^Sicht\s*\/\s*Wetter\s*:/i.test(nextLine.trim())) {
+            return null
+          }
+
           return ''
         }
 
@@ -554,6 +559,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return highlightSeewetterKeywords(escapeHtml(line))
       })
+      .filter(line => line !== null)
       .join('\n')
 
     if (!standText) {
