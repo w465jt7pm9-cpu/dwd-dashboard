@@ -452,6 +452,57 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/'/g, '&#39;')
   }
 
+  function escapeRegExp (value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  }
+
+  const WETTERLAGE_WEEKDAY_REGEX =
+    /\b(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)\b/gi
+
+  const WETTERLAGE_SEA_AREAS = [
+    'Mecklenburger Bucht',
+    'Pommersche Bucht',
+    'Kieler Bucht',
+    'Deutsche Bucht',
+    'Westliche Ostsee',
+    'Oestliche Ostsee',
+    'Östliche Ostsee',
+    'Nordsee',
+    'Ostsee',
+    'Skagerrak',
+    'Kattegat',
+    'Beltsee',
+    'Helgoland',
+    'Bornholm',
+    'Fehmarn',
+    'Borkum',
+    'Arkona',
+    'Rügen',
+    'Ruegen',
+    'Sylt',
+    'Sund'
+  ]
+
+  const WETTERLAGE_SEA_AREA_REGEX = new RegExp(
+    WETTERLAGE_SEA_AREAS.slice()
+      .sort((left, right) => right.length - left.length)
+      .map(escapeRegExp)
+      .join('|'),
+    'gi'
+  )
+
+  function highlightSeewetterKeywords (escapedLine) {
+    return escapedLine
+      .replace(
+        WETTERLAGE_WEEKDAY_REGEX,
+        '<span class="weatherlage-weekday">$1</span>'
+      )
+      .replace(
+        WETTERLAGE_SEA_AREA_REGEX,
+        '<span class="weatherlage-sea-area">$&</span>'
+      )
+  }
+
   function highlightBeaufortInWindLine (lineText) {
     const chunks = lineText.split(/(\b(?:1[0-2]|[0-9])\b)/g)
 
@@ -463,11 +514,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const beaufortValue = Number(chunk)
         if (beaufortValue >= 8) {
-          return `<span class="weatherlage-bft weatherlage-bft--storm">${beaufortValue} Bft</span>`
+          return `<span class="weatherlage-bft weatherlage-bft--storm">${beaufortValue}</span>`
         }
 
         if (beaufortValue >= 6) {
-          return `<span class="weatherlage-bft weatherlage-bft--strong">${beaufortValue} Bft</span>`
+          return `<span class="weatherlage-bft weatherlage-bft--strong">${beaufortValue}</span>`
         }
 
         return escapeHtml(chunk)
@@ -508,12 +559,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (/^Wind\s*:/i.test(trimmedLine)) {
-          return `<span class="weatherlage-wind-line">${highlightBeaufortInWindLine(
-            line
+          return `<span class="weatherlage-wind-line">${highlightSeewetterKeywords(
+            highlightBeaufortInWindLine(line)
           )}</span>`
         }
 
-        return escapeHtml(line)
+        return highlightSeewetterKeywords(escapeHtml(line))
       })
       .join('\n')
 

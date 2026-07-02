@@ -130,8 +130,10 @@ damit ich Wetterlage, Vorhersage und Aktualitätsstand schneller erfassen kann, 
 
 - [x] Der Zeitstempel `Stand:` wird im Overlay optisch klar und dauerhaft am Anfang angezeigt
 - [x] Abschnittsüberschriften wie `Wetterlage` und `Vorhersage` sind visuell hervorgehoben
-- [x] Windangaben mit `6-7 Bft` werden als Starkwind visuell hervorgehoben
-- [x] Windangaben ab `8 Bft` werden als Sturmwarnung visuell hervorgehoben
+- [x] Seegebiete im Seewettertext sind visuell hervorgehoben
+- [x] Wochentage im Seewettertext sind visuell hervorgehoben
+- [x] Windangaben mit `6-7` werden als Starkwind visuell hervorgehoben
+- [x] Windangaben ab `8` werden als Sturmwarnung visuell hervorgehoben
 - [x] Hervorhebung greift nur bei Windangaben (nicht bei Seegangshöhen in Metern)
 - [x] Der Fließtext bleibt vollständig scrollbar und unverändert vollständig lesbar
 
@@ -155,7 +157,8 @@ damit ich Wetterlage, Vorhersage und Aktualitätsstand schneller erfassen kann, 
 
 - `Stand:` nach oben
 - `Wetterlage` und `Vorhersage` hervorheben
-- `6-7 Bft` als Starkwind markieren, `8+ Bft` als Sturmwarnung markieren (nur in Windzeilen)
+- Seegebiete und Wochentage im Text hervorheben
+- `6-7` als Starkwind markieren, `8+` als Sturmwarnung markieren (nur in Windzeilen)
 - sonst kein neues Verhalten
 
 Vorteile:
