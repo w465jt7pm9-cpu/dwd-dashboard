@@ -969,3 +969,163 @@ Keine unnötigen Refactorings durchführen.
 - Die aktuelle Implementierung verwendet den dedizierten DWD-Seewetterbericht als Primärquelle, extrahiert den Abschnitt ab „Aktuelle Wetterlage“ inklusive vollständigem Vorhersageblock und zeigt ihn als Overlay an.
 - Als technische Rückfallebene dient die maritime Open-Data-Datei `https://opendata.dwd.de/weather/maritime/forecast/german/FQEN50_EDZW_LATEST`, inklusive Latin‑1-Decoding und bestehendem Offline-Cache-Verhalten.
 ````
+
+---
+
+# 🧭 Feature: Seewettertext vorab online cachen
+
+## Ziel
+
+Der Seewettertext soll bereits bei normaler Online-Nutzung der App im Hintergrund geladen und lokal gespeichert werden, damit er nach dem Ablegen auch ohne vorheriges Öffnen der Lightbox offline verfügbar bleibt.
+
+---
+
+## Copilot Prompt
+
+```text
+Erweitere das bestehende DWD Dashboard so, dass der aktuelle Seewettertext bereits im Hintergrund vorgeladen und lokal gespeichert wird, bevor die Bodenanalyse-Lightbox geöffnet wird.
+
+Kontext:
+- bestehende Wetterlage-Logik in app.js
+- bestehender Cache in localStorage für Wetterlage-Text, Modelllauf, Quelle und Zeitstempel
+- bestehende Lightbox soll weiterhin denselben Cache nutzen
+- keine neue UI, kein zusätzlicher Button
+
+Ziel:
+- stilles Preload bei normaler Online-Nutzung
+- offline soll der zuletzt geladene Seewettertext auch dann verfügbar sein, wenn die Lightbox vor Netzverlust nie geöffnet wurde
+- bestehende Daten- und Lightbox-Logik minimal-invasiv erweitern
+
+---
+
+1. Trigger-Logik
+
+- Implementiere Option A aus US-019:
+  - stilles Preload beim App-Start und/oder beim Aufruf der Land-Seite
+- Kein Preload, wenn `navigator.onLine === false`
+- Kein unnötiger erneuter Download, wenn der gecachte Inhalt noch aktuell ist
+
+---
+
+2. Cache-Nutzung
+
+- Verwende die bestehenden localStorage-Keys weiter
+- Die Lightbox darf später nur auf denselben Cache zugreifen
+- Ein neuer Bericht ersetzt den bisherigen Cache-Eintrag
+
+---
+
+3. Aktualisierung
+
+- Orientiere die Aktualisierung an sinnvollen Veröffentlichungszeitpunkten des Seewetterberichts
+- Vermeide Mehrfach-Fetches bei unverändertem Stand
+- Keine Änderung an der bestehenden Bild-Refresh-Logik
+
+---
+
+4. Constraints
+
+- keine neue Library
+- keine neue sichtbare UI
+- keine Regression bei Zoom, Pan, Swipe, Edge-Tap oder Lightbox
+- bestehende Fetch-Quelle und Fallback-Reihenfolge beibehalten
+- minimal-invasive Änderungen in app.js
+
+---
+
+Vorgehen:
+
+1. Analyse der bestehenden Wetterlage-Fetch- und Cache-Logik
+2. Einbau eines stillen Preload-Triggers außerhalb der Lightbox
+3. Wiederverwendung der bestehenden Cache- und Render-Pfade
+4. Prüfung auf Offline-Verfügbarkeit ohne vorheriges Öffnen der Lightbox
+
+Keine unnötigen Refactorings durchführen.
+```
+
+## Hinweis zum Umsetzungsstand
+
+- US-019 ist umgesetzt.
+- Der Seewettertext wird im Online-Betrieb still im Hintergrund vorgeladen (App-Start/Land-Seite) und bei Netzrückkehr erneut angestoßen.
+- Die Bodenanalyse-Lightbox nutzt weiterhin denselben Cache und zeigt offline den zuletzt gespeicherten Stand.
+
+---
+
+# 🧭 Feature: Seewetter-Overlay lesbarer strukturieren
+
+## Ziel
+
+Der bereits vollständig geladene Seewettertext soll in der Lightbox klarer strukturiert dargestellt werden, ohne die Datenlogik oder Interaktionslogik zu verändern.
+
+---
+
+## Copilot Prompt
+
+```text
+Verbessere die Lesbarkeit des bestehenden Seewetter-Overlays in der Lightbox minimal-invasiv.
+
+Kontext:
+- der vollständige Seewettertext wird bereits geladen und im Overlay angezeigt
+- Overlay ist scrollbar und darf Touch-/Zoom-Gesten nicht stören
+- keine Änderung an Datenquelle, Cache-Logik oder Fetch-Reihenfolge
+
+Ziel:
+- bessere visuelle Struktur für lange Texte
+- schnellere Erfassung von `Stand`, `Wetterlage` und `Vorhersage`
+- kritische Windstärken (`6-7 Bft` / `8+ Bft`) im Text schneller erkennbar machen
+- keine neue Interaktionslogik
+
+---
+
+1. Umfang
+
+- Implementiere Option A aus US-018:
+  - `Stand:` optisch klar am Anfang des Overlays anzeigen
+  - `Wetterlage` und `Vorhersage` visuell hervorheben
+  - Windangaben mit `6-7 Bft` als Starkwind hervorheben
+  - Windangaben ab `8 Bft` als Sturmwarnung hervorheben
+  - Hervorhebung nur in Windangaben anwenden, nicht auf Seegangshöhen in Metern
+  - kein Einklappen, kein Toggle, keine zusätzliche Navigation
+
+---
+
+2. Darstellung
+
+- Der Text muss vollständig erhalten bleiben
+- Der Text muss weiterhin scrollbar sein
+- Die Strukturierung muss auch bei langen Vorhersagen stabil bleiben
+
+---
+
+3. Technik
+
+- Wenn nötig, erweitere die Overlay-Ausgabe in app.js moderat
+- Wenn nötig, ergänze nur das bestehende CSS für das Lightbox-Overlay
+- Keine neue Library
+- Keine Regression bei Zoom, Pan, Swipe oder Schließen der Lightbox
+
+---
+
+4. Constraints
+
+- Fetch-, Fallback-, Offline- und Cache-Logik unverändert lassen
+- keine zusätzliche UI außerhalb des bestehenden Overlays
+- minimal-invasive Änderungen
+
+---
+
+Vorgehen:
+
+1. Analyse der aktuellen Overlay-Ausgabe
+2. Strukturierung von Zeitstempel und Abschnittsüberschriften
+3. gezielte Hervorhebung von `6-7 Bft` / `8+ Bft` in Windangaben
+4. gezielte CSS-Anpassung für bessere Lesbarkeit
+5. Prüfung, dass Scroll- und Lightbox-Gesten unbeeinträchtigt bleiben
+
+Keine unnötigen Refactorings durchführen.
+```
+
+## Hinweis zum Umsetzungsstand
+
+- US-018 ist aktuell noch nicht umgesetzt.
+- Der Overlay-Text wird derzeit vollständig, aber ohne zusätzliche visuelle Strukturierung für `Stand`, `Wetterlage` und `Vorhersage` angezeigt.

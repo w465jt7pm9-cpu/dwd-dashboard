@@ -382,6 +382,11 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${getUtcDateId(runDate)}-${padTimePart(runHour)}`
   }
 
+  function getActiveSeewetterCycleId (now = new Date()) {
+    const cycleHour = now.getUTCHours() >= 12 ? 12 : 0
+    return `${getUtcDateId(now)}-${padTimePart(cycleHour)}`
+  }
+
   function getBodenRefreshKind (imageElement) {
     const baseKey = imageElement.dataset.base
     const imagePath = imageElement.dataset.path || ''
@@ -588,10 +593,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function ensureWetterlageOverlayContent () {
-    const activeModelRunId = getActiveBodenForecastRunId()
-    const cachedText = getCachedWetterlageText()
+  async function refreshWetterlageCacheIfNeeded ({ force = false } = {}) {
+    if (!navigator.onLine) {
+      return null
+    }
+
+    const activeSeewetterCycleId = getActiveSeewetterCycleId()
     const cachedRunId = getCachedWetterlageRun()
+    const cachedText = getCachedWetterlageText()
+
+    if (!force && cachedText && activeSeewetterCycleId === cachedRunId) {
+      return null
+    }
+
+    const payload = await fetchRelevantWetterlage()
+    const cachePayload = {
+      text: payload.text,
+      modelRunId: activeSeewetterCycleId,
+      sourceUrl: payload.sourceUrl,
+      updatedAt: Date.now()
+    }
+    setCachedWetterlagePayload(cachePayload)
+
+    return cachePayload
+  }
+
+  async function preloadWetterlageInBackground () {
+    if (!navigator.onLine) {
+      return
+    }
+
+    try {
+      await refreshWetterlageCacheIfNeeded()
+    } catch {
+      // Preload errors are non-blocking. Overlay fetch handles user-facing fallbacks.
+    }
+  }
+
+  async function ensureWetterlageOverlayContent () {
+    const cachedText = getCachedWetterlageText()
     const cachedUpdatedAt = getCachedWetterlageUpdatedAt()
 
     if (cachedText) {
@@ -603,26 +643,23 @@ document.addEventListener('DOMContentLoaded', () => {
       renderWetterlageOverlay('Wetterlage wird geladen ...', { visible: true })
     }
 
-    const shouldFetch = navigator.onLine && activeModelRunId !== cachedRunId
-    if (!shouldFetch) {
-      if (!navigator.onLine && !cachedText) {
+    if (!navigator.onLine) {
+      if (!cachedText) {
         renderWetterlageOverlay(
           'Offline: Keine gespeicherte Wetterlage verfügbar.',
-          { visible: true }
+          {
+            visible: true
+          }
         )
       }
       return
     }
 
     try {
-      const payload = await fetchRelevantWetterlage()
-      const cachePayload = {
-        text: payload.text,
-        modelRunId: activeModelRunId,
-        sourceUrl: payload.sourceUrl,
-        updatedAt: Date.now()
+      const cachePayload = await refreshWetterlageCacheIfNeeded()
+      if (!cachePayload) {
+        return
       }
-      setCachedWetterlagePayload(cachePayload)
 
       if (!isLightboxOpen) {
         return
@@ -984,6 +1021,10 @@ document.addEventListener('DOMContentLoaded', () => {
       carouselElement.style.transform = `translateX(${
         -currentPageIndex * 100
       }vw)`
+    }
+
+    if (currentPageIndex === 0) {
+      void preloadWetterlageInBackground()
     }
 
     refreshVisibleImages()
@@ -1570,6 +1611,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('online', () => {
     updateOfflineUi()
+    void preloadWetterlageInBackground()
     IMAGE_ELEMENTS.forEach(imageElement => {
       const cardElement = imageElement.closest('.card')
       const statusBadge = cardElement?.querySelector('.card-status')

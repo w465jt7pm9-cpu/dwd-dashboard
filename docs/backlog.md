@@ -10,6 +10,179 @@
 
 ---
 
+## 🧭 US-019 – Seewettertext vorab online cachen
+
+**Status:** DONE  
+**Priorität:** Hoch
+
+👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Seewettertext vorab online cachen“
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich, dass der aktuelle Seewettertext bereits online im Hintergrund geladen und lokal gespeichert wird, bevor ich die Bodenanalyse-Lightbox öffne  
+damit ich nach dem Ablegen ohne Mobilfunknetz den aktuellen Seewetterbericht weiterhin verfügbar habe
+
+---
+
+### 🎯 Zielbild
+
+- Der Seewettertext wird bei bestehender Internetverbindung frühzeitig geladen
+- Offshore steht der zuletzt verfügbare Text auch ohne vorheriges Öffnen der Lightbox bereit
+- Die Lightbox zeigt weiterhin sofort den gecachten Text
+- Die bestehende Karten-, Cache- und Lightbox-Logik bleibt stabil
+
+---
+
+### ✅ Akzeptanzkriterien
+
+**Vorab-Laden**
+
+- [x] Der Seewettertext wird bereits bei normaler Nutzung der App im Hintergrund geladen, ohne dass die Lightbox zuvor geöffnet werden muss
+- [x] Das Vorab-Laden erfolgt nur, wenn eine Internetverbindung besteht
+- [x] Bereits aktuelle Inhalte werden nicht unnötig mehrfach geladen
+
+**Offline-Nutzung**
+
+- [x] Nach erfolgreichem Vorab-Laden bleibt der zuletzt gespeicherte Seewettertext offline verfügbar
+- [x] Die Bodenanalyse-Lightbox zeigt offline den zuletzt gespeicherten Text, auch wenn sie vor Netzverlust nie geöffnet wurde
+- [x] Wenn noch kein Text geladen werden konnte, bleibt das bestehende Offline-Fallback-Verhalten erhalten
+
+**Aktualisierungslogik**
+
+- [x] Die Aktualisierung orientiert sich an sinnvollen Veröffentlichungszeitpunkten des Seewetterberichts
+- [x] Ein neuer Bericht ersetzt den vorherigen Cache-Eintrag
+- [x] Kein unkontrolliertes Cache-Wachstum
+
+**Technik / Constraints**
+
+- [x] Keine neue Library
+- [x] Keine Beeinträchtigung von Zoom, Pan, Swipe und bestehender Lightbox-Bedienung
+- [x] Änderungen bleiben minimal-invasiv
+- [x] Bestehende Bild-Refresh-Logik bleibt fachlich unverändert
+
+---
+
+### 🔀 Umsetzungsoptionen
+
+**Option A – stilles Preload beim App-Start / Seitenwechsel (festgelegt)**
+
+- Hintergrund-Fetch bei App-Start oder beim Aufruf der Land-Seite
+- Lightbox nutzt später nur noch den Cache
+
+Vorteile:
+
+- kein zusätzlicher UI-Aufwand
+- passt gut zum Hafen-/Ablege-Workflow
+
+Nachteile:
+
+- braucht saubere Trigger-Logik, damit nicht unnötig oft geladen wird
+
+**Option B – zusätzlich manueller Sicherungs-Trigger**
+
+- wie Option A
+- plus expliziter Button oder Aktion zum Vorab-Sichern
+
+Vorteile:
+
+- maximale Kontrolle vor dem Ablegen
+- für kritische Nutzung robuster
+
+Nachteile:
+
+- zusätzlicher UI-Eingriff
+- mehr Bedienoberfläche
+
+---
+
+## 🧭 US-018 – Seewetter-Overlay lesbarer strukturieren
+
+**Status:** TODO  
+**Priorität:** Mittel
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich den eingeblendeten Seewettertext in der Lightbox klarer strukturiert sehen  
+damit ich Wetterlage, Vorhersage und Aktualitätsstand schneller erfassen kann, ohne lange im Text suchen zu müssen
+
+---
+
+### 🎯 Zielbild
+
+- Der Overlay-Text bleibt vollständig erhalten
+- Die wichtigsten Informationen sind schneller erfassbar
+- Die bestehende Lightbox-Bedienung bleibt unverändert robust
+- Keine Änderung an Datenquelle, Cache-Logik oder Refresh-Zyklen
+
+---
+
+### ✅ Akzeptanzkriterien
+
+**Struktur**
+
+- [ ] Der Zeitstempel `Stand:` wird im Overlay optisch klar und dauerhaft am Anfang angezeigt
+- [ ] Abschnittsüberschriften wie `Wetterlage` und `Vorhersage` sind visuell hervorgehoben
+- [ ] Windangaben mit `6-7 Bft` werden als Starkwind visuell hervorgehoben
+- [ ] Windangaben ab `8 Bft` werden als Sturmwarnung visuell hervorgehoben
+- [ ] Hervorhebung greift nur bei Windangaben (nicht bei Seegangshöhen in Metern)
+- [ ] Der Fließtext bleibt vollständig scrollbar und unverändert vollständig lesbar
+
+**Interaktion**
+
+- [ ] Scrollen im Overlay funktioniert weiterhin sauber auf Touch und Desktop
+- [ ] Zoom-, Pan-, Swipe- und Schließen-Gesten der Lightbox werden nicht beeinträchtigt
+- [ ] Die Darstellung funktioniert auch bei langen Vorhersagetexten stabil
+
+**Technik**
+
+- [ ] Keine Änderung an Fetch-, Fallback-, Offline- und Cache-Logik
+- [ ] Keine neue Library
+- [ ] Änderungen bleiben minimal-invasiv
+
+---
+
+### 🔀 Umsetzungsoptionen
+
+**Option A – nur visuelle Strukturierung (festgelegt)**
+
+- `Stand:` nach oben
+- `Wetterlage` und `Vorhersage` hervorheben
+- `6-7 Bft` als Starkwind markieren, `8+ Bft` als Sturmwarnung markieren (nur in Windzeilen)
+- sonst kein neues Verhalten
+
+Vorteile:
+
+- kleinster Eingriff
+- geringstes Risiko
+- sofort spürbarer Nutzen
+
+Nachteile:
+
+- lange Forecasts bleiben weiterhin vollständig offen
+
+**Option B – visuelle Strukturierung plus einklappbare Vorhersage**
+
+- alles aus Option A
+- zusätzlicher Toggle für Vorhersageblock
+
+Vorteile:
+
+- ruhigeres Overlay bei langen Texten
+- Fokus zunächst auf Wetterlage
+
+Nachteile:
+
+- etwas mehr UI- und Interaktionslogik
+- höheres Risiko für Nebenwirkungen
+
+---
+
 ## 🌍 US-017 – UI-Texte für Internationalisierung strukturieren
 
 **Status:** TODO  
