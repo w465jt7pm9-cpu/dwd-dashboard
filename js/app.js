@@ -460,27 +460,15 @@ document.addEventListener('DOMContentLoaded', () => {
     /\b(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)\b/gi
 
   const WETTERLAGE_SEA_AREAS = [
-    'Mecklenburger Bucht',
-    'Pommersche Bucht',
-    'Kieler Bucht',
+    'Südwestliche Nordsee',
     'Deutsche Bucht',
-    'Westliche Ostsee',
-    'Oestliche Ostsee',
-    'Östliche Ostsee',
-    'Nordsee',
-    'Ostsee',
+    'Fischer',
     'Skagerrak',
     'Kattegat',
-    'Beltsee',
-    'Helgoland',
-    'Bornholm',
-    'Fehmarn',
-    'Borkum',
-    'Arkona',
-    'Rügen',
-    'Ruegen',
-    'Sylt',
-    'Sund'
+    'Belte und Sund',
+    'Westliche Ostsee',
+    'Südliche Ostsee',
+    'Südöstliche Ostsee'
   ]
 
   const WETTERLAGE_SEA_AREA_REGEX = new RegExp(
