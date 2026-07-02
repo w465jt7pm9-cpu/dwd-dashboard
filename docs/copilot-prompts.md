@@ -890,10 +890,10 @@ Wichtig:
 
 2. Parsing
 
-- Extrahiere ausschließlich den Abschnitt:
-  "Aktuelle Wetterlage"
-- Ende:
-  - bei "Vorhersage für ..."
+- Extrahiere den Abschnitt ab:
+  - "Aktuelle Wetterlage"
+- Ergänze den vollständigen nachfolgenden Vorhersageblock
+- Ende erst beim nächsten fachfremden Seiten-/Feed-Abschnitt
 - Rückgabe als String
 
 ---

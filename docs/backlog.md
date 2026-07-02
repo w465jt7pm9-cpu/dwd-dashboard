@@ -207,7 +207,7 @@ Die Bodenwetterkarten des Deutschen Wetterdienstes folgen einem festen meteorolo
 ### 🧑‍💻 Beschreibung
 
 Als Nutzer  
-möchte ich zur Bodenwetter-Analysekarte die aktuelle Wetterlage aus dem Seewetterbericht als Text eingeblendet bekommen – auch im Offline-Modus  
+möchte ich zur Bodenwetter-Analysekarte die aktuelle Wetterlage samt vollständiger Vorhersage aus dem Seewetterbericht als Text eingeblendet bekommen – auch im Offline-Modus  
 damit ich die dargestellte Wetterkarte besser interpretieren kann und auch ohne Internetverbindung eine fundierte Einschätzung erhalte
 
 ---
@@ -223,14 +223,14 @@ Der Deutsche Wetterdienst stellt den Seewetterbericht als dedizierte Quelle bere
 Der Text wird nicht als strukturierte API (JSON), sondern als Klartext geliefert und muss:
 
 - dekodiert (Latin‑1)
-- geparst (z. B. Abschnitt „Wetterlage“)
+- geparst (Abschnitt „Aktuelle Wetterlage“ inklusive vollständigem Vorhersageblock)
 - und zwischengespeichert werden
 
 ---
 
 ### 🎯 Zielbild
 
-- Beim Zoom der Bodenanalysekarte wird die aktuelle Wetterlage als Overlay angezeigt
+- Beim Zoom der Bodenanalysekarte wird die aktuelle Wetterlage inklusive vollständiger Vorhersage als Overlay angezeigt
 - Darstellung ist dezent und beeinträchtigt nicht die Karteninterpretation
 - letzter verfügbarer Bericht bleibt offline verfügbar
 
@@ -242,7 +242,7 @@ Der Text wird nicht als strukturierte API (JSON), sondern als Klartext geliefert
 
 - [x] Seewetterbericht wird aus der dedizierten DWD-Seewetterbericht-Quelle geladen
 - [x] Text wird korrekt dekodiert (Latin‑1 → UTF‑8 Darstellung)
-- [x] Abschnitt „Wetterlage“ wird zuverlässig extrahiert
+- [x] Abschnitt „Aktuelle Wetterlage“ inklusive vollständiger Vorhersage wird zuverlässig extrahiert
 
 ---
 

@@ -466,18 +466,41 @@ document.addEventListener('DOMContentLoaded', () => {
       .trim()
   }
 
+  function extractTextBlockBetweenHeadings (text, startPattern, endPattern) {
+    if (!text) {
+      return ''
+    }
+
+    const startMatch = text.match(startPattern)
+    if (!startMatch || typeof startMatch.index !== 'number') {
+      return ''
+    }
+
+    const blockStartIndex = startMatch.index
+    const textAfterStart = text.slice(blockStartIndex)
+    const endMatch = textAfterStart.match(endPattern)
+    const blockEndIndex =
+      endMatch && typeof endMatch.index === 'number'
+        ? blockStartIndex + endMatch.index
+        : text.length
+
+    return normalizeWetterlageText(text.slice(blockStartIndex, blockEndIndex))
+  }
+
   function extractWetterlageSection (rawText) {
     const normalizedText = normalizeWetterlageText(rawText)
 
-    const weatherlageMatch = normalizedText.match(
-      /(Aktuelle\s+Wetterlage|Wetterlage)\s*:?\s*([\s\S]*?)(?:\n\s*Vorhersage\b|$)/i
+    const fullForecastBlock = extractTextBlockBetweenHeadings(
+      normalizedText,
+      /(Aktuelle\s+Wetterlage|Wetterlage)\s*:?/i,
+      /\n\s*(?:Deutscher\s+Wetterdienst|Copyright|\$\$|\=)/i
     )
-    if (weatherlageMatch?.[2]) {
-      return normalizeWetterlageText(weatherlageMatch[2])
+    if (fullForecastBlock) {
+      return fullForecastBlock
     }
 
     const fallbackMatch = normalizedText.match(
-      /Wetter-\s*und\s*Warnlage\s*:?\s*([\s\S]*?)(?:\n\s*GEWITTER\b|\n\s*Vorhersage\b|$)/i
+      /Wetter-\s*und\s*Warnlage\s*:?\s*([\s\S]*?)(?:\n\s*GEWITTER\b|\n\s*Deutscher\s+Wetterdienst\b|$)/i
     )
     if (fallbackMatch?.[1]) {
       return normalizeWetterlageText(fallbackMatch[1])
@@ -496,22 +519,22 @@ document.addEventListener('DOMContentLoaded', () => {
       parsedDocument.body?.textContent || ''
     )
 
-    const fullSectionMatch = pageText.match(
-      /(Seewetterbericht\s+für\s+Nord-\s*und\s*Ostsee[\s\S]*?Aktuelle\s+Wetterlage\s*[\s\S]*?)(Vorhersage\s+für\s+[^\n]+)/i
+    const fullSection = extractTextBlockBetweenHeadings(
+      pageText,
+      /Seewetterbericht\s+für\s+Nord-\s*und\s*Ostsee[\s\S]*?Aktuelle\s+Wetterlage/i,
+      /\n\s*(?:Ergänzende\s+Informationen|Verwandte\s+Leistungen|INHATSVERZEICHNIS)\b/i
     )
-    if (fullSectionMatch?.[1] && fullSectionMatch?.[2]) {
-      return normalizeWetterlageText(
-        `${fullSectionMatch[1].trim()}\n\n${fullSectionMatch[2].trim()}`
-      )
+    if (fullSection) {
+      return fullSection
     }
 
-    const weatherlageOnlyMatch = pageText.match(
-      /(Aktuelle\s+Wetterlage\s*[\s\S]*?)(Vorhersage\s+für\s+[^\n]+)/i
+    const compactSection = extractTextBlockBetweenHeadings(
+      pageText,
+      /Aktuelle\s+Wetterlage/i,
+      /\n\s*(?:Ergänzende\s+Informationen|Verwandte\s+Leistungen|INHATSVERZEICHNIS)\b/i
     )
-    if (weatherlageOnlyMatch?.[1] && weatherlageOnlyMatch?.[2]) {
-      return normalizeWetterlageText(
-        `${weatherlageOnlyMatch[1].trim()}\n\n${weatherlageOnlyMatch[2].trim()}`
-      )
+    if (compactSection) {
+      return compactSection
     }
 
     return ''
@@ -597,10 +620,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (cachedText) {
       const updatedLabel = formatTimestamp(cachedUpdatedAt)
-      renderWetterlageOverlay(
-        `${cachedText}\n\nStand: ${updatedLabel}`,
-        { visible: true }
-      )
+      renderWetterlageOverlay(`${cachedText}\n\nStand: ${updatedLabel}`, {
+        visible: true
+      })
     } else {
       renderWetterlageOverlay('Wetterlage wird geladen ...', { visible: true })
     }
