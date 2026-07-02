@@ -214,7 +214,7 @@ damit ich die dargestellte Wetterkarte besser interpretieren kann und auch ohne 
 
 ### 🧠 Fachlicher Hintergrund
 
-Der Deutsche Wetterdienst stellt den Seewetterbericht als dedizierte Quelle bereit; ein Open-Data-Textfeed kann als Fallback genutzt werden. Dieser enthält u. a.:
+Der Deutsche Wetterdienst stellt den Seewetterbericht als dedizierte Quelle bereit; als technischer Fallback kann der maritime Open-Data-Textfeed unter `https://opendata.dwd.de/weather/maritime/forecast/german/FQEN50_EDZW_LATEST` genutzt werden. Dieser enthält u. a.:
 
 - Abschnitt „Wetterlage“
 - Zeitstempel (UTC)

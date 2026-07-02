@@ -878,7 +878,7 @@ Ziel:
 
 Verwende den dedizierten DWD-Seewetterbericht als Primärquelle:
 - https://www.dwd.de/DE/leistungen/seewetternordostsee/seewetternordostsee.html
-- optionaler technischer Fallback: Open-Data-Textfeed
+- optionaler technischer Fallback: maritime Open-Data-Datei `https://opendata.dwd.de/weather/maritime/forecast/german/FQEN50_EDZW_LATEST`
 
 Wichtig:
 - Response ist NICHT UTF-8
@@ -966,6 +966,6 @@ Keine unnötigen Refactorings durchführen.
 
 ## Hinweis zum Umsetzungsstand
 
-- Die aktuelle Implementierung verwendet den dedizierten DWD-Seewetterbericht als Primärquelle, extrahiert den Abschnitt „Aktuelle Wetterlage“ bis „Vorhersage für ...“ und zeigt ihn als Overlay an.
-- Ein Open-Data-Textfeed bleibt als technische Rückfallebene aktiv, inklusive Latin‑1-Decoding und bestehendem Offline-Cache-Verhalten.
+- Die aktuelle Implementierung verwendet den dedizierten DWD-Seewetterbericht als Primärquelle, extrahiert den Abschnitt ab „Aktuelle Wetterlage“ inklusive vollständigem Vorhersageblock und zeigt ihn als Overlay an.
+- Als technische Rückfallebene dient die maritime Open-Data-Datei `https://opendata.dwd.de/weather/maritime/forecast/german/FQEN50_EDZW_LATEST`, inklusive Latin‑1-Decoding und bestehendem Offline-Cache-Verhalten.
 ````

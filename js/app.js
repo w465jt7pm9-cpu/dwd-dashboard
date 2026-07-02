@@ -53,9 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const WETTERLAGE_UPDATED_AT_CACHE_KEY = 'dwdWetterlageUpdatedAt'
   const DWD_SEEWETTERBERICHT_URL =
     'https://www.dwd.de/DE/leistungen/seewetternordostsee/seewetternordostsee.html'
-  const DWD_TEXT_FORECASTS_INDEX_URL =
-    'https://opendata.dwd.de/weather/text_forecasts/txt/'
-  const DWD_WETTERLAGE_FILE_REGEX = /href="(ber01-VHDL13_DWON_[^"]+-ia5)"/gi
+  const DWD_MARITIME_FORECAST_URL =
+    'https://opendata.dwd.de/weather/maritime/forecast/german/FQEN50_EDZW_LATEST'
   const LAST_KNOWN_IMAGE_URL_KEY_PREFIX = 'dwdImageLastKnownUrl:'
   const THEME_STORAGE_KEY = 'dwdTheme'
 
@@ -540,33 +539,10 @@ document.addEventListener('DOMContentLoaded', () => {
     return ''
   }
 
-  async function resolveLatestWetterlageSourceUrl () {
-    const indexResponse = await fetch(DWD_TEXT_FORECASTS_INDEX_URL, {
+  async function fetchWetterlageFromFeed () {
+    const textResponse = await fetch(DWD_MARITIME_FORECAST_URL, {
       cache: 'no-cache'
     })
-    if (!indexResponse.ok) {
-      throw new Error('Wetterlage-Index nicht erreichbar')
-    }
-
-    const indexHtml = await indexResponse.text()
-    const candidates = []
-    let match
-    while ((match = DWD_WETTERLAGE_FILE_REGEX.exec(indexHtml)) !== null) {
-      candidates.push(match[1])
-    }
-
-    if (!candidates.length) {
-      throw new Error('Kein passender Wetterlage-Feed gefunden')
-    }
-
-    candidates.sort()
-    const latestFileName = candidates[candidates.length - 1]
-    return `${DWD_TEXT_FORECASTS_INDEX_URL}${latestFileName}`
-  }
-
-  async function fetchWetterlageFromFeed () {
-    const sourceUrl = await resolveLatestWetterlageSourceUrl()
-    const textResponse = await fetch(sourceUrl, { cache: 'no-cache' })
     if (!textResponse.ok) {
       throw new Error('Wetterlage-Feed nicht erreichbar')
     }
@@ -580,7 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     return {
       text: weatherlageText,
-      sourceUrl
+      sourceUrl: DWD_MARITIME_FORECAST_URL
     }
   }
 
