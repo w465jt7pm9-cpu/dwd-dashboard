@@ -531,8 +531,16 @@ document.addEventListener('DOMContentLoaded', () => {
       .map((line, index, lines) => {
         const trimmedLine = line.trim()
         if (!trimmedLine) {
-          const nextLine = lines[index + 1] || ''
-          if (/^Sicht\s*\/\s*Wetter\s*:/i.test(nextLine.trim())) {
+          let lookaheadIndex = index + 1
+          while (
+            lookaheadIndex < lines.length &&
+            !String(lines[lookaheadIndex]).trim()
+          ) {
+            lookaheadIndex += 1
+          }
+
+          const nextContentLine = lines[lookaheadIndex] || ''
+          if (/^Sicht\s*\/\s*Wetter\s*:/i.test(nextContentLine.trim())) {
             return null
           }
 
