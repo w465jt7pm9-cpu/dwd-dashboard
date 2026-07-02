@@ -349,7 +349,7 @@
 }
 
 .weatherlage-wind-line {
-  display: block;
+  display: inline;
 }
 
 .weatherlage-bft {
