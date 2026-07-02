@@ -100,8 +100,10 @@ Nachteile:
 
 ## 🧭 US-018 – Seewetter-Overlay lesbarer strukturieren
 
-**Status:** TODO  
+**Status:** DONE  
 **Priorität:** Mittel
+
+👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Seewetter-Overlay lesbarer strukturieren“
 
 ---
 
@@ -126,24 +128,24 @@ damit ich Wetterlage, Vorhersage und Aktualitätsstand schneller erfassen kann, 
 
 **Struktur**
 
-- [ ] Der Zeitstempel `Stand:` wird im Overlay optisch klar und dauerhaft am Anfang angezeigt
-- [ ] Abschnittsüberschriften wie `Wetterlage` und `Vorhersage` sind visuell hervorgehoben
-- [ ] Windangaben mit `6-7 Bft` werden als Starkwind visuell hervorgehoben
-- [ ] Windangaben ab `8 Bft` werden als Sturmwarnung visuell hervorgehoben
-- [ ] Hervorhebung greift nur bei Windangaben (nicht bei Seegangshöhen in Metern)
-- [ ] Der Fließtext bleibt vollständig scrollbar und unverändert vollständig lesbar
+- [x] Der Zeitstempel `Stand:` wird im Overlay optisch klar und dauerhaft am Anfang angezeigt
+- [x] Abschnittsüberschriften wie `Wetterlage` und `Vorhersage` sind visuell hervorgehoben
+- [x] Windangaben mit `6-7 Bft` werden als Starkwind visuell hervorgehoben
+- [x] Windangaben ab `8 Bft` werden als Sturmwarnung visuell hervorgehoben
+- [x] Hervorhebung greift nur bei Windangaben (nicht bei Seegangshöhen in Metern)
+- [x] Der Fließtext bleibt vollständig scrollbar und unverändert vollständig lesbar
 
 **Interaktion**
 
-- [ ] Scrollen im Overlay funktioniert weiterhin sauber auf Touch und Desktop
-- [ ] Zoom-, Pan-, Swipe- und Schließen-Gesten der Lightbox werden nicht beeinträchtigt
-- [ ] Die Darstellung funktioniert auch bei langen Vorhersagetexten stabil
+- [x] Scrollen im Overlay funktioniert weiterhin sauber auf Touch und Desktop
+- [x] Zoom-, Pan-, Swipe- und Schließen-Gesten der Lightbox werden nicht beeinträchtigt
+- [x] Die Darstellung funktioniert auch bei langen Vorhersagetexten stabil
 
 **Technik**
 
-- [ ] Keine Änderung an Fetch-, Fallback-, Offline- und Cache-Logik
-- [ ] Keine neue Library
-- [ ] Änderungen bleiben minimal-invasiv
+- [x] Keine Änderung an Fetch-, Fallback-, Offline- und Cache-Logik
+- [x] Keine neue Library
+- [x] Änderungen bleiben minimal-invasiv
 
 ---
 

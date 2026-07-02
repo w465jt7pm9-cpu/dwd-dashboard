@@ -325,6 +325,50 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.weatherlage-stand {
+  position: sticky;
+  top: -10px;
+  display: block;
+  margin: -10px -12px 8px;
+  padding: 8px 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: rgba(214, 228, 255, 0.95);
+  background: rgba(8, 16, 28, 0.84);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.weatherlage-section-title {
+  display: block;
+  margin: 5px 0 2px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: rgba(242, 247, 255, 0.98);
+}
+
+.weatherlage-wind-line {
+  display: block;
+}
+
+.weatherlage-bft {
+  display: inline-block;
+  margin: 0 1px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-weight: 700;
+  color: #00121d;
+}
+
+.weatherlage-bft--strong {
+  background: rgba(255, 212, 112, 0.96);
+}
+
+.weatherlage-bft--storm {
+  background: rgba(255, 111, 111, 0.96);
+}
+
 .lightbox-weatherlage.is-hidden {
   display: none;
 }

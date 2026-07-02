@@ -1127,5 +1127,6 @@ Keine unnötigen Refactorings durchführen.
 
 ## Hinweis zum Umsetzungsstand
 
-- US-018 ist aktuell noch nicht umgesetzt.
-- Der Overlay-Text wird derzeit vollständig, aber ohne zusätzliche visuelle Strukturierung für `Stand`, `Wetterlage` und `Vorhersage` angezeigt.
+- US-018 ist umgesetzt.
+- Der Overlay-Text zeigt `Stand:` als Kopfzeile, hebt `Wetterlage` und `Vorhersage` sichtbar hervor und markiert Windangaben mit `6-7 Bft` (Starkwind) sowie `8+ Bft` (Sturmwarnung).
+- Die Hervorhebung wird nur in Windzeilen angewandt; Fetch-, Fallback- und Cache-Logik bleiben unverändert.

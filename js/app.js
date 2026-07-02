@@ -443,6 +443,89 @@ document.addEventListener('DOMContentLoaded', () => {
     return lightboxImageList[currentLightboxImageIndex]
   }
 
+  function escapeHtml (value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+  }
+
+  function highlightBeaufortInWindLine (lineText) {
+    const chunks = lineText.split(/(\b(?:1[0-2]|[0-9])\b)/g)
+
+    return chunks
+      .map(chunk => {
+        if (!/^\d+$/.test(chunk)) {
+          return escapeHtml(chunk)
+        }
+
+        const beaufortValue = Number(chunk)
+        if (beaufortValue >= 8) {
+          return `<span class="weatherlage-bft weatherlage-bft--storm">${beaufortValue} Bft</span>`
+        }
+
+        if (beaufortValue >= 6) {
+          return `<span class="weatherlage-bft weatherlage-bft--strong">${beaufortValue} Bft</span>`
+        }
+
+        return escapeHtml(chunk)
+      })
+      .join('')
+  }
+
+  function buildWetterlageOverlayMarkup (message) {
+    const normalizedMessage = normalizeWetterlageText(message)
+    if (!normalizedMessage) {
+      return ''
+    }
+
+    const standMatch = normalizedMessage.match(/\n\s*Stand:\s*([^\n]+)\s*$/i)
+    const standText = standMatch?.[1] || ''
+    const textBody = standMatch
+      ? normalizedMessage.slice(0, standMatch.index).trimEnd()
+      : normalizedMessage
+
+    const renderedLines = textBody
+      .split('\n')
+      .map(line => {
+        const trimmedLine = line.trim()
+        if (!trimmedLine) {
+          return ''
+        }
+
+        if (/^(Aktuelle\s+)?Wetterlage\s*:?\s*$/i.test(trimmedLine)) {
+          return `<span class="weatherlage-section-title">${escapeHtml(
+            trimmedLine
+          )}</span>`
+        }
+
+        if (/^Vorhersage(?:\s+f[uü]r.*)?\s*:?\s*$/i.test(trimmedLine)) {
+          return `<span class="weatherlage-section-title">${escapeHtml(
+            trimmedLine
+          )}</span>`
+        }
+
+        if (/^Wind\s*:/i.test(trimmedLine)) {
+          return `<span class="weatherlage-wind-line">${highlightBeaufortInWindLine(
+            line
+          )}</span>`
+        }
+
+        return escapeHtml(line)
+      })
+      .join('\n')
+
+    if (!standText) {
+      return renderedLines
+    }
+
+    return `<span class="weatherlage-stand">Stand: ${escapeHtml(
+      standText
+    )}</span>\n\n${renderedLines}`
+  }
+
   function renderWetterlageOverlay (message, { visible = false } = {}) {
     if (!lightboxWeatherlageElement) {
       return
@@ -454,7 +537,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    lightboxWeatherlageElement.textContent = message || ''
+    lightboxWeatherlageElement.innerHTML = buildWetterlageOverlayMarkup(
+      message || ''
+    )
     lightboxWeatherlageElement.classList.remove('is-hidden')
   }
 
