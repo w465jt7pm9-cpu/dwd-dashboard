@@ -628,7 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .sort((left, right) => left[1] - right[1])
       .map(([slotKey]) => ({
         key: slotKey,
-        label: `${slotKey.slice(0, 2)}${slotKey.slice(2)}`
+        label: `${slotKey.slice(0, 2)} ${slotKey.slice(2)}`
       }))
 
     return {
@@ -661,7 +661,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/\s+/g, '')
       .replace('O', 'E')
 
-    const primaryDirection = normalizedDirection.split('-')[0]
     const directionMap = {
       W: '→',
       NW: '↘',
@@ -673,7 +672,56 @@ document.addEventListener('DOMContentLoaded', () => {
       SW: '↗'
     }
 
-    return directionMap[primaryDirection] || '•'
+    const directionParts = normalizedDirection
+      .split('-')
+      .map(part => part.trim())
+      .filter(Boolean)
+
+    if (!directionParts.length) {
+      return '•'
+    }
+
+    return directionParts.map(part => directionMap[part] || '•').join('')
+  }
+
+  function getBeaufortLevelClassName (value) {
+    const values = String(value || '')
+      .match(/\d+/g)
+      ?.map(Number)
+      .filter(Number.isFinite)
+
+    if (!values?.length) {
+      return ''
+    }
+
+    const maxValue = Math.max(...values)
+    if (maxValue >= 8) {
+      return 'weatherlage-bft weatherlage-bft--storm'
+    }
+
+    if (maxValue >= 6) {
+      return 'weatherlage-bft weatherlage-bft--strong'
+    }
+
+    return ''
+  }
+
+  function renderBftValueMarkup (value) {
+    const normalizedValue = String(value || '').trim()
+    if (!normalizedValue) {
+      return ''
+    }
+
+    const levelClassName = getBeaufortLevelClassName(normalizedValue)
+    if (!levelClassName) {
+      return `<span class="ostsee-ts-value">${escapeHtml(
+        normalizedValue
+      )}</span>`
+    }
+
+    return `<span class="ostsee-ts-value ${levelClassName}">${escapeHtml(
+      normalizedValue
+    )}</span>`
   }
 
   function getWeatherDisplayValue (weatherCode) {
@@ -712,15 +760,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const directionSymbol = getWindDirectionSymbol(row.windDirection)
-            const gustMarkup = row.gustBft
-              ? `<span class="ostsee-ts-gust">G${escapeHtml(
-                  row.gustBft
-                )}</span>`
-              : ''
+            const windValueMarkup = renderBftValueMarkup(row.windBft)
+            const gustMarkup = renderBftValueMarkup(row.gustBft)
+            const combinedValueMarkup = gustMarkup
+              ? `${windValueMarkup}${gustMarkup}`
+              : windValueMarkup
 
-            return `<td><span class="ostsee-ts-wind">${directionSymbol}${escapeHtml(
-              row.windBft || '·'
-            )}${gustMarkup}</span></td>`
+            return `<td><span class="ostsee-ts-wind"><span class="ostsee-ts-dir">${directionSymbol}</span>${combinedValueMarkup}</span></td>`
           })
           .join('')
 

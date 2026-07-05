@@ -407,16 +407,18 @@
 .lightbox-weatherlage.ostsee-timeseries {
   top: max(56px, calc(env(safe-area-inset-top) + 12px));
   bottom: auto;
-  width: min(96vw, 1220px);
+  width: min(99vw, 1460px);
   max-height: 33vh;
   padding: 8px 10px;
   font-size: 0.74rem;
   line-height: 1.22;
+  overflow: hidden;
 }
 
 .ostsee-ts-wrap {
   overflow: auto;
   touch-action: pan-y;
+  max-height: calc(33vh - 42px);
 }
 
 .ostsee-ts-table {
@@ -460,17 +462,29 @@
 }
 
 .ostsee-ts-wind {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-weight: 700;
 }
 
-.ostsee-ts-gust {
+.ostsee-ts-dir {
+  min-width: 22px;
+  letter-spacing: -0.02em;
+}
+
+.ostsee-ts-value {
+  display: inline-block;
+}
+
+.ostsee-ts-value + .ostsee-ts-value {
   margin-left: 4px;
+}
+
+.ostsee-ts-value.weatherlage-bft {
+  margin: 0;
   padding: 0 4px;
-  border-radius: 999px;
-  background: rgba(255, 209, 112, 0.94);
-  color: #0a2235;
   font-size: 0.66rem;
-  font-weight: 700;
 }
 
 .lightbox-weatherlage.is-hidden {
