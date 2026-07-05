@@ -766,23 +766,51 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getWeatherDisplayValue (weatherCode) {
-    const normalizedCode = String(weatherCode || '').toUpperCase()
-    const weatherCodeMap = {
-      RAIN: '🌧',
-      DZ: '💧',
-      SH: '🌦',
-      TS: '⛈',
-      FOG: '🌫'
+    const normalizedCode = String(weatherCode || '')
+      .toUpperCase()
+      .trim()
+    if (!normalizedCode) {
+      return '·'
     }
 
-    return (
-      weatherCodeMap[normalizedCode] || (normalizedCode ? normalizedCode : '·')
-    )
+    const tokenList = normalizedCode
+      .split(/[\s,;/|+-]+/)
+      .map(token => token.trim())
+      .filter(Boolean)
+
+    const hasAnyCode = codes =>
+      codes.some(
+        code => tokenList.includes(code) || normalizedCode.includes(code)
+      )
+
+    if (hasAnyCode(['TS', 'TSTORM', 'THUNDER', 'THUNDERSTORM'])) {
+      return '⛈'
+    }
+
+    if (hasAnyCode(['SH', 'SHOWER', 'SHOWERS'])) {
+      return '🌦'
+    }
+
+    if (hasAnyCode(['RAIN', 'RA'])) {
+      return '🌧'
+    }
+
+    if (hasAnyCode(['DZ', 'DRIZZLE'])) {
+      return '💧'
+    }
+
+    if (hasAnyCode(['FOG', 'MIST', 'BR'])) {
+      return '🌫'
+    }
+
+    return normalizedCode
   }
 
   function renderWeatherValueMarkup (weatherCode) {
-    const normalizedCode = String(weatherCode || '').toUpperCase().trim()
-    if (normalizedCode === 'TS') {
+    const normalizedCode = String(weatherCode || '')
+      .toUpperCase()
+      .trim()
+    if (/\bTS\b|THUNDER|TSTORM/.test(normalizedCode)) {
       return '<span class="ostsee-ts-weather ostsee-ts-weather--thunderstorm" title="Gewitterwarnung" aria-label="Gewitterwarnung">⛈⚠</span>'
     }
 
