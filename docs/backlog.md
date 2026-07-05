@@ -10,6 +10,158 @@
 
 ---
 
+## 🧭 US-021 – Inhaltsfenster in gezoomter Seegang-Ostsee-Lightbox
+
+**Status:** DONE  
+**Priorität:** Mittel
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich in der gezoomten Ansicht jeder Seegang-Ostsee-Karte ein kompaktes Inhaltsfenster sehen  
+damit ich Kontext, Zeitschritt und Quelle direkt in der Lightbox verfügbar habe
+
+---
+
+### ✅ Akzeptanzkriterien
+
+- [x] In der Lightbox wird auf allen Bildern der Seite „Seegang Ostsee" ein Inhaltsfenster eingeblendet
+- [x] Das Fenster zeigt je Karte einen klaren Zeitbezug (+00/+24/+48/+72)
+- [x] Das Fenster bleibt auf andere Seiten begrenzt und beeinflusst deren Lightbox-Inhalte nicht
+- [x] Die bestehende Zoom-/Pan-/Swipe-Interaktion bleibt unverändert stabil
+
+---
+
+## 🌬️ US-020 – Windy-ähnliche Darstellung von DWD-Seewetter-Zeitreihen
+
+**Status:** DONE  
+**Priorität:** Hoch
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich die DWD-Seewettervorhersagen für Nord- und Ostsee in einer kompakten, Windy-ähnlichen Tabellen- bzw. Meteogramm-Darstellung sehen  
+damit ich Wind, Böen, Seegang und Wetterentwicklung über mehrere Tage schnell erfassen kann, ohne die langen Rohtexte der DWD-Seewetterberichte lesen zu müssen
+
+---
+
+### 🎯 Zielbild
+
+- Zeitachse verläuft horizontal von links nach rechts
+- Seegebiete werden untereinander in klaren Zeilen dargestellt
+- Kompakte Meteogramm-/Tabellenoptik angelehnt an Windy oder PredictWind
+- Windrichtung als meteorologische Herkunftsrichtung visualisiert
+- Wellenhöhe numerisch in Metern
+- Wetterereignisse als Kürzel oder Symbol
+
+---
+
+### 🗂️ Datenquellen
+
+Primär:
+
+- DWD „Seewettervorhersagen Ostsee“ (FEBQ52-Inhalt)
+- URL: https://www.dwd.de/DE/leistungen/seevorhersageostsee/seevorhersagenostsee.html?nn=16102
+
+Alternativ:
+
+- DWD OpenData (Produktkennung FEBQ52)
+- Basis: https://opendata.dwd.de/weather/maritime/forecast/german/
+
+Enthaltene Gebiete umfassen unter anderem:
+
+- Skagerrak
+- Kattegat
+- Belte/Sund
+- Kieler Bucht
+- Mecklenburger Bucht
+- Westlich Rügen
+- Boddengewässer Ost
+- Südliche Ostsee
+- Zentrale Ostsee
+- Nördliche Ostsee
+- Rigaischer Meerbusen
+
+Hinweis:
+
+- Es werden ausschließlich DWD-Text- und Zeitreihenprodukte verwendet, ohne eigene Bild- oder Karteninterpretation
+
+---
+
+### 🧭 Fachliche Regeln
+
+**Windrichtungen (meteorologische Herkunftsrichtung)**
+
+| Richtung | Symbol |
+| -------- | ------ |
+| W        | →      |
+| NW       | ↘      |
+| N        | ↓      |
+| SW       | ↗      |
+| O        | ←      |
+| S        | ↑      |
+
+**Wetterkürzel / Symbole**
+
+| DWD  | Anzeige |
+| ---- | ------- |
+| RAIN | 🌧       |
+| SH   | 🌦       |
+| TS   | ⛈       |
+
+---
+
+### ✅ Akzeptanzkriterien
+
+**AK1 – Zeitachse**
+
+- [x] Gegeben eine DWD-Seewetterzeitreihe
+- [x] Wenn die Daten dargestellt werden
+- [x] Dann müssen die Vorhersagezeitpunkte horizontal von links nach rechts angeordnet sein
+
+**AK2 – Mehrere Seegebiete**
+
+- [x] Gegeben eine DWD-Ostseevorhersage
+- [x] Wenn die Daten aufbereitet werden
+- [x] Dann müssen alle enthaltenen Seegebiete dargestellt werden
+
+**AK3 – Winddarstellung**
+
+- [x] Gegeben eine Windrichtung und Windstärke
+- [x] Wenn die Tabelle erzeugt wird
+- [x] Dann müssen Richtung und Beaufort-Wert in einer kompakten Zelle kombiniert dargestellt werden
+- [x] Beispielzellen: ↘6, →5, ↓4
+
+**AK4 – Seegang**
+
+- [x] Gegeben eine signifikante Wellenhöhe
+- [x] Wenn die Tabelle erzeugt wird
+- [x] Dann muss die Wellenhöhe in Metern angezeigt werden
+
+**AK5 – Wetter**
+
+- [x] Gegeben Wetterereignisse im DWD-Bericht
+- [x] Wenn ein Ereignis vorhanden ist
+- [x] Dann soll ein Symbol oder Kürzel angezeigt werden
+
+**AK6 – Keine Bildanalyse**
+
+- [x] Gegeben DWD-Textprodukte
+- [x] Wenn Vorhersagen erzeugt werden
+- [x] Dann sollen ausschließlich die bereits vom DWD interpretierten Text- und Zeitreihenprodukte verwendet werden und keine eigene Wetterinterpretation aus Wetterkarten erfolgen
+
+---
+
+### 📈 Nutzen
+
+Der Anwender erhält eine kompakte, nautisch nutzbare Übersicht, die die Lesbarkeit eines Windy-Meteogramms mit der fachlichen Qualität der vom DWD bereitgestellten Seewettervorhersagen kombiniert.
+
+---
+
 ## 🧭 US-019 – Seewettertext vorab online cachen
 
 **Status:** DONE  
@@ -392,7 +544,7 @@ damit ich die dargestellte Wetterkarte besser interpretieren kann und auch ohne 
 
 ### 🧠 Fachlicher Hintergrund
 
-Der Deutsche Wetterdienst stellt den Seewetterbericht als dedizierte Quelle bereit; als technischer Fallback kann der maritime Open-Data-Textfeed unter `https://opendata.dwd.de/weather/maritime/forecast/german/FQEN50_EDZW_LATEST` genutzt werden. Dieser enthält u. a.:
+Der Deutsche Wetterdienst stellt den Seewetterbericht als dedizierte Quelle bereit; als technischer Fallback kann das maritime Open-Data-Produkt FEBQ52 (Verzeichnis `https://opendata.dwd.de/weather/maritime/forecast/german/`) genutzt werden. Dieses enthält u. a.:
 
 - Abschnitt „Wetterlage“
 - Zeitstempel (UTC)

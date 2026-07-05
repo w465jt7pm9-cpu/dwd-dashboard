@@ -9,6 +9,8 @@
 > Update US-012: Zusätzliche Carousel-Seite für Seegang Ostsee im gleichen Interaktions- und Layoutprinzip.
 > Update US-013: Einheitlicher Seegang-Datenzyklus für alle WX_SEE-Seiten (~07/~19 UTC).
 > Update US-014: Offline-Zugriff mit stabiler Wiederverwendung des letzten Bildstands je Karte, auch nach Resize/Orientation-Change.
+> Update US-021: In der gezoomten Lightbox-Ansicht der Seite Seegang Ostsee wird je Karte ein kompaktes Inhaltsfenster eingeblendet.
+> Update US-020: Das Ostsee-Inhaltsfenster zeigt eine Windy-aehnliche Zeitreihen-/Meteogramm-Tabelle (Wind, Boeen, Welle, Wetter) auf Basis der DWD-Seewettervorhersage Ostsee.
 
 ```mermaid
 flowchart TD
@@ -26,6 +28,9 @@ flowchart TD
   Lightbox --> Arrows[Pfeile dynamisch]
   Lightbox --> Elastic[Elastic Pan + Soft Clamp]
   Lightbox --> Overlay[Hintergrund]
+  Lightbox --> OstseeWindow[Inhaltsfenster Seegang Ostsee]
+  OstseeWindow --> Meteogram[Zeitreihe links nach rechts]
+  OstseeWindow --> Areas[Seegebiete untereinander]
   App --> Gestures[Gesten / Pfeiltasten]
   App --> Theme[Automatischer Dark Mode]
   App --> Refresh[Auto-Zyklus + Pull-to-Refresh]

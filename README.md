@@ -3,7 +3,7 @@
 Interaktive Darstellung von DWD-Wetterkarten  
 optimiert für Desktop und Touch-Geräte.
 
-Release-Stand: 1.2
+Release-Stand: 1.3
 
 Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
 
@@ -29,6 +29,8 @@ Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End ge
 - zyklische Navigation im Carousel (Swipe, Edge-Tap, Tastatur)
 - Lightbox mit Peek-Nachbarn, Zoom, Elastic Pan und Soft Snap-Back
 - Seegangskarten für Nordsee und Ostsee integriert
+- gezoomte Ostsee-Lightbox mit Inhaltsfenster je Karte
+- Windy-aehnliche Ostsee-Zeitreihenansicht (Wind, Boeen, Welle, Wetter)
 - globaler Seegang-Datenzyklus (~07/~19 UTC) für alle WX_SEE-Seiten
 - verbesserte Offline-Nutzung mit Cache-Wiederverwendung und Reconnect-Refresh
 - stabiler Offline-Bildstand auch bei Resize/Orientierungswechsel

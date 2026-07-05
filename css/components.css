@@ -379,6 +379,95 @@
   color: rgba(198, 255, 212, 0.98);
 }
 
+.ostsee-overlay-title {
+  display: block;
+  margin: 2px 0 8px;
+  font-weight: 700;
+  color: rgba(222, 238, 255, 0.98);
+}
+
+.ostsee-overlay-line {
+  display: block;
+  margin: 3px 0;
+}
+
+.ostsee-overlay-link {
+  color: rgba(176, 220, 255, 0.98);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ostsee-overlay-link:hover,
+.ostsee-overlay-link:focus-visible {
+  color: rgba(214, 238, 255, 1);
+}
+
+.lightbox-weatherlage.ostsee-timeseries {
+  width: min(96vw, 1220px);
+  max-height: min(74vh, 560px);
+  padding: 8px 10px;
+  font-size: 0.74rem;
+  line-height: 1.22;
+}
+
+.ostsee-ts-wrap {
+  overflow: auto;
+}
+
+.ostsee-ts-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+.ostsee-ts-table th,
+.ostsee-ts-table td {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 4px 6px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.ostsee-ts-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: rgba(8, 16, 28, 0.92);
+}
+
+.ostsee-ts-table th[scope='row'] {
+  text-align: left;
+  background: rgba(8, 16, 28, 0.6);
+}
+
+.ostsee-ts-area th {
+  text-align: left;
+  background: rgba(26, 44, 68, 0.88);
+  color: rgba(226, 239, 255, 0.98);
+  font-weight: 700;
+}
+
+.ostsee-ts-meta {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 0.68rem;
+  color: rgba(184, 214, 244, 0.95);
+}
+
+.ostsee-ts-wind {
+  font-weight: 700;
+}
+
+.ostsee-ts-gust {
+  margin-left: 4px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: rgba(255, 209, 112, 0.94);
+  color: #0a2235;
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
 .lightbox-weatherlage.is-hidden {
   display: none;
 }

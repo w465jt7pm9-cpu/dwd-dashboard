@@ -51,10 +51,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const WETTERLAGE_RUN_CACHE_KEY = 'dwdWetterlageModelRun'
   const WETTERLAGE_SOURCE_CACHE_KEY = 'dwdWetterlageSource'
   const WETTERLAGE_UPDATED_AT_CACHE_KEY = 'dwdWetterlageUpdatedAt'
+  const OSTSEE_TS_CACHE_KEY = 'dwdOstseeTimeseriesCache'
+  const OSTSEE_TS_UPDATED_AT_CACHE_KEY = 'dwdOstseeTimeseriesUpdatedAt'
   const DWD_SEEWETTERBERICHT_URL =
     'https://www.dwd.de/DE/leistungen/seewetternordostsee/seewetternordostsee.html'
   const DWD_MARITIME_FORECAST_URL =
     'https://opendata.dwd.de/weather/maritime/forecast/german/FQEN50_EDZW_LATEST'
+  const DWD_OSTSEE_3DAY_URL =
+    'https://www.dwd.de/DE/leistungen/seevorhersageostsee/seevorhersagenostsee.html?nn=16102'
+  const OSTSEE_TS_CACHE_TTL_MS = 3 * 60 * 60 * 1000
   const LAST_KNOWN_IMAGE_URL_KEY_PREFIX = 'dwdImageLastKnownUrl:'
   const THEME_STORAGE_KEY = 'dwdTheme'
 
@@ -237,6 +242,46 @@ document.addEventListener('DOMContentLoaded', () => {
       return localStorage.getItem(WETTERLAGE_UPDATED_AT_CACHE_KEY)
     } catch {
       return null
+    }
+  }
+
+  function getCachedOstseeTimeseriesPayload () {
+    try {
+      const serializedPayload = localStorage.getItem(OSTSEE_TS_CACHE_KEY)
+      if (!serializedPayload) {
+        return null
+      }
+
+      return JSON.parse(serializedPayload)
+    } catch {
+      return null
+    }
+  }
+
+  function getCachedOstseeTimeseriesUpdatedAt () {
+    try {
+      const updatedAt = Number(
+        localStorage.getItem(OSTSEE_TS_UPDATED_AT_CACHE_KEY)
+      )
+      if (!Number.isFinite(updatedAt)) {
+        return null
+      }
+
+      return updatedAt
+    } catch {
+      return null
+    }
+  }
+
+  function setCachedOstseeTimeseriesPayload (payload) {
+    try {
+      localStorage.setItem(OSTSEE_TS_CACHE_KEY, JSON.stringify(payload))
+      localStorage.setItem(
+        OSTSEE_TS_UPDATED_AT_CACHE_KEY,
+        String(payload.updatedAt || Date.now())
+      )
+    } catch {
+      // localStorage is optional here.
     }
   }
 
@@ -431,6 +476,22 @@ document.addEventListener('DOMContentLoaded', () => {
     )
   }
 
+  function getImagePageIndex (imageElement) {
+    const pageElement = imageElement?.closest('.page')
+    if (!pageElement) {
+      return -1
+    }
+
+    return Number(pageElement.dataset.page)
+  }
+
+  function isOstseeSeegangImageElement (imageElement) {
+    return (
+      imageElement?.dataset?.base === 'WX_SEE' &&
+      getImagePageIndex(imageElement) === OSTSEE_PAGE_INDEX
+    )
+  }
+
   function getCurrentLightboxImageElement () {
     if (
       !lightboxImageList.length ||
@@ -454,6 +515,319 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function escapeRegExp (value) {
     return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  }
+
+  function normalizeInlineText (text) {
+    return String(text || '')
+      .replace(/\u00a0/g, ' ')
+      .replace(/[\t\r\n]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+  }
+
+  function extractOstseeAreaHeader (headerText) {
+    const normalizedHeader = normalizeInlineText(headerText)
+    const headerMatch = normalizedHeader.match(
+      /^(.*?)\s*\(([^)]+)\)\s*WT:\s*([^\s]+\s*[CF]?)/i
+    )
+    if (!headerMatch) {
+      return null
+    }
+
+    return {
+      areaName: normalizeInlineText(headerMatch[1]),
+      position: normalizeInlineText(headerMatch[2]),
+      waterTemp: normalizeInlineText(headerMatch[3]).replace(/\s+/g, ' ')
+    }
+  }
+
+  function parseOstseeTimeseriesFromHtml (rawHtml) {
+    if (!rawHtml) {
+      throw new Error('Leere Ostsee-Zeitreihenquelle')
+    }
+
+    const parsedDocument = new DOMParser().parseFromString(rawHtml, 'text/html')
+    const allTables = Array.from(parsedDocument.querySelectorAll('table'))
+    const allAreas = []
+    const slotOrderMap = new Map()
+
+    allTables.forEach(tableElement => {
+      const rowElements = Array.from(tableElement.querySelectorAll('tr'))
+      if (rowElements.length < 4) {
+        return
+      }
+
+      const areaHeaderCell = rowElements[0]?.querySelector('td,th')
+      const areaHeader = extractOstseeAreaHeader(areaHeaderCell?.textContent)
+      if (!areaHeader?.areaName) {
+        return
+      }
+
+      const areaRows = []
+      rowElements.slice(3).forEach(rowElement => {
+        const cellTexts = Array.from(rowElement.querySelectorAll('td,th')).map(
+          cellElement => normalizeInlineText(cellElement.textContent)
+        )
+
+        if (cellTexts.length < 7) {
+          return
+        }
+
+        const day = cellTexts[0]
+        const hour = cellTexts[1]
+
+        if (!/^(Mo|Di|Mi|Do|Fr|Sa|So)$/i.test(day) || !/^\d{2}$/.test(hour)) {
+          return
+        }
+
+        const slotKey = `${day}${hour}`
+        if (!slotOrderMap.has(slotKey)) {
+          slotOrderMap.set(slotKey, slotOrderMap.size)
+        }
+
+        areaRows.push({
+          slotKey,
+          day,
+          hour,
+          windDirection: cellTexts[2] || '',
+          windBft: cellTexts[3] || '',
+          gustBft: cellTexts[4] || '',
+          waveM: cellTexts[5] || '',
+          weather: cellTexts[6] || ''
+        })
+      })
+
+      if (!areaRows.length) {
+        return
+      }
+
+      allAreas.push({
+        ...areaHeader,
+        rows: areaRows
+      })
+    })
+
+    if (!allAreas.length) {
+      throw new Error('Keine Ostsee-Zeitreihen im DWD-Quellformat gefunden')
+    }
+
+    const slots = Array.from(slotOrderMap.entries())
+      .sort((left, right) => left[1] - right[1])
+      .map(([slotKey]) => ({
+        key: slotKey,
+        label: `${slotKey.slice(0, 2)}${slotKey.slice(2)}`
+      }))
+
+    return {
+      slots,
+      areas: allAreas
+    }
+  }
+
+  async function fetchOstseeTimeseriesPayload () {
+    const response = await fetch(DWD_OSTSEE_3DAY_URL, {
+      cache: 'no-cache'
+    })
+    if (!response.ok) {
+      throw new Error('Ostsee-Zeitreihe nicht erreichbar')
+    }
+
+    const htmlText = await response.text()
+    const parsedTimeseries = parseOstseeTimeseriesFromHtml(htmlText)
+
+    return {
+      ...parsedTimeseries,
+      sourceUrl: DWD_OSTSEE_3DAY_URL,
+      updatedAt: Date.now()
+    }
+  }
+
+  function getWindDirectionSymbol (windDirection) {
+    const normalizedDirection = String(windDirection || '')
+      .toUpperCase()
+      .replace(/\s+/g, '')
+      .replace('O', 'E')
+
+    const primaryDirection = normalizedDirection.split('-')[0]
+    const directionMap = {
+      W: '→',
+      NW: '↘',
+      N: '↓',
+      NE: '↙',
+      E: '←',
+      SE: '↖',
+      S: '↑',
+      SW: '↗'
+    }
+
+    return directionMap[primaryDirection] || '•'
+  }
+
+  function getWeatherDisplayValue (weatherCode) {
+    const normalizedCode = String(weatherCode || '').toUpperCase()
+    const weatherCodeMap = {
+      RAIN: '🌧',
+      SH: '🌦',
+      TS: '⛈'
+    }
+
+    return (
+      weatherCodeMap[normalizedCode] || (normalizedCode ? normalizedCode : '·')
+    )
+  }
+
+  function buildOstseeTimeseriesOverlayMarkup (payload) {
+    const slots = Array.isArray(payload?.slots) ? payload.slots : []
+    const areas = Array.isArray(payload?.areas) ? payload.areas : []
+    if (!slots.length || !areas.length) {
+      return ''
+    }
+
+    const tableHeaderMarkup = slots
+      .map(slot => `<th scope="col">${escapeHtml(slot.label)}</th>`)
+      .join('')
+
+    const tableBodyMarkup = areas
+      .map(area => {
+        const rowsBySlot = new Map(area.rows.map(row => [row.slotKey, row]))
+
+        const windCells = slots
+          .map(slot => {
+            const row = rowsBySlot.get(slot.key)
+            if (!row) {
+              return '<td>·</td>'
+            }
+
+            const directionSymbol = getWindDirectionSymbol(row.windDirection)
+            const gustMarkup = row.gustBft
+              ? `<span class="ostsee-ts-gust">G${escapeHtml(
+                  row.gustBft
+                )}</span>`
+              : ''
+
+            return `<td><span class="ostsee-ts-wind">${directionSymbol}${escapeHtml(
+              row.windBft || '·'
+            )}${gustMarkup}</span></td>`
+          })
+          .join('')
+
+        const waveCells = slots
+          .map(slot => {
+            const row = rowsBySlot.get(slot.key)
+            const waveValue = row?.waveM ? `${row.waveM}m` : '·'
+            return `<td>${escapeHtml(waveValue)}</td>`
+          })
+          .join('')
+
+        const weatherCells = slots
+          .map(slot => {
+            const row = rowsBySlot.get(slot.key)
+            return `<td>${escapeHtml(
+              getWeatherDisplayValue(row?.weather || '')
+            )}</td>`
+          })
+          .join('')
+
+        const areaMeta = area.waterTemp
+          ? `${area.position} · WT ${area.waterTemp}`
+          : area.position
+
+        return [
+          `<tr class="ostsee-ts-area"><th colspan="${
+            slots.length + 1
+          }">${escapeHtml(
+            area.areaName
+          )}<span class="ostsee-ts-meta">${escapeHtml(
+            areaMeta
+          )}</span></th></tr>`,
+          `<tr><th scope="row">Wind</th>${windCells}</tr>`,
+          `<tr><th scope="row">Welle</th>${waveCells}</tr>`,
+          `<tr><th scope="row">Wetter</th>${weatherCells}</tr>`
+        ].join('')
+      })
+      .join('')
+
+    const updatedLabel = formatTimestamp(payload.updatedAt)
+
+    return [
+      `<span class="weatherlage-stand">DWD Ostsee Zeitreihe · Stand ${escapeHtml(
+        updatedLabel
+      )}</span>`,
+      '<div class="ostsee-ts-wrap">',
+      '<table class="ostsee-ts-table">',
+      `<thead><tr><th scope="col">Gebiet</th>${tableHeaderMarkup}</tr></thead>`,
+      `<tbody>${tableBodyMarkup}</tbody>`,
+      '</table>',
+      '</div>'
+    ].join('')
+  }
+
+  async function ensureOstseeTimeseriesOverlayContent () {
+    const cachedPayload = getCachedOstseeTimeseriesPayload()
+    const cachedUpdatedAt = getCachedOstseeTimeseriesUpdatedAt()
+    const isCacheFresh =
+      cachedPayload &&
+      cachedUpdatedAt &&
+      Date.now() - cachedUpdatedAt <= OSTSEE_TS_CACHE_TTL_MS
+
+    if (cachedPayload) {
+      renderWetterlageOverlay(
+        buildOstseeTimeseriesOverlayMarkup(cachedPayload),
+        {
+          visible: true,
+          useRawMarkup: true,
+          mode: 'ostsee-timeseries'
+        }
+      )
+    } else {
+      renderWetterlageOverlay('Ostsee-Zeitreihe wird geladen ...', {
+        visible: true,
+        mode: 'ostsee-timeseries'
+      })
+    }
+
+    if (!navigator.onLine || isCacheFresh) {
+      if (!cachedPayload && !navigator.onLine) {
+        renderWetterlageOverlay(
+          'Offline: Keine gespeicherte Ostsee-Zeitreihe verfügbar.',
+          {
+            visible: true,
+            mode: 'ostsee-timeseries'
+          }
+        )
+      }
+      return
+    }
+
+    try {
+      const freshPayload = await fetchOstseeTimeseriesPayload()
+      setCachedOstseeTimeseriesPayload(freshPayload)
+
+      if (!isLightboxOpen) {
+        return
+      }
+
+      const currentImageElement = getCurrentLightboxImageElement()
+      if (!isOstseeSeegangImageElement(currentImageElement)) {
+        return
+      }
+
+      renderWetterlageOverlay(
+        buildOstseeTimeseriesOverlayMarkup(freshPayload),
+        {
+          visible: true,
+          useRawMarkup: true,
+          mode: 'ostsee-timeseries'
+        }
+      )
+    } catch {
+      if (!cachedPayload) {
+        renderWetterlageOverlay('Ostsee-Zeitreihe derzeit nicht verfügbar.', {
+          visible: true,
+          mode: 'ostsee-timeseries'
+        })
+      }
+    }
   }
 
   const WETTERLAGE_WEEKDAY_REGEX =
@@ -579,20 +953,29 @@ document.addEventListener('DOMContentLoaded', () => {
     )}</span>\n\n${renderedLines}`
   }
 
-  function renderWetterlageOverlay (message, { visible = false } = {}) {
+  function renderWetterlageOverlay (
+    message,
+    { visible = false, useRawMarkup = false, mode = 'default' } = {}
+  ) {
     if (!lightboxWeatherlageElement) {
       return
     }
 
     if (!visible) {
       lightboxWeatherlageElement.classList.add('is-hidden')
+      lightboxWeatherlageElement.classList.remove('ostsee-timeseries')
       lightboxWeatherlageElement.textContent = ''
       return
     }
 
-    lightboxWeatherlageElement.innerHTML = buildWetterlageOverlayMarkup(
-      message || ''
+    lightboxWeatherlageElement.classList.toggle(
+      'ostsee-timeseries',
+      mode === 'ostsee-timeseries'
     )
+
+    lightboxWeatherlageElement.innerHTML = useRawMarkup
+      ? message || ''
+      : buildWetterlageOverlayMarkup(message || '')
     lightboxWeatherlageElement.classList.remove('is-hidden')
   }
 
@@ -830,6 +1213,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const currentImageElement = getCurrentLightboxImageElement()
+
+    if (isOstseeSeegangImageElement(currentImageElement)) {
+      void ensureOstseeTimeseriesOverlayContent()
+      return
+    }
+
     if (!isBodenAnalysisImageElement(currentImageElement)) {
       renderWetterlageOverlay('', { visible: false })
       return
