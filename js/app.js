@@ -553,25 +553,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     allTables.forEach(tableElement => {
       const rowElements = Array.from(tableElement.querySelectorAll('tr'))
-      if (rowElements.length < 4) {
+      if (!rowElements.length) {
         return
       }
 
-      const areaHeaderCell = rowElements[0]?.querySelector('td,th')
-      const areaHeader = extractOstseeAreaHeader(areaHeaderCell?.textContent)
-      if (!areaHeader?.areaName) {
-        return
+      let currentArea = null
+
+      const flushCurrentArea = () => {
+        if (currentArea && currentArea.rows.length) {
+          allAreas.push(currentArea)
+        }
       }
 
-      const areaRows = []
-      rowElements.slice(3).forEach(rowElement => {
-        const cellTexts = Array.from(rowElement.querySelectorAll('td,th')).map(
-          cellElement => normalizeInlineText(cellElement.textContent)
-        )
-
-        if (cellTexts.length < 7) {
+      rowElements.forEach(rowElement => {
+        const cellElements = Array.from(rowElement.querySelectorAll('td,th'))
+        if (!cellElements.length) {
           return
         }
+
+        if (cellElements.length === 1) {
+          const areaHeader = extractOstseeAreaHeader(
+            cellElements[0].textContent
+          )
+          if (areaHeader?.areaName) {
+            flushCurrentArea()
+            currentArea = {
+              ...areaHeader,
+              rows: []
+            }
+          }
+          return
+        }
+
+        if (!currentArea || cellElements.length < 7) {
+          return
+        }
+
+        const cellTexts = cellElements.map(cellElement =>
+          normalizeInlineText(cellElement.textContent)
+        )
 
         const day = cellTexts[0]
         const hour = cellTexts[1]
@@ -585,7 +605,7 @@ document.addEventListener('DOMContentLoaded', () => {
           slotOrderMap.set(slotKey, slotOrderMap.size)
         }
 
-        areaRows.push({
+        currentArea.rows.push({
           slotKey,
           day,
           hour,
@@ -597,14 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
       })
 
-      if (!areaRows.length) {
-        return
-      }
-
-      allAreas.push({
-        ...areaHeader,
-        rows: areaRows
-      })
+      flushCurrentArea()
     })
 
     if (!allAreas.length) {

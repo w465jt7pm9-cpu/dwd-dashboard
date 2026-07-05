@@ -151,7 +151,7 @@
   background: var(--color-lightbox);
   z-index: var(--z-lightbox);
   overflow: hidden;
-  touch-action: none;
+  touch-action: auto;
 
   pointer-events: none;
   visibility: hidden;
@@ -251,6 +251,7 @@
 
   user-select: none;
   -webkit-user-drag: none;
+  touch-action: none;
 }
 
 .lightbox.lb-dragging .lightbox-main {
@@ -323,6 +324,7 @@
   white-space: pre-wrap;
   z-index: calc(var(--z-lightbox-nav) - 1);
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .weatherlage-stand {
@@ -412,6 +414,7 @@
 
 .ostsee-ts-wrap {
   overflow: auto;
+  touch-action: pan-y;
 }
 
 .ostsee-ts-table {
