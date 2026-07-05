@@ -744,8 +744,28 @@ document.addEventListener('DOMContentLoaded', () => {
       return ''
     }
 
+    const getSlotDisplayLabel = slot => {
+      const normalizedLabel = String(slot?.label || '').trim()
+      if (/^[A-Za-z]{2}\s\d{2}$/.test(normalizedLabel)) {
+        return normalizedLabel
+      }
+
+      const key = String(slot?.key || '').trim()
+      if (/^[A-Za-z]{2}\d{2}$/.test(key)) {
+        return `${key.slice(0, 2)} ${key.slice(2)}`
+      }
+
+      if (/^[A-Za-z]{2}\d{2}$/.test(normalizedLabel)) {
+        return `${normalizedLabel.slice(0, 2)} ${normalizedLabel.slice(2)}`
+      }
+
+      return normalizedLabel || key || '·'
+    }
+
     const tableHeaderMarkup = slots
-      .map(slot => `<th scope="col">${escapeHtml(slot.label)}</th>`)
+      .map(
+        slot => `<th scope="col">${escapeHtml(getSlotDisplayLabel(slot))}</th>`
+      )
       .join('')
 
     const tableBodyMarkup = areas

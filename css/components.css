@@ -408,7 +408,7 @@
   top: max(56px, calc(env(safe-area-inset-top) + 12px));
   bottom: auto;
   width: min(99vw, 1460px);
-  max-height: 33vh;
+  max-height: 50vh;
   padding: 8px 10px;
   font-size: 0.74rem;
   line-height: 1.22;
@@ -418,7 +418,7 @@
 .ostsee-ts-wrap {
   overflow: auto;
   touch-action: pan-y;
-  max-height: calc(33vh - 42px);
+  max-height: calc(50vh - 42px);
 }
 
 .ostsee-ts-table {
