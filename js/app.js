@@ -781,7 +781,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const directionSymbol = getWindDirectionSymbol(row.windDirection)
             const windValueMarkup = renderBftValueMarkup(row.windBft)
-            const gustMarkup = renderBftValueMarkup(row.gustBft)
+            const gustMarkup = row.gustBft
+              ? `<span class="ostsee-ts-gust-prefix">B</span>${renderBftValueMarkup(
+                  row.gustBft
+                )}`
+              : ''
             const combinedValueMarkup = gustMarkup
               ? `${windValueMarkup}${gustMarkup}`
               : windValueMarkup
