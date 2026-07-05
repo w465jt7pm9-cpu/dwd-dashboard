@@ -11,6 +11,7 @@
 > Update US-014: Offline-Zugriff mit stabiler Wiederverwendung des letzten Bildstands je Karte, auch nach Resize/Orientation-Change.
 > Update US-021: In der gezoomten Lightbox-Ansicht der Seite Seegang Ostsee wird je Karte ein kompaktes Inhaltsfenster eingeblendet.
 > Update US-020: Das Ostsee-Inhaltsfenster zeigt eine Windy-aehnliche Zeitreihen-/Meteogramm-Tabelle (Wind, Boeen, Welle, Wetter) auf Basis der DWD-Seewettervorhersage Ostsee.
+> Update US-020b: Das Ostsee-Zeitreihenfenster startet unterhalb der oberen Titelzeile und ist auf maximal ein Drittel der Fensterhoehe begrenzt.
 
 ```mermaid
 flowchart TD

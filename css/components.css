@@ -405,8 +405,10 @@
 }
 
 .lightbox-weatherlage.ostsee-timeseries {
+  top: max(56px, calc(env(safe-area-inset-top) + 12px));
+  bottom: auto;
   width: min(96vw, 1220px);
-  max-height: min(74vh, 560px);
+  max-height: 33vh;
   padding: 8px 10px;
   font-size: 0.74rem;
   line-height: 1.22;
