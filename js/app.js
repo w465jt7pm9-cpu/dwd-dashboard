@@ -721,6 +721,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return 'weatherlage-bft weatherlage-bft--storm'
     }
 
+    if (maxValue >= 6) {
+      return 'weatherlage-bft weatherlage-bft--strong'
+    }
+
     return ''
   }
 
@@ -765,13 +769,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const normalizedCode = String(weatherCode || '').toUpperCase()
     const weatherCodeMap = {
       RAIN: '🌧',
+      DZ: '💧',
       SH: '🌦',
-      TS: '⛈'
+      TS: '⛈',
+      FOG: '🌫'
     }
 
     return (
       weatherCodeMap[normalizedCode] || (normalizedCode ? normalizedCode : '·')
     )
+  }
+
+  function renderWeatherValueMarkup (weatherCode) {
+    const normalizedCode = String(weatherCode || '').toUpperCase().trim()
+    if (normalizedCode === 'TS') {
+      return '<span class="ostsee-ts-weather ostsee-ts-weather--thunderstorm" title="Gewitterwarnung" aria-label="Gewitterwarnung">⛈⚠</span>'
+    }
+
+    return `<span class="ostsee-ts-weather">${escapeHtml(
+      getWeatherDisplayValue(normalizedCode)
+    )}</span>`
   }
 
   function buildOstseeTimeseriesOverlayMarkup (payload) {
@@ -838,9 +855,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const weatherCells = slots
           .map(slot => {
             const row = rowsBySlot.get(slot.key)
-            return `<td>${escapeHtml(
-              getWeatherDisplayValue(row?.weather || '')
-            )}</td>`
+            return `<td>${renderWeatherValueMarkup(row?.weather || '')}</td>`
           })
           .join('')
 

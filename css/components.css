@@ -491,6 +491,21 @@
   font-size: 0.66rem;
 }
 
+.ostsee-ts-weather {
+  display: inline-block;
+  font-weight: 700;
+}
+
+.ostsee-ts-weather--thunderstorm {
+  min-width: 2.25em;
+  padding: 1px 4px;
+  border-radius: 4px;
+  color: rgba(255, 243, 178, 0.98);
+  background: rgba(166, 28, 28, 0.95);
+  border: 1px solid rgba(255, 196, 92, 0.95);
+  box-shadow: 0 0 10px rgba(226, 76, 76, 0.45);
+}
+
 .lightbox-weatherlage.is-hidden {
   display: none;
 }
