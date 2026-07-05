@@ -13,6 +13,7 @@
 > Update US-020: Das Ostsee-Inhaltsfenster zeigt eine Windy-aehnliche Zeitreihen-/Meteogramm-Tabelle (Wind, Boeen, Welle, Wetter) auf Basis der DWD-Seewettervorhersage Ostsee.
 > Update US-020b: Das Ostsee-Zeitreihenfenster startet unterhalb der oberen Titelzeile und ist auf maximal ein Drittel der Fensterhoehe begrenzt.
 > Update US-020c: Wind und Boeen werden nach Starkwind-/Sturmregeln eingefaerbt, Richtungsbereiche zeigen kombinierte Pfeile (z. B. W-NW), der Zeitslot-Header bleibt sticky und die Fensterbreite wurde erweitert.
+> Update US-020d: Boeen werden als B-Praefix direkt am Wert dargestellt (gleiche Farbe), Rotfaerbung fuer Boeen erst ab >=8 Bft; vertikale Fensterhoehe wurde reduziert und horizontales Scrollen bleibt nur fuer sehr schmale Displays verfuegbar.
 
 ```mermaid
 flowchart TD

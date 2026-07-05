@@ -706,6 +706,24 @@ document.addEventListener('DOMContentLoaded', () => {
     return ''
   }
 
+  function getGustBeaufortLevelClassName (value) {
+    const values = String(value || '')
+      .match(/\d+/g)
+      ?.map(Number)
+      .filter(Number.isFinite)
+
+    if (!values?.length) {
+      return ''
+    }
+
+    const maxValue = Math.max(...values)
+    if (maxValue >= 8) {
+      return 'weatherlage-bft weatherlage-bft--storm'
+    }
+
+    return ''
+  }
+
   function renderBftValueMarkup (value) {
     const normalizedValue = String(value || '').trim()
     if (!normalizedValue) {
@@ -721,6 +739,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     return `<span class="ostsee-ts-value ${levelClassName}">${escapeHtml(
       normalizedValue
+    )}</span>`
+  }
+
+  function renderGustBftValueMarkup (value) {
+    const normalizedValue = String(value || '').trim()
+    if (!normalizedValue) {
+      return ''
+    }
+
+    const levelClassName = getGustBeaufortLevelClassName(normalizedValue)
+    const valueWithPrefix = `B${normalizedValue}`
+    if (!levelClassName) {
+      return `<span class="ostsee-ts-value">${escapeHtml(
+        valueWithPrefix
+      )}</span>`
+    }
+
+    return `<span class="ostsee-ts-value ${levelClassName}">${escapeHtml(
+      valueWithPrefix
     )}</span>`
   }
 
@@ -781,11 +818,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const directionSymbol = getWindDirectionSymbol(row.windDirection)
             const windValueMarkup = renderBftValueMarkup(row.windBft)
-            const gustMarkup = row.gustBft
-              ? `<span class="ostsee-ts-gust-prefix">B</span>${renderBftValueMarkup(
-                  row.gustBft
-                )}`
-              : ''
+            const gustMarkup = renderGustBftValueMarkup(row.gustBft)
             const combinedValueMarkup = gustMarkup
               ? `${windValueMarkup}${gustMarkup}`
               : windValueMarkup

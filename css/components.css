@@ -408,7 +408,7 @@
   top: max(56px, calc(env(safe-area-inset-top) + 12px));
   bottom: auto;
   width: min(99vw, 1460px);
-  max-height: 42vh;
+  max-height: 38vh;
   padding: 8px 10px;
   font-size: 0.74rem;
   line-height: 1.22;
@@ -419,7 +419,7 @@
   overflow-y: auto;
   overflow-x: auto;
   touch-action: auto;
-  max-height: calc(42vh - 42px);
+  max-height: calc(38vh - 42px);
 }
 
 .ostsee-ts-table {
@@ -483,13 +483,6 @@
 
 .ostsee-ts-value + .ostsee-ts-value {
   margin-left: 4px;
-}
-
-.ostsee-ts-gust-prefix {
-  margin-left: 4px;
-  font-size: 0.66rem;
-  font-weight: 700;
-  color: rgba(214, 232, 251, 0.96);
 }
 
 .ostsee-ts-value.weatherlage-bft {
