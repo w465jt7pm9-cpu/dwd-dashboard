@@ -34,7 +34,7 @@ damit ich Kontext, Zeitschritt und Quelle direkt in der Lightbox verfügbar habe
 
 ---
 
-## 🌬️ US-020 – Windy-ähnliche Darstellung von DWD-Seewetter-Zeitreihen
+## 🌬️ US-020 – Kompakte Darstellung von DWD-Seewetter-Zeitreihen
 
 **Status:** DONE  
 **Priorität:** Hoch
@@ -44,7 +44,7 @@ damit ich Kontext, Zeitschritt und Quelle direkt in der Lightbox verfügbar habe
 ### 🧑‍💻 Beschreibung
 
 Als Nutzer  
-möchte ich die DWD-Seewettervorhersagen für Nord- und Ostsee in einer kompakten, Windy-ähnlichen Tabellen- bzw. Meteogramm-Darstellung sehen  
+möchte ich die DWD-Seewettervorhersagen für Nord- und Ostsee in einer kompakten, leicht lesbaren Tabellen- bzw. Zeitreihen-Darstellung sehen  
 damit ich Wind, Böen, Seegang und Wetterentwicklung über mehrere Tage schnell erfassen kann, ohne die langen Rohtexte der DWD-Seewetterberichte lesen zu müssen
 
 ---
@@ -53,7 +53,7 @@ damit ich Wind, Böen, Seegang und Wetterentwicklung über mehrere Tage schnell 
 
 - Zeitachse verläuft horizontal von links nach rechts
 - Seegebiete werden untereinander in klaren Zeilen dargestellt
-- Kompakte Meteogramm-/Tabellenoptik angelehnt an Windy oder PredictWind
+- Kompakte, übersichtliche Tabellen- bzw. Zeitreihenansicht
 - Windrichtung als meteorologische Herkunftsrichtung visualisiert
 - Wellenhöhe numerisch in Metern
 - Wetterereignisse als Kürzel oder Symbol
@@ -158,7 +158,7 @@ Hinweis:
 
 ### 📈 Nutzen
 
-Der Anwender erhält eine kompakte, nautisch nutzbare Übersicht, die die Lesbarkeit eines Windy-Meteogramms mit der fachlichen Qualität der vom DWD bereitgestellten Seewettervorhersagen kombiniert.
+Der Anwender erhält eine kompakte, nautisch nutzbare Übersicht, die eine schnelle Lesbarkeit mit der fachlichen Qualität der vom DWD bereitgestellten Seewettervorhersagen kombiniert.
 
 ---
 
