@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dwd-dashboard-release-1.2'
+const CACHE_VERSION = 'dwd-dashboard-release-1.3'
 
 const APP_SHELL_ASSETS = [
   './',
