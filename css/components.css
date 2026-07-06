@@ -479,12 +479,16 @@
 
 @media (max-width: 767px) and (orientation: landscape) {
   .lightbox-weatherlage.ostsee-timeseries {
-    max-height: 72vh;
+    max-height: 92vh;
     font-size: 0.72rem;
   }
 
+  .lightbox-weatherlage.ostsee-timeseries.is-collapsed {
+    max-height: 46px;
+  }
+
   .ostsee-ts-wrap {
-    max-height: calc(72vh - 42px);
+    max-height: calc(92vh - 42px);
   }
 
   .ostsee-ts-table {
@@ -553,6 +557,13 @@
 .ostsee-ts-dir {
   min-width: 22px;
   letter-spacing: -0.02em;
+}
+
+.ostsee-ts-table th[scope='row'] {
+  font-size: 0.82rem;
+  line-height: 1;
+  color: rgba(255, 248, 220, 0.98);
+  text-shadow: 0 0 6px rgba(255, 182, 64, 0.3);
 }
 
 .ostsee-ts-value {
