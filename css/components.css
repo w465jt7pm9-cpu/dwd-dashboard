@@ -458,13 +458,22 @@
   .lightbox-weatherlage.ostsee-timeseries {
     top: max(10px, calc(env(safe-area-inset-top) + 8px));
     width: min(100vw - 12px, 1460px);
-    max-height: 24vh;
+    max-height: 35vh;
     padding: 8px;
-    font-size: 0.7rem;
+    font-size: 0.76rem;
   }
 
   .lightbox-weatherlage.ostsee-timeseries.is-collapsed {
     max-height: 46px;
+  }
+
+  .ostsee-ts-wrap {
+    max-height: calc(35vh - 42px);
+  }
+
+  .ostsee-ts-table {
+    font-size: 0.74rem;
+    min-width: 680px;
   }
 }
 
