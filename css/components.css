@@ -429,6 +429,16 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-height: 0;
+}
+
+.ostsee-ts-content {
+  display: block;
+  overflow: hidden;
+}
+
+.ostsee-ts-shell.is-collapsed .ostsee-ts-content {
+  display: none;
 }
 
 .ostsee-ts-toggle {

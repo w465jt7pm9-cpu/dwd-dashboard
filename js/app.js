@@ -1112,6 +1112,28 @@ document.addEventListener('DOMContentLoaded', () => {
     )}</span>\n\n${renderedLines}`
   }
 
+  function setOstseeTimeseriesToggleState (isCollapsed) {
+    const shellElement =
+      lightboxWeatherlageElement?.querySelector('.ostsee-ts-shell')
+    const toggleButton = shellElement?.querySelector('.ostsee-ts-toggle')
+
+    if (!shellElement) {
+      return false
+    }
+
+    shellElement.classList.toggle('is-collapsed', isCollapsed)
+    lightboxWeatherlageElement?.classList.toggle('is-collapsed', isCollapsed)
+
+    if (toggleButton) {
+      toggleButton.setAttribute('aria-expanded', String(!isCollapsed))
+      toggleButton.textContent = isCollapsed
+        ? 'Zeitreihe öffnen'
+        : 'Zeitreihe schließen'
+    }
+
+    return isCollapsed
+  }
+
   function renderWetterlageOverlay (
     message,
     { visible = false, useRawMarkup = false, mode = 'default' } = {}
@@ -1135,29 +1157,27 @@ document.addEventListener('DOMContentLoaded', () => {
       'ostsee-timeseries',
       isOstseeTimeseries
     )
-    lightboxWeatherlageElement.classList.toggle(
-      'is-collapsed',
-      shouldStartCollapsed
-    )
 
     const renderedContent = useRawMarkup
       ? message || ''
       : buildWetterlageOverlayMarkup(message || '')
 
     lightboxWeatherlageElement.innerHTML = isOstseeTimeseries
-      ? `<div class="ostsee-ts-shell${
-          shouldStartCollapsed ? ' is-collapsed' : ''
-        }">
+      ? `<div class="ostsee-ts-shell">
           <button
             class="ostsee-ts-toggle"
             type="button"
-            aria-expanded="${String(!shouldStartCollapsed)}"
-          >${
-            shouldStartCollapsed ? 'Zeitreihe öffnen' : 'Zeitreihe schließen'
-          }</button>
+            aria-expanded="true"
+          >Zeitreihe schließen</button>
           <div class="ostsee-ts-content">${renderedContent}</div>
         </div>`
       : renderedContent
+
+    if (isOstseeTimeseries) {
+      setOstseeTimeseriesToggleState(shouldStartCollapsed)
+    } else {
+      lightboxWeatherlageElement.classList.remove('is-collapsed')
+    }
 
     lightboxWeatherlageElement.classList.remove('is-hidden')
   }
@@ -2384,12 +2404,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (toggleButton) {
       event.stopPropagation()
       const shellElement = toggleButton.closest('.ostsee-ts-shell')
-      const isCollapsed = shellElement?.classList.toggle('is-collapsed')
-      lightboxWeatherlageElement.classList.toggle('is-collapsed', isCollapsed)
-      toggleButton.setAttribute('aria-expanded', String(!isCollapsed))
-      toggleButton.textContent = isCollapsed
-        ? 'Zeitreihe öffnen'
-        : 'Zeitreihe schließen'
+      const isCollapsed = shellElement
+        ? !shellElement.classList.contains('is-collapsed')
+        : false
+      setOstseeTimeseriesToggleState(isCollapsed)
       return
     }
 
