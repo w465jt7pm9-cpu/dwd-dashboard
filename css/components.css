@@ -468,12 +468,28 @@
   }
 
   .ostsee-ts-wrap {
-    max-height: calc(35vh - 42px);
+    max-height: calc(48vh - 42px);
   }
 
   .ostsee-ts-table {
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     min-width: 680px;
+  }
+}
+
+@media (max-width: 767px) and (orientation: landscape) {
+  .lightbox-weatherlage.ostsee-timeseries {
+    max-height: 72vh;
+    font-size: 0.72rem;
+  }
+
+  .ostsee-ts-wrap {
+    max-height: calc(72vh - 42px);
+  }
+
+  .ostsee-ts-table {
+    font-size: 0.68rem;
+    min-width: 720px;
   }
 }
 
