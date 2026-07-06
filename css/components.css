@@ -456,9 +456,9 @@
 
 @media (max-width: 767px) {
   .lightbox-weatherlage.ostsee-timeseries {
-    top: max(8px, calc(env(safe-area-inset-top) + 8px));
+    top: max(6px, calc(env(safe-area-inset-top) + 6px));
     width: min(100vw - 12px, 1460px);
-    max-height: min(88dvh, 88vh);
+    max-height: min(75dvh, 75vh);
     padding: 10px;
     font-size: 0.76rem;
   }
@@ -468,7 +468,7 @@
   }
 
   .ostsee-ts-wrap {
-    max-height: calc(min(88dvh, 88vh) - 42px);
+    max-height: calc(min(75dvh, 75vh) - 42px);
   }
 
   .ostsee-ts-table {
