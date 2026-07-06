@@ -899,9 +899,9 @@ document.addEventListener('DOMContentLoaded', () => {
           )}<span class="ostsee-ts-meta">${escapeHtml(
             areaMeta
           )}</span></th></tr>`,
-          `<tr><th scope="row">Wind</th>${windCells}</tr>`,
-          `<tr><th scope="row">Welle</th>${waveCells}</tr>`,
-          `<tr><th scope="row">Wetter</th>${weatherCells}</tr>`
+          `<tr><th scope="row">⇢</th>${windCells}</tr>`,
+          `<tr><th scope="row">≈</th>${waveCells}</tr>`,
+          `<tr><th scope="row">☀</th>${weatherCells}</tr>`
         ].join('')
       })
       .join('')
@@ -914,7 +914,7 @@ document.addEventListener('DOMContentLoaded', () => {
       )}</span>`,
       '<div class="ostsee-ts-wrap">',
       '<table class="ostsee-ts-table">',
-      `<thead><tr><th scope="col">Gebiet</th>${tableHeaderMarkup}</tr></thead>`,
+      `<thead><tr><th scope="col"></th>${tableHeaderMarkup}</tr></thead>`,
       `<tbody>${tableBodyMarkup}</tbody>`,
       '</table>',
       '</div>'
