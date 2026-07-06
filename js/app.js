@@ -1123,18 +1123,44 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!visible) {
       lightboxWeatherlageElement.classList.add('is-hidden')
       lightboxWeatherlageElement.classList.remove('ostsee-timeseries')
+      lightboxWeatherlageElement.classList.remove('is-collapsed')
       lightboxWeatherlageElement.textContent = ''
       return
     }
 
+    const isOstseeTimeseries = mode === 'ostsee-timeseries'
+    const shouldStartCollapsed =
+      isOstseeTimeseries && window.matchMedia('(max-width: 767px)').matches
+
     lightboxWeatherlageElement.classList.toggle(
       'ostsee-timeseries',
-      mode === 'ostsee-timeseries'
+      isOstseeTimeseries
+    )
+    lightboxWeatherlageElement.classList.toggle(
+      'is-collapsed',
+      shouldStartCollapsed
     )
 
-    lightboxWeatherlageElement.innerHTML = useRawMarkup
+    const renderedContent = useRawMarkup
       ? message || ''
       : buildWetterlageOverlayMarkup(message || '')
+
+    lightboxWeatherlageElement.innerHTML = isOstseeTimeseries
+      ? `<div class="ostsee-ts-shell${
+          shouldStartCollapsed ? ' is-collapsed' : ''
+        }">
+          <button
+            class="ostsee-ts-toggle"
+            type="button"
+            aria-expanded="${String(!shouldStartCollapsed)}"
+          >${
+            shouldStartCollapsed ? 'Zeitreihe öffnen' : 'Zeitreihe schließen'
+          }</button>
+          <div class="ostsee-ts-summary">DWD Ostsee-Zeitreihe</div>
+          <div class="ostsee-ts-content">${renderedContent}</div>
+        </div>`
+      : renderedContent
+
     lightboxWeatherlageElement.classList.remove('is-hidden')
   }
 
@@ -2356,6 +2382,19 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   lightboxWeatherlageElement?.addEventListener('click', event => {
+    const toggleButton = event.target.closest('.ostsee-ts-toggle')
+    if (toggleButton) {
+      event.stopPropagation()
+      const shellElement = toggleButton.closest('.ostsee-ts-shell')
+      const isCollapsed = shellElement?.classList.toggle('is-collapsed')
+      lightboxWeatherlageElement.classList.toggle('is-collapsed', isCollapsed)
+      toggleButton.setAttribute('aria-expanded', String(!isCollapsed))
+      toggleButton.textContent = isCollapsed
+        ? 'Zeitreihe öffnen'
+        : 'Zeitreihe schließen'
+      return
+    }
+
     event.stopPropagation()
   })
 

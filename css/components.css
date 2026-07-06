@@ -415,6 +415,59 @@
   overflow: hidden;
 }
 
+.lightbox-weatherlage.ostsee-timeseries.is-collapsed {
+  max-height: 52px;
+  padding-bottom: 10px;
+}
+
+.lightbox-weatherlage.ostsee-timeseries.is-collapsed .ostsee-ts-content,
+.ostsee-ts-shell.is-collapsed .ostsee-ts-content {
+  display: none;
+}
+
+.ostsee-ts-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ostsee-ts-toggle {
+  align-self: flex-start;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(8, 16, 28, 0.8);
+  color: rgba(244, 248, 255, 0.96);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.ostsee-ts-toggle:hover,
+.ostsee-ts-toggle:focus-visible {
+  background: rgba(24, 44, 72, 0.95);
+}
+
+.ostsee-ts-summary {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: rgba(214, 228, 255, 0.96);
+}
+
+@media (max-width: 767px) {
+  .lightbox-weatherlage.ostsee-timeseries {
+    top: max(10px, calc(env(safe-area-inset-top) + 8px));
+    width: min(100vw - 12px, 1460px);
+    max-height: 24vh;
+    padding: 8px;
+    font-size: 0.7rem;
+  }
+
+  .lightbox-weatherlage.ostsee-timeseries.is-collapsed {
+    max-height: 46px;
+  }
+}
+
 .ostsee-ts-wrap {
   overflow-y: auto;
   overflow-x: auto;
