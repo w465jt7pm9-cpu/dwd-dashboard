@@ -406,13 +406,16 @@
 
 .lightbox-weatherlage.ostsee-timeseries {
   top: max(56px, calc(env(safe-area-inset-top) + 12px));
-  bottom: auto;
+  bottom: max(12px, calc(env(safe-area-inset-bottom) + 12px));
   width: min(99vw, 1460px);
-  max-height: 38vh;
+  max-height: min(72dvh, 72vh);
   padding: 8px 10px;
   font-size: 0.74rem;
   line-height: 1.22;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .lightbox-weatherlage.ostsee-timeseries.is-collapsed {
@@ -430,10 +433,14 @@
   flex-direction: column;
   gap: 6px;
   min-height: 0;
+  flex: 1 1 auto;
 }
 
 .ostsee-ts-content {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -467,9 +474,9 @@
 @media (max-width: 767px) {
   .lightbox-weatherlage.ostsee-timeseries {
     top: max(6px, calc(env(safe-area-inset-top) + 6px));
+    bottom: max(8px, calc(env(safe-area-inset-bottom) + 8px));
     width: min(100vw - 12px, 1460px);
-    height: min(75dvh, 75vh);
-    max-height: min(75dvh, 75vh);
+    max-height: min(80dvh, 80vh);
     padding: 10px;
     font-size: 0.76rem;
   }
@@ -479,8 +486,9 @@
   }
 
   .ostsee-ts-wrap {
-    height: calc(min(75dvh, 75vh) - 42px);
-    max-height: calc(min(75dvh, 75vh) - 42px);
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
   }
 
   .ostsee-ts-table {
@@ -513,7 +521,9 @@
   overflow-y: auto;
   overflow-x: auto;
   touch-action: auto;
-  max-height: calc(38vh - 42px);
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
 }
 
 .ostsee-ts-table {
