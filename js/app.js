@@ -1156,7 +1156,6 @@ document.addEventListener('DOMContentLoaded', () => {
           >${
             shouldStartCollapsed ? 'Zeitreihe öffnen' : 'Zeitreihe schließen'
           }</button>
-          <div class="ostsee-ts-summary">DWD Ostsee-Zeitreihe</div>
           <div class="ostsee-ts-content">${renderedContent}</div>
         </div>`
       : renderedContent
