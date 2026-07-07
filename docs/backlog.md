@@ -10,7 +10,7 @@
 
 ---
 
-## 🧭 US-021 – Inhaltsfenster in gezoomter Seegang-Ostsee-Lightbox
+## 🧭 US-021 – Kompaktes Inhaltsfenster in der gezoomten Seegang-Ostsee-Lightbox
 
 **Status:** DONE  
 **Priorität:** Mittel
@@ -20,17 +20,32 @@
 ### 🧑‍💻 Beschreibung
 
 Als Nutzer  
-möchte ich in der gezoomten Ansicht jeder Seegang-Ostsee-Karte ein kompaktes Inhaltsfenster sehen  
-damit ich Kontext, Zeitschritt und Quelle direkt in der Lightbox verfügbar habe
+möchte ich in der gezoomten Lightbox der Seite „Seegang Ostsee“ pro aktuell geöffneter Karte ein kompaktes Inhaltsfenster sehen  
+damit ich Zeitbezug, Kontext und die kompakte Ostsee-Zeitreihen-Übersicht direkt in der Lightbox zur Verfügung habe, ohne dass die eigentliche Bildansicht überladen wirkt
+
+---
+
+### 🎯 Zielbild
+
+- Das Inhaltsfenster wird nur in der Ostsee-Lightbox eingeblendet und bleibt auf diese Seite begrenzt
+- Es erscheint als optisch abgesetztes Overlay im Lightbox-Fenster und nimmt dabei nur einen begrenzten Teil der Höhe ein
+- Es zeigt die kompakte Zeitreihen-Ansicht mit Wind, Böen, Welle und Wetter für die aktuelle Karte
+- Der Inhalt kann bei Bedarf zusammengeklappt werden, ohne die Zoom-/Pan-/Swipe-Interaktion zu beeinträchtigen
 
 ---
 
 ### ✅ Akzeptanzkriterien
 
-- [x] In der Lightbox wird auf allen Bildern der Seite „Seegang Ostsee" ein Inhaltsfenster eingeblendet
-- [x] Das Fenster zeigt je Karte einen klaren Zeitbezug (+00/+24/+48/+72)
-- [x] Das Fenster bleibt auf andere Seiten begrenzt und beeinflusst deren Lightbox-Inhalte nicht
-- [x] Die bestehende Zoom-/Pan-/Swipe-Interaktion bleibt unverändert stabil
+- [x] In der Lightbox der Seite „Seegang Ostsee“ wird pro Karte ein kompaktes Inhaltsfenster eingeblendet
+- [x] Das Fenster zeigt einen klaren zeitlichen Bezug zu der jeweiligen Vorhersage bzw. dem jeweiligen Bild
+- [x] Das Fenster bleibt auf die Ostsee-Lightbox begrenzt und beeinflusst andere Seiten nicht
+- [x] Die bestehende Zoom-/Pan-/Swipe-Interaktion bleibt stabil
+- [x] Die Darstellung ist als kompakte, scrollbare Zeitreihen-Ansicht umgesetzt und kann bei Bedarf zusammengeklappt werden
+
+### 💡 Ergänzung zur Abgrenzung
+
+- Die eigentliche Zeitreihen-Darstellung ist bereits in US-020 beschrieben; US-021 fokussiert auf die Platzierung, den Kontext und die Integration des Fensters in die Lightbox
+- Eine zusätzliche US-022 wäre derzeit nur dann sinnvoll, wenn künftig weitere Interaktionsstufen geplant sind, etwa Filter, Auswahl weiterer Zeiträume oder separate Datenquellen
 
 ---
 
