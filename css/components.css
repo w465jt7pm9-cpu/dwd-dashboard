@@ -408,7 +408,7 @@
   top: max(56px, calc(env(safe-area-inset-top) + 12px));
   bottom: max(12px, calc(env(safe-area-inset-bottom) + 12px));
   width: min(99vw, 1460px);
-  max-height: min(72dvh, 72vh);
+  max-height: min(33dvh, 33vh);
   padding: 8px 10px;
   font-size: 0.74rem;
   line-height: 1.22;
@@ -476,7 +476,7 @@
     top: max(6px, calc(env(safe-area-inset-top) + 6px));
     bottom: max(8px, calc(env(safe-area-inset-bottom) + 8px));
     width: min(100vw - 12px, 1460px);
-    max-height: min(80dvh, 80vh);
+    max-height: min(50dvh, 50vh);
     padding: 10px;
     font-size: 0.76rem;
   }
@@ -499,7 +499,7 @@
 
 @media (max-width: 767px) and (orientation: landscape) {
   .lightbox-weatherlage.ostsee-timeseries {
-    max-height: min(82dvh, 82vh);
+    max-height: min(50dvh, 50vh);
     font-size: 0.72rem;
   }
 

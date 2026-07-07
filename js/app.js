@@ -1151,7 +1151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const isOstseeTimeseries = mode === 'ostsee-timeseries'
-    const shouldStartCollapsed = false
+    const shouldStartCollapsed = true
 
     lightboxWeatherlageElement.classList.toggle(
       'ostsee-timeseries',
