@@ -848,10 +848,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return '💧'
     }
 
-    if (hasAnyCode(['FOG', 'MIST', 'BR'])) {
-      return '🌫'
-    }
-
     return normalizedCode
   }
 
@@ -859,8 +855,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const normalizedCode = String(weatherCode || '')
       .toUpperCase()
       .trim()
+
     if (/\bTS\b|THUNDER|TSTORM/.test(normalizedCode)) {
       return '<span class="ostsee-ts-weather ostsee-ts-weather--thunderstorm" title="Gewitterwarnung" aria-label="Gewitterwarnung">⛈⚠</span>'
+    }
+
+    if (/\bFOG\b/.test(normalizedCode)) {
+      return '<span class="ostsee-ts-weather ostsee-ts-weather--thunderstorm" title="Nebel" aria-label="Nebel">☰⚠</span>'
+    }
+
+    if (/\bMIST\b|\bBR\b/.test(normalizedCode)) {
+      return '<span class="ostsee-ts-weather ostsee-ts-weather--thunderstorm" title="Dunst / Leichter Nebel" aria-label="Dunst / Leichter Nebel">⚌⚠</span>'
     }
 
     return `<span class="ostsee-ts-weather">${escapeHtml(

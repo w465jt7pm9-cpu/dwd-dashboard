@@ -122,11 +122,13 @@ Hinweis:
 
 **Wetterkürzel / Symbole**
 
-| DWD  | Anzeige |
-| ---- | ------- |
-| RAIN | 🌧       |
-| SH   | 🌦       |
-| TS   | ⛈       |
+| DWD       | Anzeige                          |
+| --------- | -------------------------------- |
+| RAIN      | 🌧                                |
+| SH        | 🌦                                |
+| TS        | ⛈⚠ (roter Warnbadge)            |
+| FOG       | ☰⚠ (3 Striche, U+2630)          |
+| MIST / BR | ⚌⚠ (2 Striche, U+268C)          |
 
 ---
 
