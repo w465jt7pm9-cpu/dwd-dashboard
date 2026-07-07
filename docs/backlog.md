@@ -177,6 +177,55 @@ Der Anwender erhält eine kompakte, nautisch nutzbare Übersicht, die eine schne
 
 ---
 
+## 🧭 US-022 – Kompakte Nordsee-Zeitreihe in der Seegang-Nordsee-Lightbox
+
+**Status:** BACKLOG  
+**Priorität:** Mittel
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer  
+möchte ich in der gezoomten Lightbox der Seite „Seegang Nordsee“ eine kompakte Zeitreihen-Ansicht der DWD-Seewettervorhersage Nordsee sehen  
+damit ich Wind, Böen, Seegang und Wetterentwicklung auch für die Nordsee schnell erfassen kann, ohne die langen Rohtexte der DWD-Seewetterberichte lesen zu müssen
+
+---
+
+### 🎯 Zielbild
+
+- Die Nordsee-Zeitreihe wird direkt in der Nordsee-Lightbox als kompaktes Overlay dargestellt
+- Die Zeitachse verläuft horizontal von links nach rechts
+- Die Darstellung zeigt mehrere Seegebiete der Nordsee in klaren Zeilen an
+- Wind, Böen, Wellenhöhe und Wetter werden in einer kompakten, leicht lesbaren Tabelle angezeigt
+- Die Darstellung bleibt auf die Nordsee-Lightbox begrenzt und beeinflusst andere Seiten nicht
+
+---
+
+### 🗂️ Datenquelle
+
+- DWD „Seewettervorhersagen Nordsee“
+- URL: https://www.dwd.de/DE/leistungen/seevorhersagenordsee/seevorhersagennordsee.html?nn=16102
+
+---
+
+### ✅ Akzeptanzkriterien
+
+- [ ] In der Lightbox der Seite „Seegang Nordsee“ wird pro Karte ein kompaktes Inhaltsfenster eingeblendet
+- [ ] Die Darstellung zeigt die Vorhersagezeitpunkte horizontal von links nach rechts an
+- [ ] Die enthaltenen Seegebiete der Nordsee-Vorhersage werden in separaten Zeilen dargestellt
+- [ ] Wind und Böen werden kombiniert als Richtung + Beaufort-Wert dargestellt
+- [ ] Wellenhöhe wird in Metern angezeigt
+- [ ] Wetterereignisse werden als Kürzel oder Symbol dargestellt
+- [ ] Die bestehende Zoom-/Pan-/Swipe-Interaktion bleibt stabil
+- [ ] Die Darstellung bleibt auf die Nordsee-Lightbox begrenzt und beeinflusst andere Seiten nicht
+
+### 💡 Optionales Feature
+
+- Ein Collapse-/Expand-Button analog zur Ostsee-Zeitreihe, damit die Lightbox bei Bedarf kompakter bleibt
+
+---
+
 ## 🧭 US-019 – Seewettertext vorab online cachen
 
 **Status:** DONE  

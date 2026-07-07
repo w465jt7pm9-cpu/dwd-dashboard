@@ -53,12 +53,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const WETTERLAGE_UPDATED_AT_CACHE_KEY = 'dwdWetterlageUpdatedAt'
   const OSTSEE_TS_CACHE_KEY = 'dwdOstseeTimeseriesCache'
   const OSTSEE_TS_UPDATED_AT_CACHE_KEY = 'dwdOstseeTimeseriesUpdatedAt'
+  const NORDSEE_TS_CACHE_KEY = 'dwdNordseeTimeseriesCache'
+  const NORDSEE_TS_UPDATED_AT_CACHE_KEY = 'dwdNordseeTimeseriesUpdatedAt'
   const DWD_SEEWETTERBERICHT_URL =
     'https://www.dwd.de/DE/leistungen/seewetternordostsee/seewetternordostsee.html'
   const DWD_MARITIME_FORECAST_URL =
     'https://opendata.dwd.de/weather/maritime/forecast/german/FQEN50_EDZW_LATEST'
   const DWD_OSTSEE_3DAY_URL =
     'https://www.dwd.de/DE/leistungen/seevorhersageostsee/seevorhersagenostsee.html?nn=16102'
+  const DWD_NORDSEE_3DAY_URL =
+    'https://www.dwd.de/DE/leistungen/seevorhersagenordsee/seevorhersagennordsee.html?nn=16102'
   const OSTSEE_TS_CACHE_TTL_MS = 3 * 60 * 60 * 1000
   const LAST_KNOWN_IMAGE_URL_KEY_PREFIX = 'dwdImageLastKnownUrl:'
   const THEME_STORAGE_KEY = 'dwdTheme'
@@ -245,9 +249,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function getCachedOstseeTimeseriesPayload () {
+  function getCachedSeaTimeseriesPayload (regionKey) {
+    const cacheKey =
+      regionKey === 'nordsee' ? NORDSEE_TS_CACHE_KEY : OSTSEE_TS_CACHE_KEY
+
     try {
-      const serializedPayload = localStorage.getItem(OSTSEE_TS_CACHE_KEY)
+      const serializedPayload = localStorage.getItem(cacheKey)
       if (!serializedPayload) {
         return null
       }
@@ -258,11 +265,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function getCachedOstseeTimeseriesUpdatedAt () {
+  function getCachedSeaTimeseriesUpdatedAt (regionKey) {
+    const updatedAtCacheKey =
+      regionKey === 'nordsee'
+        ? NORDSEE_TS_UPDATED_AT_CACHE_KEY
+        : OSTSEE_TS_UPDATED_AT_CACHE_KEY
+
     try {
-      const updatedAt = Number(
-        localStorage.getItem(OSTSEE_TS_UPDATED_AT_CACHE_KEY)
-      )
+      const updatedAt = Number(localStorage.getItem(updatedAtCacheKey))
       if (!Number.isFinite(updatedAt)) {
         return null
       }
@@ -273,11 +283,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function setCachedOstseeTimeseriesPayload (payload) {
+  function setCachedSeaTimeseriesPayload (regionKey, payload) {
+    const cacheKey =
+      regionKey === 'nordsee' ? NORDSEE_TS_CACHE_KEY : OSTSEE_TS_CACHE_KEY
+    const updatedAtCacheKey =
+      regionKey === 'nordsee'
+        ? NORDSEE_TS_UPDATED_AT_CACHE_KEY
+        : OSTSEE_TS_UPDATED_AT_CACHE_KEY
+
     try {
-      localStorage.setItem(OSTSEE_TS_CACHE_KEY, JSON.stringify(payload))
+      localStorage.setItem(cacheKey, JSON.stringify(payload))
       localStorage.setItem(
-        OSTSEE_TS_UPDATED_AT_CACHE_KEY,
+        updatedAtCacheKey,
         String(payload.updatedAt || Date.now())
       )
     } catch {
@@ -485,11 +502,41 @@ document.addEventListener('DOMContentLoaded', () => {
     return Number(pageElement.dataset.page)
   }
 
-  function isOstseeSeegangImageElement (imageElement) {
-    return (
-      imageElement?.dataset?.base === 'WX_SEE' &&
-      getImagePageIndex(imageElement) === OSTSEE_PAGE_INDEX
-    )
+  function getSeaTimeseriesConfigForPageIndex (pageIndex) {
+    if (pageIndex === NORDSEE_PAGE_INDEX) {
+      return {
+        key: 'nordsee',
+        label: 'Nordsee',
+        pageIndex: NORDSEE_PAGE_INDEX,
+        sourceUrl: DWD_NORDSEE_3DAY_URL,
+        loadingLabel: 'Nordsee-Zeitreihe wird geladen ...',
+        offlineLabel:
+          'Offline: Keine gespeicherte Nordsee-Zeitreihe verfügbar.',
+        unavailableLabel: 'Nordsee-Zeitreihe derzeit nicht verfügbar.'
+      }
+    }
+
+    if (pageIndex === OSTSEE_PAGE_INDEX) {
+      return {
+        key: 'ostsee',
+        label: 'Ostsee',
+        pageIndex: OSTSEE_PAGE_INDEX,
+        sourceUrl: DWD_OSTSEE_3DAY_URL,
+        loadingLabel: 'Ostsee-Zeitreihe wird geladen ...',
+        offlineLabel: 'Offline: Keine gespeicherte Ostsee-Zeitreihe verfügbar.',
+        unavailableLabel: 'Ostsee-Zeitreihe derzeit nicht verfügbar.'
+      }
+    }
+
+    return null
+  }
+
+  function getSeaTimeseriesConfigForImageElement (imageElement) {
+    return getSeaTimeseriesConfigForPageIndex(getImagePageIndex(imageElement))
+  }
+
+  function isSeaTimeseriesImageElement (imageElement) {
+    return Boolean(getSeaTimeseriesConfigForImageElement(imageElement))
   }
 
   function getCurrentLightboxImageElement () {
@@ -525,7 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .trim()
   }
 
-  function extractOstseeAreaHeader (headerText) {
+  function extractSeaTimeseriesAreaHeader (headerText) {
     const normalizedHeader = normalizeInlineText(headerText)
     const headerMatch = normalizedHeader.match(
       /^(.*?)\s*\(([^)]+)\)\s*WT:\s*([^\s]+\s*[CF]?)/i
@@ -541,9 +588,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function parseOstseeTimeseriesFromHtml (rawHtml) {
+  function parseSeaTimeseriesFromHtml (rawHtml, regionLabel = 'Ostsee') {
     if (!rawHtml) {
-      throw new Error('Leere Ostsee-Zeitreihenquelle')
+      throw new Error(`Leere ${regionLabel}-Zeitreihenquelle`)
     }
 
     const parsedDocument = new DOMParser().parseFromString(rawHtml, 'text/html')
@@ -572,7 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (cellElements.length === 1) {
-          const areaHeader = extractOstseeAreaHeader(
+          const areaHeader = extractSeaTimeseriesAreaHeader(
             cellElements[0].textContent
           )
           if (areaHeader?.areaName) {
@@ -621,7 +668,9 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     if (!allAreas.length) {
-      throw new Error('Keine Ostsee-Zeitreihen im DWD-Quellformat gefunden')
+      throw new Error(
+        `Keine ${regionLabel}-Zeitreihen im DWD-Quellformat gefunden`
+      )
     }
 
     const slots = Array.from(slotOrderMap.entries())
@@ -637,20 +686,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function fetchOstseeTimeseriesPayload () {
-    const response = await fetch(DWD_OSTSEE_3DAY_URL, {
+  async function fetchSeaTimeseriesPayload (config) {
+    const response = await fetch(config.sourceUrl, {
       cache: 'no-cache'
     })
     if (!response.ok) {
-      throw new Error('Ostsee-Zeitreihe nicht erreichbar')
+      throw new Error(`${config.label}-Zeitreihe nicht erreichbar`)
     }
 
     const htmlText = await response.text()
-    const parsedTimeseries = parseOstseeTimeseriesFromHtml(htmlText)
+    const parsedTimeseries = parseSeaTimeseriesFromHtml(htmlText, config.label)
 
     return {
       ...parsedTimeseries,
-      sourceUrl: DWD_OSTSEE_3DAY_URL,
+      sourceUrl: config.sourceUrl,
       updatedAt: Date.now()
     }
   }
@@ -819,7 +868,10 @@ document.addEventListener('DOMContentLoaded', () => {
     )}</span>`
   }
 
-  function buildOstseeTimeseriesOverlayMarkup (payload) {
+  function buildSeaTimeseriesOverlayMarkup (
+    payload,
+    { regionLabel = 'Ostsee' } = {}
+  ) {
     const slots = Array.isArray(payload?.slots) ? payload.slots : []
     const areas = Array.isArray(payload?.areas) ? payload.areas : []
     if (!slots.length || !areas.length) {
@@ -909,9 +961,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const updatedLabel = formatTimestamp(payload.updatedAt)
 
     return [
-      `<span class="weatherlage-stand">DWD Ostsee Zeitreihe · Stand ${escapeHtml(
-        updatedLabel
-      )}</span>`,
+      `<span class="weatherlage-stand">DWD ${escapeHtml(
+        regionLabel
+      )} Zeitreihe · Stand ${escapeHtml(updatedLabel)}</span>`,
       '<div class="ostsee-ts-wrap">',
       '<table class="ostsee-ts-table">',
       `<thead><tr><th scope="col"></th>${tableHeaderMarkup}</tr></thead>`,
@@ -921,9 +973,9 @@ document.addEventListener('DOMContentLoaded', () => {
     ].join('')
   }
 
-  async function ensureOstseeTimeseriesOverlayContent () {
-    const cachedPayload = getCachedOstseeTimeseriesPayload()
-    const cachedUpdatedAt = getCachedOstseeTimeseriesUpdatedAt()
+  async function ensureSeaTimeseriesOverlayContent (config) {
+    const cachedPayload = getCachedSeaTimeseriesPayload(config.key)
+    const cachedUpdatedAt = getCachedSeaTimeseriesUpdatedAt(config.key)
     const isCacheFresh =
       cachedPayload &&
       cachedUpdatedAt &&
@@ -931,7 +983,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (cachedPayload) {
       renderWetterlageOverlay(
-        buildOstseeTimeseriesOverlayMarkup(cachedPayload),
+        buildSeaTimeseriesOverlayMarkup(cachedPayload, {
+          regionLabel: config.label
+        }),
         {
           visible: true,
           useRawMarkup: true,
@@ -939,7 +993,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       )
     } else {
-      renderWetterlageOverlay('Ostsee-Zeitreihe wird geladen ...', {
+      renderWetterlageOverlay(config.loadingLabel, {
         visible: true,
         mode: 'ostsee-timeseries'
       })
@@ -947,32 +1001,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!navigator.onLine || isCacheFresh) {
       if (!cachedPayload && !navigator.onLine) {
-        renderWetterlageOverlay(
-          'Offline: Keine gespeicherte Ostsee-Zeitreihe verfügbar.',
-          {
-            visible: true,
-            mode: 'ostsee-timeseries'
-          }
-        )
+        renderWetterlageOverlay(config.offlineLabel, {
+          visible: true,
+          mode: 'ostsee-timeseries'
+        })
       }
       return
     }
 
     try {
-      const freshPayload = await fetchOstseeTimeseriesPayload()
-      setCachedOstseeTimeseriesPayload(freshPayload)
+      const freshPayload = await fetchSeaTimeseriesPayload(config)
+      setCachedSeaTimeseriesPayload(config.key, freshPayload)
 
       if (!isLightboxOpen) {
         return
       }
 
       const currentImageElement = getCurrentLightboxImageElement()
-      if (!isOstseeSeegangImageElement(currentImageElement)) {
+      const activeConfig =
+        getSeaTimeseriesConfigForImageElement(currentImageElement)
+      if (!activeConfig || activeConfig.key !== config.key) {
         return
       }
 
       renderWetterlageOverlay(
-        buildOstseeTimeseriesOverlayMarkup(freshPayload),
+        buildSeaTimeseriesOverlayMarkup(freshPayload, {
+          regionLabel: config.label
+        }),
         {
           visible: true,
           useRawMarkup: true,
@@ -981,7 +1036,7 @@ document.addEventListener('DOMContentLoaded', () => {
       )
     } catch {
       if (!cachedPayload) {
-        renderWetterlageOverlay('Ostsee-Zeitreihe derzeit nicht verfügbar.', {
+        renderWetterlageOverlay(config.unavailableLabel, {
           visible: true,
           mode: 'ostsee-timeseries'
         })
@@ -1416,9 +1471,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const currentImageElement = getCurrentLightboxImageElement()
+    const seaTimeseriesConfig =
+      getSeaTimeseriesConfigForImageElement(currentImageElement)
 
-    if (isOstseeSeegangImageElement(currentImageElement)) {
-      void ensureOstseeTimeseriesOverlayContent()
+    if (seaTimeseriesConfig) {
+      void ensureSeaTimeseriesOverlayContent(seaTimeseriesConfig)
       return
     }
 
