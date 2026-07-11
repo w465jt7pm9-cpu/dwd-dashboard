@@ -1,42 +1,45 @@
 # DWD Wetter Dashboard
 
-Interaktive Darstellung von DWD-Wetterkarten  
-optimiert für Desktop und Touch-Geräte.
+Das DWD Wetter Dashboard ist eine touch-freundliche Übersicht für Wetterkarten, Seewetterberichte und Seegangsvorhersagen des Deutschen Wetterdienstes.
+Es ist für die Nutzung vor dem Ablegen und unterwegs auf dem Wasser gedacht. Zuletzt geladene Inhalte bleiben auch bei eingeschränkter Verbindung verfügbar.
 
-Release-Stand: 1.3
+## Live-Version
 
-Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
+https://dwd-dashboard.pages.dev
 
-## 🚀 Live
+## Funktionsumfang
 
-👉 https://dwd-dashboard.pages.dev
+- Wetterkarten, Seewetterberichte und Seegangsvorhersagen für Nordsee und Ostsee.
+- Seegangsübersichten mit mehreren Zeitpunkten und Seegebieten.
+- Navigation per Wischen, Tippen, Tastatur und Zoom.
+- Vergrößerte Kartenansicht mit Wechsel zwischen Nachbarkarten.
+- Offline-Nutzung zuletzt geladener Karten und Texte.
+- Automatische Anpassung an den System-Dark-Mode.
 
-## 🧱 Tech Stack
+## Daten und Aktualisierung
+
+Die Inhalte stammen aus Produkten des Deutschen Wetterdienstes und werden ohne fachliche Veränderung für die Anzeige aufbereitet.
+Aktualisierungen orientieren sich an den Veröffentlichungszyklen der verwendeten DWD-Produkte, um unnötige Abrufe zu reduzieren.
+
+## Bedienung
+
+- Seitlich wischen oder Pfeiltasten nutzen, um zwischen Ansichten zu wechseln.
+- Karten antippen oder anklicken, um sie vergrößert zu öffnen.
+- In der vergrößerten Ansicht zoomen und die Karte verschieben.
+
+## Technischer Rahmen
 
 - HTML
-- CSS (modular strukturiert)
+- CSS, modular strukturiert
 - Vanilla JavaScript
-- Cloudflare Pages (Deployment)
+- Service Worker für Cache- und Offline-Unterstützung
+- Deployment über Cloudflare Pages
 
-## 📱 Fokus
+## Projektunterlagen
 
-- stabiles Touch-Verhalten
-- zuverlässige Navigation
-- robuste Lightbox
+- Weitere Architektur-, UI- und Interaktionsdokumente liegen im Ordner `docs/`.
+- User Stories und Umsetzungsstand siehe `docs/backlog.md`.
 
-## ✅ Highlights (Release 1.1)
+## Hinweis
 
-- zyklische Navigation im Carousel (Swipe, Edge-Tap, Tastatur)
-- Lightbox mit Peek-Nachbarn, Zoom, Elastic Pan und Soft Snap-Back
-- Seegangskarten für Nordsee und Ostsee integriert
-- gezoomte Ostsee-Lightbox mit Inhaltsfenster je Karte
-- Windy-aehnliche Ostsee-Zeitreihenansicht (Wind, Boeen, Welle, Wetter)
-- mobile-optimierte Ostsee-Zeitreihenansicht mit optionalem Ein-/Ausklappen auf kleinen Displays
-- globaler Seegang-Datenzyklus (~07/~19 UTC) für alle WX_SEE-Seiten
-- verbesserte Offline-Nutzung mit Cache-Wiederverwendung und Reconnect-Refresh
-- stabiler Offline-Bildstand auch bei Resize/Orientierungswechsel
-
-## 🧭 Hinweise
-
-- Architektur-, UI- und Interaktionsdokumente liegen im Ordner `docs/`
-- User Stories und Umsetzungsstand: `docs/backlog.md`
+Das Dashboard ersetzt keine eigene nautische Beurteilung und keine offiziellen Warnungen.
