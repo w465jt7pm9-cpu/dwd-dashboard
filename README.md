@@ -3,6 +3,8 @@
 Das DWD Wetter Dashboard ist eine touch-freundliche Übersicht für Wetterkarten, Seewetterberichte und Seegangsvorhersagen des Deutschen Wetterdienstes.
 Es ist für die Nutzung vor dem Ablegen und unterwegs auf dem Wasser gedacht. Zuletzt geladene Inhalte bleiben auch bei eingeschränkter Verbindung verfügbar.
 
+## Live-Version
+
 [Live-Dashboard](https://dwd-dashboard.pages.dev)
 
 ## Funktionsumfang
@@ -33,6 +35,10 @@ Aktualisierungen orientieren sich an den Veröffentlichungszyklen der verwendete
 - Service Worker für Cache- und Offline-Unterstützung
 - Deployment über Cloudflare Pages
 
+## Entwicklung
+
+Dieses Projekt wurde mit Unterstützung von KI entwickelt. Die Idee, Konzeption, Priorisierung der Funktionen sowie die fachliche Ausrichtung stammen vom Autor. KI wurde als Werkzeug zur Unterstützung von Entwurf, Implementierung, Dokumentation und Qualitätssicherung eingesetzt. Alle fachlichen und gestalterischen Entscheidungen wurden durch den Autor getroffen.
+
 ## Projektunterlagen
 
 - Weitere Architektur-, UI- und Interaktionsdokumente liegen im Ordner `docs/`.
@@ -41,6 +47,12 @@ Aktualisierungen orientieren sich an den Veröffentlichungszyklen der verwendete
 ## Lizenz
 
 Dieses Projekt steht unter der MIT-Lizenz. Details siehe Datei `LICENSE`.
+
+## Projekt unterstützen
+
+Wenn dir dieses Projekt hilft, kannst du seine Weiterentwicklung über GitHub Sponsors unterstützen.
+
+❤️ Sponsor werden
 
 ## Hinweis
 
