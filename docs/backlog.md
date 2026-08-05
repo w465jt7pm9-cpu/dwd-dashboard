@@ -246,22 +246,20 @@ damit ich Wind, Welle und Wetter im Zusammenhang mit den erwarteten Gezeiten- un
 ### 🎯 Zielbild
 
 - Die bestehende DWD-Nordsee-Zeitreihe wird um einen zusätzlichen Gezeitenindikator erweitert
-- Der Indikator basiert auf einem pragmatischen 28-Tage-Phasenmodell
+- Der Indikator basiert auf astronomischen Mondphasen (Neu-, Voll-, erstes und letztes Viertel)
 - Die Darstellung erfolgt als durchgehender Farbbalken in der zweiten Zeile unter Datum/Uhrzeit
 - Je Zeitstufe wird ein Textmarker angezeigt (Spring, Mitt, Nipp)
 - Der Balken wird pro Zeitstufe (06, 12, 18, 00 UTC) aktualisiert
 
 ---
 
-### 🧭 Phasenmodell (28 Tage)
+### 🧭 Phasenmodell (astronomisch vereinfacht)
 
-- 4 Tage Spring
-- 3 Tage Mitt
-- 4 Tage Nipp
-- 3 Tage Mitt
-- Danach Wiederholung desselben 14-Tage-Blocks (zweites Halbmonat)
+- Springtide-nah bei Neu- und Vollmond
+- Nipptide-nah bei erstem und letztem Viertel
+- Mittzeit als Ubergangsphase zwischen den genannten Mondphasen
 
-Damit ergibt sich ein 28-Tage-Zyklus mit nautisch verständlicher Klassifizierung statt astronomischer Feingranularität.
+Damit ergibt sich eine schnelle nautische Einordnung auf Basis des astronomischen Mondzyklus.
 
 ---
 
@@ -281,12 +279,12 @@ Damit ergibt sich ein 28-Tage-Zyklus mit nautisch verständlicher Klassifizierun
 - [x] Wenn die Zeitreihe dargestellt wird
 - [x] Dann wird oberhalb der Zeitstufen ein Gezeitenbalken angezeigt
 
-**AK2 – 28-Tage-Phasenlogik**
+**AK2 – Astronomische Phasenlogik**
 
 - [x] Gegeben ein Prognosezeitpunkt
 - [x] Wenn die Zeitreihe erzeugt wird
-- [x] Dann wird die Phase bevorzugt aus einem definierten Referenzmuster bestimmt (z. B. August 2026)
-- [x] Und außerhalb definierter Referenzfenster wird die Phase aus dem wiederkehrenden 28-Tage-Modell (4/3/4/3 + 4/3/4/3) abgeleitet
+- [x] Dann wird die Phase aus der aktuellen Mondphase abgeleitet (Neu-/Vollmond sowie erstes/letztes Viertel)
+- [x] Und Ubergangsbereiche werden als Mittzeit klassifiziert
 
 **AK3 – Farbcodierung**
 
@@ -323,27 +321,14 @@ Beispiel:
 
 ---
 
-### 📆 Referenzbeispiel August 2026
-
-Datum	Phase
-- 01-03:	Mitt
-- 04-08:	Nipp
-- 09:	    Mitt
-- 10-14:  Spring
-- 15-17:	Mitt
-- 18-22:	Nipp
-- 23-25:	Mitt
-- 26-30:	Spring
-- 31:	    Mitt
-
 ---
 
 ### 🧪 Technische Notiz
 
-- Für das Dashboard wird bewusst ein pragmatisches, nautisch verständliches 28-Tage-Modell verwendet (statt astronomisch exaktem AdG)
+- Für das Dashboard wird bewusst eine vereinfachte astronomische Ableitung verwendet
 - Ziel ist schnelle Einordnung: springnah, nippnah oder Übergangsphase
-- Für fachlich belegte Referenzfenster kann ein explizites Tages-Phasenmuster hinterlegt werden
-- Außerhalb dieser Referenzfenster wird das Modell zyklisch aus einem definierten Referenzdatum abgeleitet und bleibt dadurch für beliebige Prognosezeiträume nutzbar
+- Grundlage sind die Mondphasen Neu-, Voll-, erstes und letztes Viertel
+- Die Darstellung ist als Orientierungshilfe für die Nordsee ausgelegt und ersetzt keine amtlichen Gezeitenvorausberechnungen des BSH
 
 ---
 
@@ -351,10 +336,10 @@ Datum	Phase
 
 **Daten & Berechnung**
 
-- [x] Zyklusfunktion für das 28-Tage-Schema (4/3/4/3 + 4/3/4/3) implementieren
-- [x] Referenzdatum und Zyklusoffset fachlich festlegen und im Code dokumentieren
+- [x] Astronomische Zyklusfunktion auf Basis der synodischen Mondperiode implementieren
+- [x] Referenz-Neumond und Mondalterberechnung fachlich festlegen und im Code dokumentieren
 - [x] Mapping-Regeln auf Tidephase (Springzeit/Mittzeit/Nippzeit) zentral kapseln
-- [x] Referenzfenster-Override für fachliche Sondermuster (August 2026) vor dem Zyklus-Fallback auswerten
+- [x] Schwellenwerte fur Spring/Mitt/Nipp anhand der Mondphasen zentral auswerten
 
 **UI-Integration Zeitreihe**
 
@@ -385,7 +370,7 @@ Datum	Phase
 
 Gesamtschätzung:
 
-- M (ca. 2.5-5.5 PT, abhängig von Übergangslogik und gewünschtem Tooltip-Detail)
+- M (ca. 2.5-5.5 PT, abhängig von Ubergangslogik und gewünschtem Tooltip-Detail)
 
 ---
 

@@ -887,56 +887,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const GEOZEIT_MOON_CYCLE_DAYS = 29.530588853
   const GEOZEIT_REFERENCE_NEW_MOON_UTC_MS = Date.UTC(2000, 0, 6, 18, 14, 0)
   const GEOZEIT_DAY_MS = 24 * 60 * 60 * 1000
-  const GEOZEIT_PRAGMATIC_HALF_CYCLE_DAYS = 14
-  // Pragmatic cycle anchor: start of a spring block (UTC)
-  const GEOZEIT_PRAGMATIC_REFERENCE_UTC_MS = Date.UTC(2026, 6, 28, 6, 0, 0)
-  const GEOZEIT_PHASE_OVERRIDES = [
-    {
-      start: '2026-08-01',
-      end: '2026-08-03',
-      phaseKey: 'mid'
-    },
-    {
-      start: '2026-08-04',
-      end: '2026-08-08',
-      phaseKey: 'neap'
-    },
-    {
-      start: '2026-08-09',
-      end: '2026-08-09',
-      phaseKey: 'mid'
-    },
-    {
-      start: '2026-08-10',
-      end: '2026-08-14',
-      phaseKey: 'spring'
-    },
-    {
-      start: '2026-08-15',
-      end: '2026-08-17',
-      phaseKey: 'mid'
-    },
-    {
-      start: '2026-08-18',
-      end: '2026-08-22',
-      phaseKey: 'neap'
-    },
-    {
-      start: '2026-08-23',
-      end: '2026-08-25',
-      phaseKey: 'mid'
-    },
-    {
-      start: '2026-08-26',
-      end: '2026-08-30',
-      phaseKey: 'spring'
-    },
-    {
-      start: '2026-08-31',
-      end: '2026-08-31',
-      phaseKey: 'mid'
-    }
-  ]
+  const GEOZEIT_SPRING_THRESHOLD = 0.75
+  const GEOZEIT_NEAP_THRESHOLD = 0.25
 
   function getTidePhaseByKey (phaseKey) {
     if (phaseKey === 'spring') {
@@ -970,15 +922,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function formatUtcDateId (date) {
-    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
-      return ''
-    }
+  function getCircularDistance (valueA, valueB, period) {
+    const absoluteDistance = Math.abs(valueA - valueB)
+    return Math.min(absoluteDistance, period - absoluteDistance)
+  }
 
-    const year = String(date.getUTCFullYear())
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0')
-    const day = String(date.getUTCDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
+  function getNearestMoonPhaseLabel (ageDays) {
+    const phaseAnchors = [
+      { ageDays: 0, label: 'Neumond' },
+      { ageDays: GEOZEIT_MOON_CYCLE_DAYS / 4, label: 'Erstes Viertel' },
+      { ageDays: GEOZEIT_MOON_CYCLE_DAYS / 2, label: 'Vollmond' },
+      {
+        ageDays: (GEOZEIT_MOON_CYCLE_DAYS * 3) / 4,
+        label: 'Letztes Viertel'
+      }
+    ]
+
+    let nearestPhase = phaseAnchors[0]
+    let nearestDistance = Number.POSITIVE_INFINITY
+
+    phaseAnchors.forEach(anchor => {
+      const distance = getCircularDistance(
+        ageDays,
+        anchor.ageDays,
+        GEOZEIT_MOON_CYCLE_DAYS
+      )
+      if (distance < nearestDistance) {
+        nearestDistance = distance
+        nearestPhase = anchor
+      }
+    })
+
+    return nearestPhase.label
   }
 
   function parseSeaTimeseriesSlot (slot) {
@@ -1116,36 +1091,25 @@ document.addEventListener('DOMContentLoaded', () => {
     return normalizedAge
   }
 
-  function getPragmaticTidePhaseForDate (date) {
-    const dateId = formatUtcDateId(date)
-    if (!dateId) {
+  function getAstronomicalTidePhaseForDate (date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
       return getTidePhaseByKey('unknown')
     }
 
-    const overrideEntry = GEOZEIT_PHASE_OVERRIDES.find(
-      override => dateId >= override.start && dateId <= override.end
-    )
-
-    if (overrideEntry) {
-      return getTidePhaseByKey(overrideEntry.phaseKey)
+    const ageDays = getTideAgeDays(date)
+    if (!Number.isFinite(ageDays)) {
+      return getTidePhaseByKey('unknown')
     }
 
-    const cyclePosition =
-      ((((date.getTime() - GEOZEIT_PRAGMATIC_REFERENCE_UTC_MS) /
-        GEOZEIT_DAY_MS) %
-        GEOZEIT_PRAGMATIC_HALF_CYCLE_DAYS) +
-        GEOZEIT_PRAGMATIC_HALF_CYCLE_DAYS) %
-      GEOZEIT_PRAGMATIC_HALF_CYCLE_DAYS
+    // Spring intensity is maximal near new/full moon and minimal near quarter moon.
+    const moonAngle = (2 * Math.PI * ageDays) / GEOZEIT_MOON_CYCLE_DAYS
+    const springness = Math.abs(Math.cos(moonAngle))
 
-    if (cyclePosition < 4) {
+    if (springness >= GEOZEIT_SPRING_THRESHOLD) {
       return getTidePhaseByKey('spring')
     }
 
-    if (cyclePosition < 7) {
-      return getTidePhaseByKey('mid')
-    }
-
-    if (cyclePosition < 11) {
+    if (springness <= GEOZEIT_NEAP_THRESHOLD) {
       return getTidePhaseByKey('neap')
     }
 
@@ -1176,8 +1140,11 @@ document.addEventListener('DOMContentLoaded', () => {
       .map((slot, slotIndex) => {
         const slotDate = slotDates[slotIndex]
         const ageDays = getTideAgeDays(slotDate)
-        const phase = getPragmaticTidePhaseForDate(slotDate)
+        const phase = getAstronomicalTidePhaseForDate(slotDate)
         const ageLabel = Number.isFinite(ageDays) ? ageDays.toFixed(1) : 'n/a'
+        const moonPhaseLabel = Number.isFinite(ageDays)
+          ? getNearestMoonPhaseLabel(ageDays)
+          : 'Unbekannt'
         const visibleAgeLabel =
           phase.key === 'spring'
             ? 'Spring'
@@ -1188,7 +1155,9 @@ document.addEventListener('DOMContentLoaded', () => {
             : '·'
         const tooltipLabel = `${formatUtcSlotLabel(
           slotDate
-        )}\nAdG: ${ageLabel}\nPhase: ${phase.label}`
+        )}\nAdG: ${ageLabel}\nMondphase: ${moonPhaseLabel}\nPhase: ${
+          phase.label
+        }`
 
         return `<td class="ostsee-ts-tide-cell"><span class="ostsee-ts-tide-segment ${
           phase.className
