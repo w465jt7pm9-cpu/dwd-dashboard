@@ -122,13 +122,13 @@ Hinweis:
 
 **Wetterkürzel / Symbole**
 
-| DWD       | Anzeige                          |
-| --------- | -------------------------------- |
-| RAIN      | 🌧                                |
-| SH        | 🌦                                |
-| TS        | ⛈⚠ (roter Warnbadge)            |
-| FOG       | ☰⚠ (3 Striche, U+2630)          |
-| MIST / BR | ⚌⚠ (2 Striche, U+268C)          |
+| DWD       | Anzeige                |
+| --------- | ---------------------- |
+| RAIN      | 🌧                      |
+| SH        | 🌦                      |
+| TS        | ⛈⚠ (roter Warnbadge)   |
+| FOG       | ☰⚠ (3 Striche, U+2630) |
+| MIST / BR | ⚌⚠ (2 Striche, U+268C) |
 
 ---
 
@@ -225,6 +225,137 @@ damit ich Wind, Böen, Seegang und Wetterentwicklung auch für die Nordsee schne
 ### 💡 Optionales Feature
 
 - Ein Collapse-/Expand-Button analog zur Ostsee-Zeitreihe, damit die Lightbox bei Bedarf kompakter bleibt
+
+---
+
+## 🌊 US-023 – AdG-Gezeitenindikator in der DWD-Nordsee-Zeitreihe
+
+**Status:** DONE  
+**Priorität:** Mittel
+
+---
+
+### 🧑‍💻 Beschreibung
+
+Als Nutzer eines Nordsee-Wetterdashboards (Segler, Skipper, Offshore-Nutzer)  
+möchte ich den aktuellen Stand des Spring-Nipp-Zyklus direkt in der DWD-Zeitreihe sehen  
+damit ich Wind, Welle und Wetter im Zusammenhang mit den erwarteten Gezeiten- und Strömungsverhältnissen bewerten kann
+
+---
+
+### 🎯 Zielbild
+
+- Die bestehende DWD-Nordsee-Zeitreihe wird um einen zusätzlichen Gezeitenindikator erweitert
+- Der Indikator basiert auf dem dynamisch berechneten Alter der Gezeit (AdG)
+- Die Darstellung erfolgt als durchgehender Farbbalken in der zweiten Zeile unter Datum/Uhrzeit
+- Je Zeitstufe wird ein Textmarker angezeigt (Spring, Mitt, Nipp)
+- Der Balken wird pro Zeitstufe (06, 12, 18, 00 UTC) aktualisiert
+
+---
+
+### 🎨 Farbcodierung
+
+- Springzeit: Grün (Marker: Spring)
+- Mittzeit: Gelb (Marker: Mitt)
+- Nippzeit: Blau (Marker: Nipp)
+
+---
+
+### ✅ Akzeptanzkriterien
+
+**AK1 – Sichtbarkeit**
+
+- [x] Gegeben eine geöffnete DWD-Nordsee-Zeitreihe
+- [x] Wenn die Zeitreihe dargestellt wird
+- [x] Dann wird oberhalb der Zeitstufen ein Gezeitenbalken angezeigt
+
+**AK2 – Dynamische Berechnung**
+
+- [x] Gegeben ein Prognosezeitpunkt
+- [x] Wenn die Zeitreihe erzeugt wird
+- [x] Dann wird das AdG automatisch für jede Zeitstufe bestimmt
+
+**AK3 – Farbcodierung**
+
+- [x] Gegeben ein berechneter AdG-Wert
+- [x] Wenn der Wert dargestellt wird
+- [x] Dann wird Springzeit grün angezeigt
+- [x] Und Mittzeit wird gelb angezeigt
+- [x] Und Nippzeit wird blau angezeigt
+
+**AK4 – Responsive Darstellung**
+
+- [x] Gegeben ein mobiles Endgerät
+- [x] Wenn die Zeitreihe dargestellt wird
+- [x] Dann bleibt der Gezeitenbalken synchron zu den Zeitspalten ausgerichtet
+
+**AK5 – Tooltip**
+
+- [x] Gegeben der Nutzer bewegt den Mauszeiger über einen Abschnitt des Balkens
+- [x] Wenn ein Segment fokussiert wird
+- [x] Dann werden ein numerischer AdG-Wert, Tidephase sowie Datum/Uhrzeit angezeigt
+
+**AK6 – AdG in zweiter Datumszeile / Scroll-Sichtbarkeit**
+
+- [x] Gegeben die Nordsee-Zeitreihe mit horizontal scrollbarer Zeitachse
+- [x] Wenn der Nutzer in der Zeitreihe horizontal oder vertikal scrollt
+- [x] Dann bleibt die zweite Zeile unter der Datums-/Uhrzeitzeile sichtbar und spalten-synchron ausgerichtet
+- [x] Und die AdG-Kennzeichnung ist je Zeitstufe als Textmarker (Spring, Mitt, Nipp) in dieser zweiten Zeile erkennbar
+- [x] Und ein statischer Zeilenlabel-Text "AdG" kann entfallen, sofern beim Hover/Fokus ein eindeutiger Tooltip mit Datum, Uhrzeit, numerischem AdG und Phase angezeigt wird
+
+Beispiel:
+
+- Do 06.08.2026 18 UTC
+- AdG: 13.8
+- Phase: Nippzeit
+
+---
+
+### 🧪 Technische Notiz
+
+- Das AdG wird nicht manuell gepflegt, sondern aus astronomischen Mondphasen bzw. einem Gezeitenmodell berechnet
+- Die Funktion bleibt damit unabhängig von jährlich veröffentlichten Gezeitentafeln und ist für beliebige Prognosezeiträume nutzbar
+
+---
+
+### 🛠️ Umsetzungsansatz (Technische Tasks)
+
+**Daten & Berechnung**
+
+- [ ] AdG-Berechnungsfunktion definieren, die für jeden Prognosezeitpunkt einen numerischen AdG-Wert liefert
+- [ ] Berechnungsbasis festlegen (astronomische Mondphase oder Gezeitenmodell) und im Code dokumentieren
+- [ ] Mapping-Regeln von AdG-Bereichen auf Tidephase (Springzeit/Mittzeit/Nippzeit) zentral kapseln
+
+**UI-Integration Zeitreihe**
+
+- [ ] Zusätzliche Balken-Zeile oberhalb der Zeitstufen in der Nordsee-Zeitreihe einfügen
+- [ ] Pro Zeitstufe ein Segment rendern und per Phase einfärben (grün/gelb/blau)
+- [ ] Segmentbreiten an bestehende Zeitspalten koppeln, damit die Ausrichtung stabil bleibt
+
+**Tooltip & Interaktion**
+
+- [ ] Tooltip pro Segment implementieren (Hover/Focus)
+- [ ] Tooltip-Inhalt aus Zeitstempel + AdG + Phase dynamisch erzeugen
+- [ ] Touch-Variante für mobile Geräte sicherstellen (Tap/Fokus statt reinem Hover)
+
+**Responsive & Qualität**
+
+- [ ] Darstellung in mobilen Breakpoints gegen Zeitspalten-Drift prüfen
+- [ ] Visuelle Regression für Desktop/Mobil absichern
+- [ ] Fallback definieren, falls AdG-Berechnung temporär nicht verfügbar ist (z. B. neutrales Segment + Hinweis)
+
+---
+
+### ⏱️ Aufwandsschätzung (für Sprint-Planung)
+
+- Daten & Berechnung: M (ca. 1-2 PT)
+- UI-Integration Zeitreihe: M (ca. 1-2 PT)
+- Tooltip & Interaktion: S-M (ca. 0.5-1 PT)
+- Responsive & Qualität: S-M (ca. 0.5-1 PT)
+
+Gesamtschätzung:
+
+- M-L (ca. 3-6 PT, abhängig von Datenquelle und Modellierungsdetail der AdG-Berechnung)
 
 ---
 

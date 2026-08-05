@@ -873,9 +873,253 @@ document.addEventListener('DOMContentLoaded', () => {
     )}</span>`
   }
 
+  const GEOZEIT_WEEKDAY_TO_UTC = {
+    SO: 0,
+    MO: 1,
+    DI: 2,
+    MI: 3,
+    DO: 4,
+    FR: 5,
+    SA: 6
+  }
+
+  const GEOZEIT_UTC_WEEKDAY_LABELS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
+  const GEOZEIT_MOON_CYCLE_DAYS = 29.530588853
+  const GEOZEIT_MOON_CYCLE_HALF_DAYS = GEOZEIT_MOON_CYCLE_DAYS / 2
+  const GEOZEIT_REFERENCE_NEW_MOON_UTC_MS = Date.UTC(2000, 0, 6, 18, 14, 0)
+  const GEOZEIT_DAY_MS = 24 * 60 * 60 * 1000
+
+  function parseSeaTimeseriesSlot (slot) {
+    const candidates = [
+      String(slot?.label || '').trim(),
+      String(slot?.key || '').trim()
+    ]
+
+    for (const candidate of candidates) {
+      const match = candidate.match(/^([A-Za-zÄÖÜäöü]{2})\s?(\d{2})$/)
+      if (!match) {
+        continue
+      }
+
+      const weekdayToken = match[1].toUpperCase()
+      const utcWeekday = GEOZEIT_WEEKDAY_TO_UTC[weekdayToken]
+      const hourUtc = Number(match[2])
+
+      if (!Number.isFinite(utcWeekday) || !Number.isFinite(hourUtc)) {
+        continue
+      }
+
+      return {
+        weekdayToken,
+        utcWeekday,
+        hourUtc
+      }
+    }
+
+    return null
+  }
+
+  function findClosestUtcDateForSlot (slotInfo, referenceDate) {
+    const referenceDayStartUtc = Date.UTC(
+      referenceDate.getUTCFullYear(),
+      referenceDate.getUTCMonth(),
+      referenceDate.getUTCDate(),
+      0,
+      0,
+      0,
+      0
+    )
+
+    let bestCandidate = null
+    let bestDistance = Number.POSITIVE_INFINITY
+
+    for (let offsetDays = -2; offsetDays <= 9; offsetDays += 1) {
+      const candidate = new Date(
+        referenceDayStartUtc + offsetDays * GEOZEIT_DAY_MS
+      )
+      if (candidate.getUTCDay() !== slotInfo.utcWeekday) {
+        continue
+      }
+
+      candidate.setUTCHours(slotInfo.hourUtc, 0, 0, 0)
+      const distance = Math.abs(candidate.getTime() - referenceDate.getTime())
+
+      if (distance < bestDistance) {
+        bestCandidate = candidate
+        bestDistance = distance
+      }
+    }
+
+    return bestCandidate
+  }
+
+  function inferUtcDatesForTimeseriesSlots (slots, referenceDate = new Date()) {
+    if (!Array.isArray(slots) || !slots.length) {
+      return []
+    }
+
+    const slotDates = []
+    let previousDate = null
+
+    slots.forEach(slot => {
+      const slotInfo = parseSeaTimeseriesSlot(slot)
+      if (!slotInfo) {
+        slotDates.push(null)
+        return
+      }
+
+      if (!previousDate) {
+        const initialDate = findClosestUtcDateForSlot(slotInfo, referenceDate)
+        slotDates.push(initialDate)
+        previousDate = initialDate
+        return
+      }
+
+      let nextDate = null
+      const previousDayStartUtc = Date.UTC(
+        previousDate.getUTCFullYear(),
+        previousDate.getUTCMonth(),
+        previousDate.getUTCDate(),
+        0,
+        0,
+        0,
+        0
+      )
+
+      for (let offsetDays = 0; offsetDays <= 9; offsetDays += 1) {
+        const candidate = new Date(
+          previousDayStartUtc + offsetDays * GEOZEIT_DAY_MS
+        )
+        if (candidate.getUTCDay() !== slotInfo.utcWeekday) {
+          continue
+        }
+
+        candidate.setUTCHours(slotInfo.hourUtc, 0, 0, 0)
+        if (candidate.getTime() > previousDate.getTime()) {
+          nextDate = candidate
+          break
+        }
+      }
+
+      slotDates.push(nextDate)
+      if (nextDate) {
+        previousDate = nextDate
+      }
+    })
+
+    return slotDates
+  }
+
+  function getTideAgeDays (date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+      return null
+    }
+
+    const elapsedDays =
+      (date.getTime() - GEOZEIT_REFERENCE_NEW_MOON_UTC_MS) / GEOZEIT_DAY_MS
+    const normalizedAge =
+      ((elapsedDays % GEOZEIT_MOON_CYCLE_DAYS) + GEOZEIT_MOON_CYCLE_DAYS) %
+      GEOZEIT_MOON_CYCLE_DAYS
+
+    return normalizedAge
+  }
+
+  function getTidePhaseForAge (ageDays) {
+    if (!Number.isFinite(ageDays)) {
+      return {
+        key: 'unknown',
+        label: 'Unbekannt',
+        className: 'ostsee-ts-tide--unknown'
+      }
+    }
+
+    const nearestSpringDistance = Math.min(
+      Math.abs(ageDays),
+      Math.abs(ageDays - GEOZEIT_MOON_CYCLE_HALF_DAYS),
+      Math.abs(ageDays - GEOZEIT_MOON_CYCLE_DAYS)
+    )
+    const firstQuarterAge = GEOZEIT_MOON_CYCLE_DAYS / 4
+    const lastQuarterAge = (GEOZEIT_MOON_CYCLE_DAYS * 3) / 4
+    const nearestNeapDistance = Math.min(
+      Math.abs(ageDays - firstQuarterAge),
+      Math.abs(ageDays - lastQuarterAge)
+    )
+
+    if (nearestSpringDistance <= 2.4) {
+      return {
+        key: 'spring',
+        label: 'Springzeit',
+        className: 'ostsee-ts-tide--spring'
+      }
+    }
+
+    if (nearestNeapDistance <= 2.4) {
+      return {
+        key: 'neap',
+        label: 'Nippzeit',
+        className: 'ostsee-ts-tide--neap'
+      }
+    }
+
+    return {
+      key: 'mid',
+      label: 'Mittzeit',
+      className: 'ostsee-ts-tide--mid'
+    }
+  }
+
+  function formatUtcSlotLabel (date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+      return 'Zeitstufe unbekannt'
+    }
+
+    const weekday = GEOZEIT_UTC_WEEKDAY_LABELS[date.getUTCDay()] || '--'
+    const day = String(date.getUTCDate()).padStart(2, '0')
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+    const year = String(date.getUTCFullYear())
+    const hour = String(date.getUTCHours()).padStart(2, '0')
+
+    return `${weekday} ${day}.${month}.${year} ${hour} UTC`
+  }
+
+  function buildNordseeTideIndicatorHeaderRowMarkup (slots) {
+    if (!Array.isArray(slots) || !slots.length) {
+      return ''
+    }
+
+    const slotDates = inferUtcDatesForTimeseriesSlots(slots)
+    const tideCellsMarkup = slots
+      .map((slot, slotIndex) => {
+        const slotDate = slotDates[slotIndex]
+        const ageDays = getTideAgeDays(slotDate)
+        const phase = getTidePhaseForAge(ageDays)
+        const ageLabel = Number.isFinite(ageDays) ? ageDays.toFixed(1) : 'n/a'
+        const visibleAgeLabel =
+          phase.key === 'spring'
+            ? 'Spring'
+            : phase.key === 'neap'
+            ? 'Nipp'
+            : phase.key === 'mid'
+            ? 'Mitt'
+            : '·'
+        const tooltipLabel = `${formatUtcSlotLabel(
+          slotDate
+        )}\nAdG: ${ageLabel}\nPhase: ${phase.label}`
+
+        return `<td class="ostsee-ts-tide-cell"><span class="ostsee-ts-tide-segment ${
+          phase.className
+        }" title="${escapeHtml(tooltipLabel)}" aria-label="${escapeHtml(
+          tooltipLabel
+        )}" tabindex="0">${escapeHtml(visibleAgeLabel)}</span></td>`
+      })
+      .join('')
+
+    return `<tr class="ostsee-ts-tide-row"><th scope="row" class="ostsee-ts-tide-label" aria-label="AdG-Zeile"></th>${tideCellsMarkup}</tr>`
+  }
+
   function buildSeaTimeseriesOverlayMarkup (
     payload,
-    { regionLabel = 'Ostsee' } = {}
+    { regionLabel = 'Ostsee', regionKey = 'ostsee' } = {}
   ) {
     const slots = Array.isArray(payload?.slots) ? payload.slots : []
     const areas = Array.isArray(payload?.areas) ? payload.areas : []
@@ -906,6 +1150,11 @@ document.addEventListener('DOMContentLoaded', () => {
         slot => `<th scope="col">${escapeHtml(getSlotDisplayLabel(slot))}</th>`
       )
       .join('')
+
+    const tideHeaderRowMarkup =
+      regionKey === 'nordsee'
+        ? buildNordseeTideIndicatorHeaderRowMarkup(slots)
+        : ''
 
     const tableBodyMarkup = areas
       .map(area => {
@@ -971,7 +1220,7 @@ document.addEventListener('DOMContentLoaded', () => {
       )} Zeitreihe · Stand ${escapeHtml(updatedLabel)}</span>`,
       '<div class="ostsee-ts-wrap">',
       '<table class="ostsee-ts-table">',
-      `<thead><tr><th scope="col"></th>${tableHeaderMarkup}</tr></thead>`,
+      `<thead><tr><th scope="col"></th>${tableHeaderMarkup}</tr>${tideHeaderRowMarkup}</thead>`,
       `<tbody>${tableBodyMarkup}</tbody>`,
       '</table>',
       '</div>'
@@ -989,7 +1238,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cachedPayload) {
       renderWetterlageOverlay(
         buildSeaTimeseriesOverlayMarkup(cachedPayload, {
-          regionLabel: config.label
+          regionLabel: config.label,
+          regionKey: config.key
         }),
         {
           visible: true,
@@ -1031,7 +1281,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       renderWetterlageOverlay(
         buildSeaTimeseriesOverlayMarkup(freshPayload, {
-          regionLabel: config.label
+          regionLabel: config.label,
+          regionKey: config.key
         }),
         {
           visible: true,
