@@ -890,6 +890,96 @@ document.addEventListener('DOMContentLoaded', () => {
   const GEOZEIT_PRAGMATIC_HALF_CYCLE_DAYS = 14
   // Pragmatic cycle anchor: start of a spring block (UTC)
   const GEOZEIT_PRAGMATIC_REFERENCE_UTC_MS = Date.UTC(2026, 6, 28, 6, 0, 0)
+  const GEOZEIT_PHASE_OVERRIDES = [
+    {
+      start: '2026-08-01',
+      end: '2026-08-03',
+      phaseKey: 'mid'
+    },
+    {
+      start: '2026-08-04',
+      end: '2026-08-08',
+      phaseKey: 'neap'
+    },
+    {
+      start: '2026-08-09',
+      end: '2026-08-09',
+      phaseKey: 'mid'
+    },
+    {
+      start: '2026-08-10',
+      end: '2026-08-14',
+      phaseKey: 'spring'
+    },
+    {
+      start: '2026-08-15',
+      end: '2026-08-17',
+      phaseKey: 'mid'
+    },
+    {
+      start: '2026-08-18',
+      end: '2026-08-22',
+      phaseKey: 'neap'
+    },
+    {
+      start: '2026-08-23',
+      end: '2026-08-25',
+      phaseKey: 'mid'
+    },
+    {
+      start: '2026-08-26',
+      end: '2026-08-30',
+      phaseKey: 'spring'
+    },
+    {
+      start: '2026-08-31',
+      end: '2026-08-31',
+      phaseKey: 'mid'
+    }
+  ]
+
+  function getTidePhaseByKey (phaseKey) {
+    if (phaseKey === 'spring') {
+      return {
+        key: 'spring',
+        label: 'Springzeit',
+        className: 'ostsee-ts-tide--spring'
+      }
+    }
+
+    if (phaseKey === 'neap') {
+      return {
+        key: 'neap',
+        label: 'Nippzeit',
+        className: 'ostsee-ts-tide--neap'
+      }
+    }
+
+    if (phaseKey === 'mid') {
+      return {
+        key: 'mid',
+        label: 'Mittzeit',
+        className: 'ostsee-ts-tide--mid'
+      }
+    }
+
+    return {
+      key: 'unknown',
+      label: 'Unbekannt',
+      className: 'ostsee-ts-tide--unknown'
+    }
+  }
+
+  function formatUtcDateId (date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+      return ''
+    }
+
+    const year = String(date.getUTCFullYear())
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+    const day = String(date.getUTCDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
 
   function parseSeaTimeseriesSlot (slot) {
     const candidates = [
@@ -1027,12 +1117,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getPragmaticTidePhaseForDate (date) {
-    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
-      return {
-        key: 'unknown',
-        label: 'Unbekannt',
-        className: 'ostsee-ts-tide--unknown'
-      }
+    const dateId = formatUtcDateId(date)
+    if (!dateId) {
+      return getTidePhaseByKey('unknown')
+    }
+
+    const overrideEntry = GEOZEIT_PHASE_OVERRIDES.find(
+      override => dateId >= override.start && dateId <= override.end
+    )
+
+    if (overrideEntry) {
+      return getTidePhaseByKey(overrideEntry.phaseKey)
     }
 
     const cyclePosition =
@@ -1043,34 +1138,18 @@ document.addEventListener('DOMContentLoaded', () => {
       GEOZEIT_PRAGMATIC_HALF_CYCLE_DAYS
 
     if (cyclePosition < 4) {
-      return {
-        key: 'spring',
-        label: 'Springzeit',
-        className: 'ostsee-ts-tide--spring'
-      }
+      return getTidePhaseByKey('spring')
     }
 
     if (cyclePosition < 7) {
-      return {
-        key: 'mid',
-        label: 'Mittzeit',
-        className: 'ostsee-ts-tide--mid'
-      }
+      return getTidePhaseByKey('mid')
     }
 
     if (cyclePosition < 11) {
-      return {
-        key: 'neap',
-        label: 'Nippzeit',
-        className: 'ostsee-ts-tide--neap'
-      }
+      return getTidePhaseByKey('neap')
     }
 
-    return {
-      key: 'mid',
-      label: 'Mittzeit',
-      className: 'ostsee-ts-tide--mid'
-    }
+    return getTidePhaseByKey('mid')
   }
 
   function formatUtcSlotLabel (date) {

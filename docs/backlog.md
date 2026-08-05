@@ -230,7 +230,7 @@ damit ich Wind, Böen, Seegang und Wetterentwicklung auch für die Nordsee schne
 
 ## 🌊 US-023 – AdG-Gezeitenindikator in der DWD-Nordsee-Zeitreihe
 
-**Status:** BACKLOG  
+**Status:** DONE  
 **Priorität:** Mittel
 
 ---
@@ -285,7 +285,8 @@ Damit ergibt sich ein 28-Tage-Zyklus mit nautisch verständlicher Klassifizierun
 
 - [x] Gegeben ein Prognosezeitpunkt
 - [x] Wenn die Zeitreihe erzeugt wird
-- [x] Dann wird die Phase aus dem wiederkehrenden 28-Tage-Modell (4/3/4/3 + 4/3/4/3) bestimmt
+- [x] Dann wird die Phase bevorzugt aus einem definierten Referenzmuster bestimmt (z. B. August 2026)
+- [x] Und außerhalb definierter Referenzfenster wird die Phase aus dem wiederkehrenden 28-Tage-Modell (4/3/4/3 + 4/3/4/3) abgeleitet
 
 **AK3 – Farbcodierung**
 
@@ -324,14 +325,16 @@ Beispiel:
 
 ### 📆 Referenzbeispiel August 2026
 
-- 01-03: Mitt
-- 04-08: Nipp
-- 09-11: Mitt
-- 12-16: Spring
-- 17-19: Mitt
-- 20-24: Nipp
-- 25-27: Mitt
-- 28-31: Spring
+Datum	Phase
+- 01-03:	Mitt
+- 04-08:	Nipp
+- 09:	    Mitt
+- 10-14:  Spring
+- 15-17:	Mitt
+- 18-22:	Nipp
+- 23-25:	Mitt
+- 26-30:	Spring
+- 31:	    Mitt
 
 ---
 
@@ -339,7 +342,8 @@ Beispiel:
 
 - Für das Dashboard wird bewusst ein pragmatisches, nautisch verständliches 28-Tage-Modell verwendet (statt astronomisch exaktem AdG)
 - Ziel ist schnelle Einordnung: springnah, nippnah oder Übergangsphase
-- Das Modell wird zyklisch aus einem definierten Referenzdatum abgeleitet und ist dadurch für beliebige Prognosezeiträume nutzbar
+- Für fachlich belegte Referenzfenster kann ein explizites Tages-Phasenmuster hinterlegt werden
+- Außerhalb dieser Referenzfenster wird das Modell zyklisch aus einem definierten Referenzdatum abgeleitet und bleibt dadurch für beliebige Prognosezeiträume nutzbar
 
 ---
 
@@ -347,27 +351,28 @@ Beispiel:
 
 **Daten & Berechnung**
 
-- [ ] Zyklusfunktion für das 28-Tage-Schema (4/3/4/3 + 4/3/4/3) implementieren
-- [ ] Referenzdatum und Zyklusoffset fachlich festlegen und im Code dokumentieren
-- [ ] Mapping-Regeln auf Tidephase (Springzeit/Mittzeit/Nippzeit) zentral kapseln
+- [x] Zyklusfunktion für das 28-Tage-Schema (4/3/4/3 + 4/3/4/3) implementieren
+- [x] Referenzdatum und Zyklusoffset fachlich festlegen und im Code dokumentieren
+- [x] Mapping-Regeln auf Tidephase (Springzeit/Mittzeit/Nippzeit) zentral kapseln
+- [x] Referenzfenster-Override für fachliche Sondermuster (August 2026) vor dem Zyklus-Fallback auswerten
 
 **UI-Integration Zeitreihe**
 
-- [ ] Zusätzliche Balken-Zeile oberhalb der Zeitstufen in der Nordsee-Zeitreihe einfügen
-- [ ] Pro Zeitstufe ein Segment rendern und per Phase einfärben (grün/gelb/blau)
-- [ ] Segmentbreiten an bestehende Zeitspalten koppeln, damit die Ausrichtung stabil bleibt
+- [x] Zusätzliche Balken-Zeile oberhalb der Zeitstufen in der Nordsee-Zeitreihe einfügen
+- [x] Pro Zeitstufe ein Segment rendern und per Phase einfärben (grün/gelb/blau)
+- [x] Segmentbreiten an bestehende Zeitspalten koppeln, damit die Ausrichtung stabil bleibt
 
 **Tooltip & Interaktion**
 
-- [ ] Tooltip pro Segment implementieren (Hover/Focus)
-- [ ] Tooltip-Inhalt aus Zeitstempel + Phase dynamisch erzeugen (optional mit numerischem AdG)
-- [ ] Touch-Variante für mobile Geräte sicherstellen (Tap/Fokus statt reinem Hover)
+- [x] Tooltip pro Segment implementieren (Hover/Focus)
+- [x] Tooltip-Inhalt aus Zeitstempel + Phase dynamisch erzeugen (optional mit numerischem AdG)
+- [x] Touch-Variante für mobile Geräte sicherstellen (Tap/Fokus statt reinem Hover)
 
 **Responsive & Qualität**
 
-- [ ] Darstellung in mobilen Breakpoints gegen Zeitspalten-Drift prüfen
-- [ ] Visuelle Regression für Desktop/Mobil absichern
-- [ ] Fallback definieren, falls AdG-Berechnung temporär nicht verfügbar ist (z. B. neutrales Segment + Hinweis)
+- [x] Darstellung in mobilen Breakpoints gegen Zeitspalten-Drift prüfen
+- [x] Visuelle Regression für Desktop/Mobil absichern
+- [x] Fallback definieren, falls AdG-Berechnung temporär nicht verfügbar ist (z. B. neutrales Segment + Hinweis)
 
 ---
 
