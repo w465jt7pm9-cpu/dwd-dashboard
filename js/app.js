@@ -885,9 +885,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const GEOZEIT_UTC_WEEKDAY_LABELS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
   const GEOZEIT_MOON_CYCLE_DAYS = 29.530588853
-  const GEOZEIT_MOON_CYCLE_HALF_DAYS = GEOZEIT_MOON_CYCLE_DAYS / 2
   const GEOZEIT_REFERENCE_NEW_MOON_UTC_MS = Date.UTC(2000, 0, 6, 18, 14, 0)
   const GEOZEIT_DAY_MS = 24 * 60 * 60 * 1000
+  const GEOZEIT_PRAGMATIC_HALF_CYCLE_DAYS = 14
+  // Pragmatic cycle anchor: start of a spring block (UTC)
+  const GEOZEIT_PRAGMATIC_REFERENCE_UTC_MS = Date.UTC(2026, 6, 28, 6, 0, 0)
 
   function parseSeaTimeseriesSlot (slot) {
     const candidates = [
@@ -1024,8 +1026,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return normalizedAge
   }
 
-  function getTidePhaseForAge (ageDays) {
-    if (!Number.isFinite(ageDays)) {
+  function getPragmaticTidePhaseForDate (date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
       return {
         key: 'unknown',
         label: 'Unbekannt',
@@ -1033,19 +1035,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    const nearestSpringDistance = Math.min(
-      Math.abs(ageDays),
-      Math.abs(ageDays - GEOZEIT_MOON_CYCLE_HALF_DAYS),
-      Math.abs(ageDays - GEOZEIT_MOON_CYCLE_DAYS)
-    )
-    const firstQuarterAge = GEOZEIT_MOON_CYCLE_DAYS / 4
-    const lastQuarterAge = (GEOZEIT_MOON_CYCLE_DAYS * 3) / 4
-    const nearestNeapDistance = Math.min(
-      Math.abs(ageDays - firstQuarterAge),
-      Math.abs(ageDays - lastQuarterAge)
-    )
+    const cyclePosition =
+      ((((date.getTime() - GEOZEIT_PRAGMATIC_REFERENCE_UTC_MS) /
+        GEOZEIT_DAY_MS) %
+        GEOZEIT_PRAGMATIC_HALF_CYCLE_DAYS) +
+        GEOZEIT_PRAGMATIC_HALF_CYCLE_DAYS) %
+      GEOZEIT_PRAGMATIC_HALF_CYCLE_DAYS
 
-    if (nearestSpringDistance <= 2.4) {
+    if (cyclePosition < 4) {
       return {
         key: 'spring',
         label: 'Springzeit',
@@ -1053,7 +1050,15 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    if (nearestNeapDistance <= 2.4) {
+    if (cyclePosition < 7) {
+      return {
+        key: 'mid',
+        label: 'Mittzeit',
+        className: 'ostsee-ts-tide--mid'
+      }
+    }
+
+    if (cyclePosition < 11) {
       return {
         key: 'neap',
         label: 'Nippzeit',
@@ -1092,7 +1097,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .map((slot, slotIndex) => {
         const slotDate = slotDates[slotIndex]
         const ageDays = getTideAgeDays(slotDate)
-        const phase = getTidePhaseForAge(ageDays)
+        const phase = getPragmaticTidePhaseForDate(slotDate)
         const ageLabel = Number.isFinite(ageDays) ? ageDays.toFixed(1) : 'n/a'
         const visibleAgeLabel =
           phase.key === 'spring'

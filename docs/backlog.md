@@ -181,7 +181,7 @@ Der Anwender erhält eine kompakte, nautisch nutzbare Übersicht, die eine schne
 
 ## 🧭 US-022 – Kompakte Nordsee-Zeitreihe in der Seegang-Nordsee-Lightbox
 
-**Status:** BACKLOG  
+**Status:** DONE  
 **Priorität:** Mittel
 
 ---
@@ -230,7 +230,7 @@ damit ich Wind, Böen, Seegang und Wetterentwicklung auch für die Nordsee schne
 
 ## 🌊 US-023 – AdG-Gezeitenindikator in der DWD-Nordsee-Zeitreihe
 
-**Status:** DONE  
+**Status:** BACKLOG  
 **Priorität:** Mittel
 
 ---
@@ -246,10 +246,22 @@ damit ich Wind, Welle und Wetter im Zusammenhang mit den erwarteten Gezeiten- un
 ### 🎯 Zielbild
 
 - Die bestehende DWD-Nordsee-Zeitreihe wird um einen zusätzlichen Gezeitenindikator erweitert
-- Der Indikator basiert auf dem dynamisch berechneten Alter der Gezeit (AdG)
+- Der Indikator basiert auf einem pragmatischen 28-Tage-Phasenmodell
 - Die Darstellung erfolgt als durchgehender Farbbalken in der zweiten Zeile unter Datum/Uhrzeit
 - Je Zeitstufe wird ein Textmarker angezeigt (Spring, Mitt, Nipp)
 - Der Balken wird pro Zeitstufe (06, 12, 18, 00 UTC) aktualisiert
+
+---
+
+### 🧭 Phasenmodell (28 Tage)
+
+- 4 Tage Spring
+- 3 Tage Mitt
+- 4 Tage Nipp
+- 3 Tage Mitt
+- Danach Wiederholung desselben 14-Tage-Blocks (zweites Halbmonat)
+
+Damit ergibt sich ein 28-Tage-Zyklus mit nautisch verständlicher Klassifizierung statt astronomischer Feingranularität.
 
 ---
 
@@ -269,15 +281,15 @@ damit ich Wind, Welle und Wetter im Zusammenhang mit den erwarteten Gezeiten- un
 - [x] Wenn die Zeitreihe dargestellt wird
 - [x] Dann wird oberhalb der Zeitstufen ein Gezeitenbalken angezeigt
 
-**AK2 – Dynamische Berechnung**
+**AK2 – 28-Tage-Phasenlogik**
 
 - [x] Gegeben ein Prognosezeitpunkt
 - [x] Wenn die Zeitreihe erzeugt wird
-- [x] Dann wird das AdG automatisch für jede Zeitstufe bestimmt
+- [x] Dann wird die Phase aus dem wiederkehrenden 28-Tage-Modell (4/3/4/3 + 4/3/4/3) bestimmt
 
 **AK3 – Farbcodierung**
 
-- [x] Gegeben ein berechneter AdG-Wert
+- [x] Gegeben eine berechnete Phase
 - [x] Wenn der Wert dargestellt wird
 - [x] Dann wird Springzeit grün angezeigt
 - [x] Und Mittzeit wird gelb angezeigt
@@ -289,32 +301,45 @@ damit ich Wind, Welle und Wetter im Zusammenhang mit den erwarteten Gezeiten- un
 - [x] Wenn die Zeitreihe dargestellt wird
 - [x] Dann bleibt der Gezeitenbalken synchron zu den Zeitspalten ausgerichtet
 
-**AK5 – Tooltip**
-
-- [x] Gegeben der Nutzer bewegt den Mauszeiger über einen Abschnitt des Balkens
-- [x] Wenn ein Segment fokussiert wird
-- [x] Dann werden ein numerischer AdG-Wert, Tidephase sowie Datum/Uhrzeit angezeigt
-
-**AK6 – AdG in zweiter Datumszeile / Scroll-Sichtbarkeit**
+**AK5 – Marker in zweiter Datumszeile / Scroll-Sichtbarkeit**
 
 - [x] Gegeben die Nordsee-Zeitreihe mit horizontal scrollbarer Zeitachse
 - [x] Wenn der Nutzer in der Zeitreihe horizontal oder vertikal scrollt
 - [x] Dann bleibt die zweite Zeile unter der Datums-/Uhrzeitzeile sichtbar und spalten-synchron ausgerichtet
-- [x] Und die AdG-Kennzeichnung ist je Zeitstufe als Textmarker (Spring, Mitt, Nipp) in dieser zweiten Zeile erkennbar
-- [x] Und ein statischer Zeilenlabel-Text "AdG" kann entfallen, sofern beim Hover/Fokus ein eindeutiger Tooltip mit Datum, Uhrzeit, numerischem AdG und Phase angezeigt wird
+- [x] Und die Phasenkennzeichnung ist je Zeitstufe als Textmarker (Spring, Mitt, Nipp) erkennbar
+- [x] Und ein statischer Zeilenlabel-Text "AdG" kann entfallen
+
+**AK6 – Tooltip (optional detailliert)**
+
+- [x] Gegeben der Nutzer bewegt den Mauszeiger über ein Segment
+- [x] Wenn ein Segment fokussiert wird
+- [x] Dann werden mindestens Datum/Uhrzeit und Phase angezeigt
+- [x] Und optional kann zusätzlich ein numerischer AdG-Wert angezeigt werden
 
 Beispiel:
 
-- Do 06.08.2026 18 UTC
-- AdG: 13.8
-- Phase: Nippzeit
+- Do 06.08.2026 18 UTC → Nippzeit
+
+---
+
+### 📆 Referenzbeispiel August 2026
+
+- 01-03: Mitt
+- 04-08: Nipp
+- 09-11: Mitt
+- 12-16: Spring
+- 17-19: Mitt
+- 20-24: Nipp
+- 25-27: Mitt
+- 28-31: Spring
 
 ---
 
 ### 🧪 Technische Notiz
 
-- Das AdG wird nicht manuell gepflegt, sondern aus astronomischen Mondphasen bzw. einem Gezeitenmodell berechnet
-- Die Funktion bleibt damit unabhängig von jährlich veröffentlichten Gezeitentafeln und ist für beliebige Prognosezeiträume nutzbar
+- Für das Dashboard wird bewusst ein pragmatisches, nautisch verständliches 28-Tage-Modell verwendet (statt astronomisch exaktem AdG)
+- Ziel ist schnelle Einordnung: springnah, nippnah oder Übergangsphase
+- Das Modell wird zyklisch aus einem definierten Referenzdatum abgeleitet und ist dadurch für beliebige Prognosezeiträume nutzbar
 
 ---
 
@@ -322,9 +347,9 @@ Beispiel:
 
 **Daten & Berechnung**
 
-- [ ] AdG-Berechnungsfunktion definieren, die für jeden Prognosezeitpunkt einen numerischen AdG-Wert liefert
-- [ ] Berechnungsbasis festlegen (astronomische Mondphase oder Gezeitenmodell) und im Code dokumentieren
-- [ ] Mapping-Regeln von AdG-Bereichen auf Tidephase (Springzeit/Mittzeit/Nippzeit) zentral kapseln
+- [ ] Zyklusfunktion für das 28-Tage-Schema (4/3/4/3 + 4/3/4/3) implementieren
+- [ ] Referenzdatum und Zyklusoffset fachlich festlegen und im Code dokumentieren
+- [ ] Mapping-Regeln auf Tidephase (Springzeit/Mittzeit/Nippzeit) zentral kapseln
 
 **UI-Integration Zeitreihe**
 
@@ -335,7 +360,7 @@ Beispiel:
 **Tooltip & Interaktion**
 
 - [ ] Tooltip pro Segment implementieren (Hover/Focus)
-- [ ] Tooltip-Inhalt aus Zeitstempel + AdG + Phase dynamisch erzeugen
+- [ ] Tooltip-Inhalt aus Zeitstempel + Phase dynamisch erzeugen (optional mit numerischem AdG)
 - [ ] Touch-Variante für mobile Geräte sicherstellen (Tap/Fokus statt reinem Hover)
 
 **Responsive & Qualität**
@@ -348,14 +373,14 @@ Beispiel:
 
 ### ⏱️ Aufwandsschätzung (für Sprint-Planung)
 
-- Daten & Berechnung: M (ca. 1-2 PT)
+- Daten & Berechnung: S-M (ca. 0.5-1.5 PT)
 - UI-Integration Zeitreihe: M (ca. 1-2 PT)
 - Tooltip & Interaktion: S-M (ca. 0.5-1 PT)
 - Responsive & Qualität: S-M (ca. 0.5-1 PT)
 
 Gesamtschätzung:
 
-- M-L (ca. 3-6 PT, abhängig von Datenquelle und Modellierungsdetail der AdG-Berechnung)
+- M (ca. 2.5-5.5 PT, abhängig von Übergangslogik und gewünschtem Tooltip-Detail)
 
 ---
 
