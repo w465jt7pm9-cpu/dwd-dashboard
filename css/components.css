@@ -481,6 +481,20 @@
     font-size: 0.76rem;
   }
 
+  .ostsee-ts-tide-segment[data-label-compact] {
+    font-size: 0;
+    line-height: 0;
+    letter-spacing: 0.01em;
+  }
+
+  .ostsee-ts-tide-segment[data-label-compact]::before {
+    content: attr(data-label-compact);
+    display: block;
+    font-size: 0.56rem;
+    line-height: 1;
+    font-weight: 700;
+  }
+
   .lightbox-weatherlage.ostsee-timeseries.is-collapsed {
     max-height: 46px;
   }

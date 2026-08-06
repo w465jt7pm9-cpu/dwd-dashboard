@@ -889,6 +889,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const GEOZEIT_DAY_MS = 24 * 60 * 60 * 1000
   const GEOZEIT_SPRING_THRESHOLD = 0.75
   const GEOZEIT_NEAP_THRESHOLD = 0.25
+  const GEOZEIT_SPRING_RETARDATION_DAYS = 2
 
   function getTidePhaseByKey (phaseKey) {
     if (phaseKey === 'spring') {
@@ -1102,7 +1103,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Spring intensity is maximal near new/full moon and minimal near quarter moon.
-    const moonAngle = (2 * Math.PI * ageDays) / GEOZEIT_MOON_CYCLE_DAYS
+    // The German Bight shows a noticeable spring retardation, so the phase should be
+    // evaluated with a small lag relative to the pure lunar cycle.
+    const effectiveAgeDays =
+      (ageDays - GEOZEIT_SPRING_RETARDATION_DAYS + GEOZEIT_MOON_CYCLE_DAYS) %
+      GEOZEIT_MOON_CYCLE_DAYS
+    const moonAngle = (2 * Math.PI * effectiveAgeDays) / GEOZEIT_MOON_CYCLE_DAYS
     const springness = Math.abs(Math.cos(moonAngle))
 
     if (springness >= GEOZEIT_SPRING_THRESHOLD) {
@@ -1153,6 +1159,14 @@ document.addEventListener('DOMContentLoaded', () => {
             : phase.key === 'mid'
             ? 'Mitt'
             : '·'
+        const compactLabel =
+          phase.key === 'spring'
+            ? 'Sp'
+            : phase.key === 'neap'
+            ? 'Np'
+            : phase.key === 'mid'
+            ? 'Mt'
+            : '·'
         const tooltipLabel = `${formatUtcSlotLabel(
           slotDate
         )}\nAdG: ${ageLabel}\nMondphase: ${moonPhaseLabel}\nPhase: ${
@@ -1163,7 +1177,11 @@ document.addEventListener('DOMContentLoaded', () => {
           phase.className
         }" title="${escapeHtml(tooltipLabel)}" aria-label="${escapeHtml(
           tooltipLabel
-        )}" tabindex="0">${escapeHtml(visibleAgeLabel)}</span></td>`
+        )}" tabindex="0" data-label-full="${escapeHtml(
+          visibleAgeLabel
+        )}" data-label-compact="${escapeHtml(compactLabel)}">${escapeHtml(
+          visibleAgeLabel
+        )}</span></td>`
       })
       .join('')
 

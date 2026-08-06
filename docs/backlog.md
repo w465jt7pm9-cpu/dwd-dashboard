@@ -258,6 +258,7 @@ damit ich Wind, Welle und Wetter im Zusammenhang mit den erwarteten Gezeiten- un
 - Springtide-nah bei Neu- und Vollmond
 - Nipptide-nah bei erstem und letztem Viertel
 - Mittzeit als Ubergangsphase zwischen den genannten Mondphasen
+- Für die Deutsche Bucht wird zusätzlich eine kleine Springverspätung berücksichtigt, um die Einordnung an der praktischen BSH-Referenz auszurichten
 
 Damit ergibt sich eine schnelle nautische Einordnung auf Basis des astronomischen Mondzyklus.
 
@@ -306,6 +307,7 @@ Damit ergibt sich eine schnelle nautische Einordnung auf Basis des astronomische
 - [x] Wenn der Nutzer in der Zeitreihe horizontal oder vertikal scrollt
 - [x] Dann bleibt die zweite Zeile unter der Datums-/Uhrzeitzeile sichtbar und spalten-synchron ausgerichtet
 - [x] Und die Phasenkennzeichnung ist je Zeitstufe als Textmarker (Spring, Mitt, Nipp) erkennbar
+- [x] Auf schmalen Displays werden stattdessen die Kurzbezeichner Sp, Mt und Np verwendet, damit die Darstellung kompakt bleibt
 - [x] Und ein statischer Zeilenlabel-Text "AdG" kann entfallen
 
 **AK6 – Tooltip (optional detailliert)**
