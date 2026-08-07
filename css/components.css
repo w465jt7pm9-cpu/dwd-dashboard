@@ -521,6 +521,7 @@
 
 @media (max-width: 767px) and (orientation: landscape) {
   .lightbox-weatherlage.ostsee-timeseries {
+    width: min(75vw, 1460px);
     max-height: min(50dvh, 50vh);
     font-size: 0.72rem;
   }
