@@ -989,9 +989,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function findClosestUtcDateForSlot (slotInfo, referenceDate) {
     const referenceDayStartUtc = Date.UTC(
-      referenceDate.getUTCFullYear(),
-      referenceDate.getUTCMonth(),
-      referenceDate.getUTCDate(),
+      referenceDate.getFullYear(),
+      referenceDate.getMonth(),
+      referenceDate.getDate(),
       0,
       0,
       0,

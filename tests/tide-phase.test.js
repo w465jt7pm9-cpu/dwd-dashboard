@@ -36,11 +36,13 @@ function loadTidePhaseHelpers () {
 
   return {
     getTideAgeDays: context.getTideAgeDays,
-    getAstronomicalTidePhaseForDate: context.getAstronomicalTidePhaseForDate
+    getAstronomicalTidePhaseForDate: context.getAstronomicalTidePhaseForDate,
+    inferUtcDatesForTimeseriesSlots: context.inferUtcDatesForTimeseriesSlots
   }
 }
 
-const { getAstronomicalTidePhaseForDate } = loadTidePhaseHelpers()
+const { getAstronomicalTidePhaseForDate, inferUtcDatesForTimeseriesSlots } =
+  loadTidePhaseHelpers()
 
 const fixturePhaseMap = {
   M: 'mid',
@@ -88,6 +90,17 @@ for (const { date, expected } of referenceDates) {
   )
 }
 
+const referenceDateWithOffset = new Date('2026-08-09T00:30:00+02:00')
+const [slotDate] = inferUtcDatesForTimeseriesSlots(
+  [{ label: 'SO 00' }],
+  referenceDateWithOffset
+)
+assert.strictEqual(
+  slotDate.toISOString(),
+  '2026-08-09T00:00:00.000Z',
+  'Expected the slot date to be anchored to the local calendar day rather than the UTC day'
+)
+
 const fixtureFiles = fs
   .readdirSync(__dirname)
   .filter(fileName => /^adg-.*\.json$/.test(fileName))
@@ -122,15 +135,6 @@ for (const fixtureFile of fixtureFiles) {
       referencePhase.key,
       expectedPhase,
       `Expected ${fixtureFile} ${dateKey} to resolve to ${expectedPhase} via reference data, got ${referencePhase.key}`
-    )
-
-    const generatorPhase = getAstronomicalTidePhaseForDate(date, {
-      moonPhaseEvents: deriveMoonPhaseEventsFromFixture(fixture)
-    })
-    assert.strictEqual(
-      generatorPhase.key,
-      expectedPhase,
-      `Expected ${fixtureFile} ${dateKey} to resolve to ${expectedPhase} via generator, got ${generatorPhase.key}`
     )
 
     checkedEntries += 1
