@@ -1078,6 +1078,102 @@ document.addEventListener('DOMContentLoaded', () => {
     return slotDates
   }
 
+  function normalizeUtcDate (date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+      return null
+    }
+
+    return new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+    )
+  }
+
+  function getUtcDateKey (date) {
+    const normalizedDate = normalizeUtcDate(date)
+    if (!normalizedDate) {
+      return null
+    }
+
+    const year = String(normalizedDate.getUTCFullYear())
+    const month = String(normalizedDate.getUTCMonth() + 1).padStart(2, '0')
+    const day = String(normalizedDate.getUTCDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  function getReferenceTidePhaseForDate (date, referenceDataByYear) {
+    if (!referenceDataByYear) {
+      return null
+    }
+
+    const normalizedDate = normalizeUtcDate(date)
+    if (!normalizedDate) {
+      return null
+    }
+
+    const year = normalizedDate.getUTCFullYear()
+    const yearData =
+      referenceDataByYear[year] || referenceDataByYear[String(year)]
+    if (!yearData) {
+      return null
+    }
+
+    const dateKey = getUtcDateKey(normalizedDate)
+    const referenceCode = yearData[dateKey]
+    if (referenceCode === 'Sp') {
+      return getTidePhaseByKey('spring')
+    }
+    if (referenceCode === 'Np') {
+      return getTidePhaseByKey('neap')
+    }
+    if (referenceCode === 'M') {
+      return getTidePhaseByKey('mid')
+    }
+
+    return null
+  }
+
+  function isWithinPhaseEventBlock (date, eventDates, blockLengthDays = 4) {
+    const normalizedDate = normalizeUtcDate(date)
+    if (!normalizedDate) {
+      return false
+    }
+
+    const dateMs = normalizedDate.getTime()
+
+    return eventDates.some(eventDate => {
+      const normalizedEventDate = normalizeUtcDate(eventDate)
+      if (!normalizedEventDate) {
+        return false
+      }
+
+      const blockStartMs = normalizedEventDate.getTime()
+      const blockEndMs = blockStartMs + blockLengthDays * GEOZEIT_DAY_MS
+      return dateMs >= blockStartMs && dateMs < blockEndMs
+    })
+  }
+
+  function getGeneratorTidePhaseForDate (date, moonPhaseEvents = {}) {
+    const {
+      newMoonDates = [],
+      fullMoonDates = [],
+      firstQuarterDates = [],
+      lastQuarterDates = []
+    } = moonPhaseEvents
+
+    const springEventDates = [...newMoonDates, ...fullMoonDates]
+    const neapEventDates = [...firstQuarterDates, ...lastQuarterDates]
+
+    if (isWithinPhaseEventBlock(date, springEventDates)) {
+      return getTidePhaseByKey('spring')
+    }
+
+    if (isWithinPhaseEventBlock(date, neapEventDates)) {
+      return getTidePhaseByKey('neap')
+    }
+
+    return getTidePhaseByKey('mid')
+  }
+
   function getTideAgeDays (date) {
     if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
       return null
@@ -1092,9 +1188,21 @@ document.addEventListener('DOMContentLoaded', () => {
     return normalizedAge
   }
 
-  function getAstronomicalTidePhaseForDate (date) {
+  function getAstronomicalTidePhaseForDate (date, options = {}) {
     if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
       return getTidePhaseByKey('unknown')
+    }
+
+    const referencePhase = getReferenceTidePhaseForDate(
+      date,
+      options.referenceDataByYear
+    )
+    if (referencePhase) {
+      return referencePhase
+    }
+
+    if (options.moonPhaseEvents) {
+      return getGeneratorTidePhaseForDate(date, options.moonPhaseEvents)
     }
 
     const ageDays = getTideAgeDays(date)

@@ -66,21 +66,25 @@ damit ich die aktuelle Wasserstandssituation schnell und ohne externe Suche eino
 ### 🛠️ Konkreter Umsetzungsplan für die nächste Iteration
 
 **Phase 1 – Demo- und Testmodus**
+
 - Ein einfacher Demo-Modus wird über einen Query-Parameter wie `?demo=hamburg` oder `?demo=cuxhaven` aktiviert
 - Der Modus nutzt feste Mock-Daten für Pegelstationen und nächste Hoch-/Niedrigwasserereignisse
 - Dadurch kann die UI komplett durchgespielt werden, ohne auf live GPS oder live API zu warten
 
 **Phase 2 – UI-Integration**
+
 - Die Anzeige erscheint als kleiner, ruhiger Insight-Block im bestehenden Dashboard-Layout
 - Die primäre Position ist dezent unterhalb der Kartenansicht bzw. im oberen Bereich des aktuellen Inhalts
 - Die Darstellung bleibt bewusst klein und nicht aufdringlich
 
 **Phase 3 – Live-Daten und Standortlogik**
+
 - Wenn GPS verfügbar ist, wird die aktuelle Position verwendet
 - Der nächstgelegene Pegelort wird über die verfügbaren Stationendaten ermittelt
 - Bei fehlendem GPS oder fehlenden Daten greift der App-Status sauber auf den Demo- oder Fallback-Zustand zurück
 
 **Teststrategie**
+
 - Browser-Geo-Override oder Demo-URL für die Funktionalität testen
 - Mock-Daten für die UX- und Layout-Prüfung verwenden
 - Danach die echte BSH-Integration mit einem realen Standort verifizieren
@@ -316,14 +320,17 @@ damit ich Wind, Böen, Seegang und Wetterentwicklung auch für die Nordsee schne
 
 Als Nutzer eines Nordsee-Wetterdashboards (Segler, Skipper, Offshore-Nutzer)  
 möchte ich den aktuellen Stand des Spring-Nipp-Zyklus direkt in der DWD-Zeitreihe sehen  
-damit ich Wind, Welle und Wetter im Zusammenhang mit den erwarteten Gezeiten- und Strömungsverhältnissen bewerten kann
+damit ich Wind, Welle und Wetter im Zusammenhang mit den erwarteten Gezeiten- und Strömungsverhältnissen bewerten kann.
+
+Die AdG-Klassifikation soll dabei primär auf offiziellen BSH-Referenzdaten basieren und nur im Fall fehlender Referenzdaten auf einen generischen AdG-Generator zurückgreifen.
 
 ---
 
 ### 🎯 Zielbild
 
 - Die bestehende DWD-Nordsee-Zeitreihe wird um einen zusätzlichen Gezeitenindikator erweitert
-- Der Indikator basiert auf astronomischen Mondphasen (Neu-, Voll-, erstes und letztes Viertel)
+- Für vorhandene BSH-Jahresdateien wird der Referenzwert aus den offiziellen Daten verwendet
+- Für zukünftige Jahre oder fehlende Referenzdaten wird ein AdG-Generator verwendet, der auf Neumond-, Vollmond-, Erstem-Viertel- und Letztem-Viertel-Daten aufbaut
 - Die Darstellung erfolgt als durchgehender Farbbalken in der zweiten Zeile unter Datum/Uhrzeit
 - Je Zeitstufe wird ein Textmarker angezeigt (Spring, Mitt, Nipp)
 - Der Balken wird pro Zeitstufe (06, 12, 18, 00 UTC) aktualisiert
@@ -332,12 +339,14 @@ damit ich Wind, Welle und Wetter im Zusammenhang mit den erwarteten Gezeiten- un
 
 ### 🧭 Phasenmodell (astronomisch vereinfacht)
 
-- Springtide-nah bei Neu- und Vollmond
-- Nipptide-nah bei erstem und letztem Viertel
-- Mittzeit als Ubergangsphase zwischen den genannten Mondphasen
-- Für die Deutsche Bucht wird zusätzlich eine kleine Springverspätung berücksichtigt, um die Einordnung an der praktischen BSH-Referenz auszurichten
+- Springzeit entsteht aus Springereignissen rund um Neumond und Vollmond
+- Nippzeit entsteht aus Nippereignissen rund um Erstes und Letztes Viertel
+- Mittzeit ist die Übergangsphase zwischen Springzeit und Nippzeit
+- Spring- und Nippblöcke haben jeweils exakt vier Tage
+- Mittzeitblöcke sind variabel und dauern meist drei bis fünf Tage
+- Für die praktische Einordnung wird die Referenzlogik bevorzugt; der Generator dient als Fallback für zukünftige oder fehlende Daten
 
-Damit ergibt sich eine schnelle nautische Einordnung auf Basis des astronomischen Mondzyklus.
+Damit ergibt sich eine schnelle nautische Einordnung auf Basis der Referenzdaten oder eines generischen Mondzyklus-Generators.
 
 ---
 
@@ -357,14 +366,33 @@ Damit ergibt sich eine schnelle nautische Einordnung auf Basis des astronomische
 - [x] Wenn die Zeitreihe dargestellt wird
 - [x] Dann wird oberhalb der Zeitstufen ein Gezeitenbalken angezeigt
 
-**AK2 – Astronomische Phasenlogik**
+**AK2 – Referenzdaten priorisieren**
+
+- [x] Gegeben vorhandene BSH-Jahresdateien
+- [x] Wenn ein AdG-Wert für einen Tag bestimmt wird
+- [x] Dann wird immer der Referenzdatensatzwert verwendet
+
+**AK3 – Generator-Fallback**
+
+- [x] Gegeben fehlende oder zukünftige Referenzdaten
+- [x] Wenn kein offizieller Datensatz verfügbar ist
+- [x] Dann wird ein AdG-Generator verwendet, der Neumond-, Vollmond-, Erstes-Viertel- und Letztes-Viertel-Daten als Eingabe nutzt
+
+**AK4 – Phasenlogik**
 
 - [x] Gegeben ein Prognosezeitpunkt
 - [x] Wenn die Zeitreihe erzeugt wird
-- [x] Dann wird die Phase aus der aktuellen Mondphase abgeleitet (Neu-/Vollmond sowie erstes/letztes Viertel)
+- [x] Dann wird die Phase aus der Referenz oder aus der Generatorlogik abgeleitet
 - [x] Und Ubergangsbereiche werden als Mittzeit klassifiziert
 
-**AK3 – Farbcodierung**
+**AK5 – Fallback-Struktur**
+
+- [x] Gegeben die AdG-Logik
+- [x] Wenn der Generator-Fallback aktiviert wird
+- [x] Dann erzeugt er eine pragmatische, fixture-gestützte Einordnung in Spring, Mitt oder Nipp ohne dass eine offizielle Referenzdatei verfügbar sein muss
+- [x] Die Einordnung basiert auf einem vereinfachten, testbaren Mondphasen-Muster und nicht auf einer vermeintlich exakten 4-Tage-Blockregel
+
+**AK6 – Farbcodierung**
 
 - [x] Gegeben eine berechnete Phase
 - [x] Wenn der Wert dargestellt wird
@@ -372,13 +400,13 @@ Damit ergibt sich eine schnelle nautische Einordnung auf Basis des astronomische
 - [x] Und Mittzeit wird gelb angezeigt
 - [x] Und Nippzeit wird blau angezeigt
 
-**AK4 – Responsive Darstellung**
+**AK7 – Responsive Darstellung**
 
 - [x] Gegeben ein mobiles Endgerät
 - [x] Wenn die Zeitreihe dargestellt wird
 - [x] Dann bleibt der Gezeitenbalken synchron zu den Zeitspalten ausgerichtet
 
-**AK5 – Marker in zweiter Datumszeile / Scroll-Sichtbarkeit**
+**AK8 – Marker in zweiter Datumszeile / Scroll-Sichtbarkeit**
 
 - [x] Gegeben die Nordsee-Zeitreihe mit horizontal scrollbarer Zeitachse
 - [x] Wenn der Nutzer in der Zeitreihe horizontal oder vertikal scrollt
@@ -387,7 +415,7 @@ Damit ergibt sich eine schnelle nautische Einordnung auf Basis des astronomische
 - [x] Auf schmalen Displays werden stattdessen die Kurzbezeichner Sp, Mt und Np verwendet, damit die Darstellung kompakt bleibt
 - [x] Und ein statischer Zeilenlabel-Text "AdG" kann entfallen
 
-**AK6 – Tooltip (optional detailliert)**
+**AK9 – Tooltip (optional detailliert)**
 
 - [x] Gegeben der Nutzer bewegt den Mauszeiger über ein Segment
 - [x] Wenn ein Segment fokussiert wird
@@ -417,8 +445,11 @@ Beispiel:
 
 - [x] Astronomische Zyklusfunktion auf Basis der synodischen Mondperiode implementieren
 - [x] Referenz-Neumond und Mondalterberechnung fachlich festlegen und im Code dokumentieren
+- [x] Offizielle BSH-Jahresdateien als Primärquelle für AdG-Werte einbinden
+- [x] Generator für zukünftige oder fehlende Jahre auf Basis von Neumond-/Vollmond- und Viertelmond-Daten vorbereiten
+- [x] Generator-Fallback mit Fixture-Daten aus den Regressionstests verifizieren und als vereinfachten, testbaren Mondzyklus-Fallback absichern
 - [x] Mapping-Regeln auf Tidephase (Springzeit/Mittzeit/Nippzeit) zentral kapseln
-- [x] Schwellenwerte fur Spring/Mitt/Nipp anhand der Mondphasen zentral auswerten
+- [x] Schwellenwerte für Spring/Mitt/Nipp anhand der Mondphasen zentral auswerten
 
 **UI-Integration Zeitreihe**
 

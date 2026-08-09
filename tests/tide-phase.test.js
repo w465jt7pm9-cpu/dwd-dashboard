@@ -5,7 +5,9 @@ const vm = require('vm')
 
 function loadTidePhaseHelpers () {
   const source = fs.readFileSync(path.join(__dirname, '../js/app.js'), 'utf8')
-  const match = source.match(/const GEOZEIT_WEEKDAY_TO_UTC = \{[\s\S]*?function getAstronomicalTidePhaseForDate \(date\) \{[\s\S]*?return getTidePhaseByKey\('mid'\)\n  \}/)
+  const match = source.match(
+    /const GEOZEIT_WEEKDAY_TO_UTC = \{[\s\S]*?function getAstronomicalTidePhaseForDate \(date(?:, options = \{\})?\) \{[\s\S]*?return getTidePhaseByKey\('mid'\)\n  \}/
+  )
 
   if (!match) {
     throw new Error('Could not extract tide phase helpers from app.js')
@@ -40,6 +42,37 @@ function loadTidePhaseHelpers () {
 
 const { getAstronomicalTidePhaseForDate } = loadTidePhaseHelpers()
 
+const fixturePhaseMap = {
+  M: 'mid',
+  Sp: 'spring',
+  Np: 'neap'
+}
+
+function deriveBlockStartDates (fixture, targetCode) {
+  const dates = Object.keys(fixture).sort()
+  const blockStarts = []
+  let previousCode = null
+
+  for (const dateKey of dates) {
+    const code = fixture[dateKey]
+    if (code === targetCode && previousCode !== targetCode) {
+      blockStarts.push(new Date(`${dateKey}T00:00:00Z`))
+    }
+    previousCode = code
+  }
+
+  return blockStarts
+}
+
+function deriveMoonPhaseEventsFromFixture (fixture) {
+  return {
+    newMoonDates: deriveBlockStartDates(fixture, 'Sp'),
+    fullMoonDates: [],
+    firstQuarterDates: deriveBlockStartDates(fixture, 'Np'),
+    lastQuarterDates: []
+  }
+}
+
 const referenceDates = [
   { date: '2026-08-09T00:00:00Z', expected: 'neap' },
   { date: '2026-08-11T00:00:00Z', expected: 'mid' },
@@ -55,4 +88,55 @@ for (const { date, expected } of referenceDates) {
   )
 }
 
-console.log('Tide phase regression checks passed')
+const fixtureFiles = fs
+  .readdirSync(__dirname)
+  .filter(fileName => /^adg-.*\.json$/.test(fileName))
+  .sort()
+
+let checkedEntries = 0
+
+for (const fixtureFile of fixtureFiles) {
+  const fixturePath = path.join(__dirname, fixtureFile)
+  const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'))
+  const yearMatch = fixtureFile.match(/adg-(\d{4})\.json$/)
+  const year = Number(yearMatch && yearMatch[1])
+  const referenceDataByYear = year ? { [year]: fixture } : null
+
+  for (const [dateKey, expectedCode] of Object.entries(fixture)) {
+    const date = new Date(`${dateKey}T00:00:00Z`)
+    if (Number.isNaN(date.getTime())) {
+      throw new Error(`Invalid fixture date ${dateKey} in ${fixtureFile}`)
+    }
+
+    const expectedPhase = fixturePhaseMap[expectedCode]
+    if (!expectedPhase) {
+      throw new Error(
+        `Unsupported fixture code ${expectedCode} in ${fixtureFile}`
+      )
+    }
+
+    const referencePhase = getAstronomicalTidePhaseForDate(date, {
+      referenceDataByYear
+    })
+    assert.strictEqual(
+      referencePhase.key,
+      expectedPhase,
+      `Expected ${fixtureFile} ${dateKey} to resolve to ${expectedPhase} via reference data, got ${referencePhase.key}`
+    )
+
+    const generatorPhase = getAstronomicalTidePhaseForDate(date, {
+      moonPhaseEvents: deriveMoonPhaseEventsFromFixture(fixture)
+    })
+    assert.strictEqual(
+      generatorPhase.key,
+      expectedPhase,
+      `Expected ${fixtureFile} ${dateKey} to resolve to ${expectedPhase} via generator, got ${generatorPhase.key}`
+    )
+
+    checkedEntries += 1
+  }
+}
+
+console.log(
+  `Tide phase regression checks passed (${checkedEntries} fixture entries checked)`
+)
