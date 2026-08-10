@@ -258,12 +258,13 @@ Die AdG-Klassifikation soll dabei primär auf offiziellen BSH-Referenzdaten basi
 
 ### 🧭 Phasenmodell (astronomisch vereinfacht)
 
+- Das AdG/Gezeitenalter wird als kontinuierliches Mondalter seit einem Referenz-Neumond berechnet und auf die synodische Mondperiode von rund 29,53 Tagen bezogen
 - Springzeit entsteht aus Springereignissen rund um Neumond und Vollmond
 - Nippzeit entsteht aus Nippereignissen rund um Erstes und Letztes Viertel
 - Mittzeit ist die Übergangsphase zwischen Springzeit und Nippzeit
-- Spring- und Nippblöcke haben jeweils exakt vier Tage
-- Mittzeitblöcke sind variabel und dauern meist drei bis fünf Tage
+- Der Generator-Fallback nutzt keinen starren 4-Tage-Block mehr, sondern denselben kontinuierlichen, distanzbasierten Kosinus-Schwellenwert wie der allgemeine Fallback – nur bezogen auf den Abstand zum nächsten berechneten Neumond-/Vollmond-Ereignis statt auf eine feste Epoche
 - Für die praktische Einordnung wird die Referenzlogik bevorzugt; der Generator dient als Fallback für zukünftige oder fehlende Daten
+- Die Darstellung ist als Orientierungshilfe für die Nordsee ausgelegt und ersetzt keine amtlichen Gezeitenvorausberechnungen des BSH
 
 Damit ergibt sich eine schnelle nautische Einordnung auf Basis der Referenzdaten oder eines generischen Mondzyklus-Generators.
 
@@ -347,59 +348,18 @@ Beispiel:
 
 ---
 
----
+### ✅ Behobene Abweichung zwischen US-Beschreibung und Implementierung (behoben am 2026-08-10)
 
-### 🧪 Technische Notiz
+Früher galt: Der einzige produktive Aufruf von `getAstronomicalTidePhaseForDate` (in `buildNordseeTideIndicatorHeaderRowMarkup`, `js/app.js`) übergab kein Options-Objekt, wodurch AK2 und AK3 im laufenden Dashboard nicht wirksam waren. Dies wurde behoben:
 
-- Für das Dashboard wird bewusst eine vereinfachte astronomische Ableitung verwendet
-- Ziel ist schnelle Einordnung: springnah, nippnah oder Übergangsphase
-- Grundlage sind die Mondphasen Neu-, Voll-, erstes und letztes Viertel
-- Die Darstellung ist als Orientierungshilfe für die Nordsee ausgelegt und ersetzt keine amtlichen Gezeitenvorausberechnungen des BSH
-
----
-
-### 🛠️ Umsetzungsansatz (Technische Tasks)
-
-**Daten & Berechnung**
-
-- [x] Astronomische Zyklusfunktion auf Basis der synodischen Mondperiode implementieren
-- [x] Referenz-Neumond und Mondalterberechnung fachlich festlegen und im Code dokumentieren
-- [x] Offizielle BSH-Jahresdateien als Primärquelle für AdG-Werte einbinden
-- [x] Generator für zukünftige oder fehlende Jahre auf Basis von Neumond-/Vollmond- und Viertelmond-Daten vorbereiten
-- [x] Generator-Fallback mit Fixture-Daten aus den Regressionstests verifizieren und als vereinfachten, testbaren Mondzyklus-Fallback absichern
-- [x] Mapping-Regeln auf Tidephase (Springzeit/Mittzeit/Nippzeit) zentral kapseln
-- [x] Schwellenwerte für Spring/Mitt/Nipp anhand der Mondphasen zentral auswerten
-
-**UI-Integration Zeitreihe**
-
-- [x] Zusätzliche Balken-Zeile oberhalb der Zeitstufen in der Nordsee-Zeitreihe einfügen
-- [x] Pro Zeitstufe ein Segment rendern und per Phase einfärben (grün/gelb/blau)
-- [x] Segmentbreiten an bestehende Zeitspalten koppeln, damit die Ausrichtung stabil bleibt
-
-**Tooltip & Interaktion**
-
-- [x] Tooltip pro Segment implementieren (Hover/Focus)
-- [x] Tooltip-Inhalt aus Zeitstempel + Phase dynamisch erzeugen (optional mit numerischem AdG)
-- [x] Touch-Variante für mobile Geräte sicherstellen (Tap/Fokus statt reinem Hover)
-
-**Responsive & Qualität**
-
-- [x] Darstellung in mobilen Breakpoints gegen Zeitspalten-Drift prüfen
-- [x] Visuelle Regression für Desktop/Mobil absichern
-- [x] Fallback definieren, falls AdG-Berechnung temporär nicht verfügbar ist (z. B. neutrales Segment + Hinweis)
+- `buildNordseeTideIndicatorHeaderRowMarkup` ermittelt jetzt die betroffenen Kalenderjahre der sichtbaren Zeitstufen und übergibt `referenceDataByYear` sowie `moonPhaseEvents` an `getAstronomicalTidePhaseForDate`
+- Die BSH-Referenzdaten für 2005, 2022, 2026 und 2027 sind direkt in `js/app.js` als `GEOZEIT_ADG_REFERENCE_DATA_BY_YEAR` eingebettet (kein zusätzlicher Netzwerk-Request, offline-sicher)
+- `buildMoonPhaseEventsForYear(s)` berechnet Neumond-/Vollmond-/Viertelmond-Ankerdaten aus der synodischen Zyklusformel und speist damit den Generator-Fallback für Jahre ohne Referenzdatei
+- Der Generator-Fallback selbst wurde von einer starren 4-Tage-Blockregel auf dieselbe kontinuierliche, distanzbasierte Kosinus-Schwellenwert-Klassifikation umgestellt wie der allgemeine Fallback
+- Verifiziert: bestehender Regressionstest `tests/tide-phase.test.js` weiterhin grün (1460 Fixture-Einträge); zusätzliches End-to-End-Skript bestätigt korrekte Referenzwerte für eingebettete Jahre (0 Abweichungen) sowie einen funktionierenden, absturzfreien Generator-Fallback für nicht eingebettete Jahre (z. B. 2028)
+- AK2 und AK3 sind damit nun auch produktiv (nicht nur testseitig) erfüllt
 
 ---
-
-### ⏱️ Aufwandsschätzung (für Sprint-Planung)
-
-- Daten & Berechnung: S-M (ca. 0.5-1.5 PT)
-- UI-Integration Zeitreihe: M (ca. 1-2 PT)
-- Tooltip & Interaktion: S-M (ca. 0.5-1 PT)
-- Responsive & Qualität: S-M (ca. 0.5-1 PT)
-
-Gesamtschätzung:
-
-- M (ca. 2.5-5.5 PT, abhängig von Ubergangslogik und gewünschtem Tooltip-Detail)
 
 ---
 
