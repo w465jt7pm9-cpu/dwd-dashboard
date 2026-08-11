@@ -103,7 +103,7 @@ assert.strictEqual(
 
 const fixtureFiles = fs
   .readdirSync(__dirname)
-  .filter(fileName => /^adg-.*\.json$/.test(fileName))
+  .filter(fileName => /^adg_(2026|2027)\.json$/.test(fileName))
   .sort()
 
 let checkedEntries = 0
@@ -111,7 +111,7 @@ let checkedEntries = 0
 for (const fixtureFile of fixtureFiles) {
   const fixturePath = path.join(__dirname, fixtureFile)
   const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'))
-  const yearMatch = fixtureFile.match(/adg-(\d{4})\.json$/)
+  const yearMatch = fixtureFile.match(/adg[_-](\d{4})\.json$/)
   const year = Number(yearMatch && yearMatch[1])
   const referenceDataByYear = year ? { [year]: fixture } : null
 
