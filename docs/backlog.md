@@ -241,15 +241,14 @@ Als Nutzer eines Nordsee-Wetterdashboards (Segler, Skipper, Offshore-Nutzer)
 möchte ich den aktuellen Stand des Spring-Nipp-Zyklus direkt in der DWD-Zeitreihe sehen  
 damit ich Wind, Welle und Wetter im Zusammenhang mit den erwarteten Gezeiten- und Strömungsverhältnissen bewerten kann.
 
-Die AdG-Klassifikation soll dabei primär auf offiziellen BSH-Referenzdaten basieren und nur im Fall fehlender Referenzdaten auf einen generischen AdG-Generator zurückgreifen.
+Die AdG-Klassifikation soll auf einen generischen AdG-Generator zurückgreifen. Tests sichern die Ergebnisse des AdG-Generators gegen offizielle BSH-Referenzdaten ab.
 
 ---
 
 ### 🎯 Zielbild
 
 - Die bestehende DWD-Nordsee-Zeitreihe wird um einen zusätzlichen Gezeitenindikator erweitert
-- Für vorhandene BSH-Jahresdateien wird der Referenzwert aus den offiziellen Daten verwendet
-- Für zukünftige Jahre oder fehlende Referenzdaten wird ein AdG-Generator verwendet, der auf Neumond-, Vollmond-, Erstem-Viertel- und Letztem-Viertel-Daten aufbaut
+- Es wird ein AdG-Generator verwendet, der auf Neumond-, Vollmond-, Erstem-Viertel- und Letztem-Viertel-Daten aufbaut
 - Die Darstellung erfolgt als durchgehender Farbbalken in der zweiten Zeile unter Datum/Uhrzeit
 - Je Zeitstufe wird ein Textmarker angezeigt (Spring, Mitt, Nipp)
 - Der Balken wird pro Zeitstufe (06, 12, 18, 00 UTC) aktualisiert
@@ -259,14 +258,10 @@ Die AdG-Klassifikation soll dabei primär auf offiziellen BSH-Referenzdaten basi
 ### 🧭 Phasenmodell (astronomisch vereinfacht)
 
 - Das AdG/Gezeitenalter wird als kontinuierliches Mondalter seit einem Referenz-Neumond berechnet und auf die synodische Mondperiode von rund 29,53 Tagen bezogen
-- Springzeit entsteht aus Springereignissen rund um Neumond und Vollmond
+- Die Springzeit dauert 4 Tage, sie entsteht aus Springereignissen rund um Neumond und Vollmond mit einer Springverspätung von ca. 1 Tag
 - Nippzeit entsteht aus Nippereignissen rund um Erstes und Letztes Viertel
 - Mittzeit ist die Übergangsphase zwischen Springzeit und Nippzeit
-- Der Generator-Fallback nutzt keinen starren 4-Tage-Block mehr, sondern denselben kontinuierlichen, distanzbasierten Kosinus-Schwellenwert wie der allgemeine Fallback – nur bezogen auf den Abstand zum nächsten berechneten Neumond-/Vollmond-Ereignis statt auf eine feste Epoche
-- Für die praktische Einordnung wird die Referenzlogik bevorzugt; der Generator dient als Fallback für zukünftige oder fehlende Daten
 - Die Darstellung ist als Orientierungshilfe für die Nordsee ausgelegt und ersetzt keine amtlichen Gezeitenvorausberechnungen des BSH
-
-Damit ergibt sich eine schnelle nautische Einordnung auf Basis der Referenzdaten oder eines generischen Mondzyklus-Generators.
 
 ---
 
@@ -286,31 +281,12 @@ Damit ergibt sich eine schnelle nautische Einordnung auf Basis der Referenzdaten
 - [x] Wenn die Zeitreihe dargestellt wird
 - [x] Dann wird oberhalb der Zeitstufen ein Gezeitenbalken angezeigt
 
-**AK2 – Referenzdaten priorisieren**
-
-- [x] Gegeben vorhandene BSH-Jahresdateien
-- [x] Wenn ein AdG-Wert für einen Tag bestimmt wird
-- [x] Dann wird immer der Referenzdatensatzwert verwendet
-
-**AK3 – Generator-Fallback**
-
-- [x] Gegeben fehlende oder zukünftige Referenzdaten
-- [x] Wenn kein offizieller Datensatz verfügbar ist
-- [x] Dann wird ein AdG-Generator verwendet, der Neumond-, Vollmond-, Erstes-Viertel- und Letztes-Viertel-Daten als Eingabe nutzt
-
 **AK4 – Phasenlogik**
 
 - [x] Gegeben ein Prognosezeitpunkt
 - [x] Wenn die Zeitreihe erzeugt wird
-- [x] Dann wird die Phase aus der Referenz oder aus der Generatorlogik abgeleitet
+- [x] Dann wird die Phase aus der AdG-Generatorlogik abgeleitet
 - [x] Und Ubergangsbereiche werden als Mittzeit klassifiziert
-
-**AK5 – Fallback-Struktur**
-
-- [x] Gegeben die AdG-Logik
-- [x] Wenn der Generator-Fallback aktiviert wird
-- [x] Dann erzeugt er eine pragmatische, fixture-gestützte Einordnung in Spring, Mitt oder Nipp ohne dass eine offizielle Referenzdatei verfügbar sein muss
-- [x] Die Einordnung basiert auf einem vereinfachten, testbaren Mondphasen-Muster und nicht auf einer vermeintlich exakten 4-Tage-Blockregel
 
 **AK6 – Farbcodierung**
 
@@ -342,24 +318,15 @@ Damit ergibt sich eine schnelle nautische Einordnung auf Basis der Referenzdaten
 - [x] Dann werden mindestens Datum/Uhrzeit und Phase angezeigt
 - [x] Und optional kann zusätzlich ein numerischer AdG-Wert angezeigt werden
 
-Beispiel:
-
-- Do 06.08.2026 18 UTC → Nippzeit
-
 ---
 
-### ✅ Behobene Abweichung zwischen US-Beschreibung und Implementierung (behoben am 2026-08-10)
+### 🔧 Umsetzungsstand Generator-Genauigkeit (Stand 2026-08-12)
 
-Früher galt: Der einzige produktive Aufruf von `getAstronomicalTidePhaseForDate` (in `buildNordseeTideIndicatorHeaderRowMarkup`, `js/app.js`) übergab kein Options-Objekt, wodurch AK2 und AK3 im laufenden Dashboard nicht wirksam waren. Dies wurde behoben:
-
-- `buildNordseeTideIndicatorHeaderRowMarkup` ermittelt jetzt die betroffenen Kalenderjahre der sichtbaren Zeitstufen und übergibt `referenceDataByYear` sowie `moonPhaseEvents` an `getAstronomicalTidePhaseForDate`
-- Die BSH-Referenzdaten für 2005, 2022, 2026 und 2027 sind direkt in `js/app.js` als `GEOZEIT_ADG_REFERENCE_DATA_BY_YEAR` eingebettet (kein zusätzlicher Netzwerk-Request, offline-sicher)
-- `buildMoonPhaseEventsForYear(s)` berechnet Neumond-/Vollmond-/Viertelmond-Ankerdaten aus der synodischen Zyklusformel und speist damit den Generator-Fallback für Jahre ohne Referenzdatei
-- Der Generator-Fallback selbst wurde von einer starren 4-Tage-Blockregel auf dieselbe kontinuierliche, distanzbasierte Kosinus-Schwellenwert-Klassifikation umgestellt wie der allgemeine Fallback
-- Verifiziert: bestehender Regressionstest `tests/tide-phase.test.js` weiterhin grün (1460 Fixture-Einträge); zusätzliches End-to-End-Skript bestätigt korrekte Referenzwerte für eingebettete Jahre (0 Abweichungen) sowie einen funktionierenden, absturzfreien Generator-Fallback für nicht eingebettete Jahre (z. B. 2028)
-- AK2 und AK3 sind damit nun auch produktiv (nicht nur testseitig) erfüllt
-
----
+- Retardation und Schwellenwerte (`GEOZEIT_SPRING_RETARDATION_DAYS`, `GEOZEIT_SPRING_THRESHOLD`, `GEOZEIT_NEAP_THRESHOLD` in `js/app.js`) sind analytisch für ein 4-Tage-Springfenster mit ca. 1 Tag Verspätung hergeleitet
+- Neu-/Vollmond-Zeitpunkte werden über eine gekürzte Meeus-Approximation (`getMeeusMoonPhaseTimeMs`) statt einer rein linearen Zyklusrechnung bestimmt, was die Übereinstimmung mit den offiziellen BSH-Referenzdaten von ca. 65 % auf **ca. 93 %** (723 geprüfte Tage in `tests/adg_2026.json` / `tests/adg_2027.json`) angehoben hat
+- Es gibt nur noch einen einzigen Generator-Pfad (kein separater, abweichender Fallback mehr) – `tests/tide-phase.test.js` prüft die Generator-Ausgabe direkt gegen die BSH-Referenzdaten mit einer Mindesttrefferquote statt exakter Gleichheit
+- Bewusste Entscheidung: Die verbleibende Abweichung (~7 %) entsteht durch real variable Springzeit-Verzögerung (u. a. Mond-Perigäum/Apogäum, Deklination), die ein Modell mit fester Retardationskonstante grundsätzlich nicht abbilden kann. Eine Untersuchung (Rundung der Mondphasen-Zeitpunkte auf Kalendertage) verschlechterte die Gesamttrefferquote (93,1 % → 86,2 %) und wurde verworfen. Eine variable, distanzabhängige Retardation wäre der nächste sinnvolle Schritt, wurde aber als Aufwand/Risiko (Overfitting auf nur 2 Referenzjahre) bewusst zurückgestellt
+- Die Darstellung bleibt damit, wie im Phasenmodell beschrieben, eine Orientierungshilfe und ersetzt keine amtlichen BSH-Gezeitenvorausberechnungen
 
 ---
 

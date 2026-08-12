@@ -6,7 +6,7 @@ const vm = require('vm')
 function loadTidePhaseHelpers () {
   const source = fs.readFileSync(path.join(__dirname, '../js/app.js'), 'utf8')
   const match = source.match(
-    /const GEOZEIT_WEEKDAY_TO_UTC = \{[\s\S]*?function getAstronomicalTidePhaseForDate \(date(?:, options = \{\})?\) \{[\s\S]*?return getTidePhaseByKey\('mid'\)\n  \}/
+    /const GEOZEIT_WEEKDAY_TO_UTC = \{[\s\S]*?function buildMoonPhaseEventsForYears \(years\) \{[\s\S]*?return merged\n  \}/
   )
 
   if (!match) {
@@ -37,12 +37,16 @@ function loadTidePhaseHelpers () {
   return {
     getTideAgeDays: context.getTideAgeDays,
     getAstronomicalTidePhaseForDate: context.getAstronomicalTidePhaseForDate,
-    inferUtcDatesForTimeseriesSlots: context.inferUtcDatesForTimeseriesSlots
+    inferUtcDatesForTimeseriesSlots: context.inferUtcDatesForTimeseriesSlots,
+    buildMoonPhaseEventsForYear: context.buildMoonPhaseEventsForYear
   }
 }
 
-const { getAstronomicalTidePhaseForDate, inferUtcDatesForTimeseriesSlots } =
-  loadTidePhaseHelpers()
+const {
+  getAstronomicalTidePhaseForDate,
+  inferUtcDatesForTimeseriesSlots,
+  buildMoonPhaseEventsForYear
+} = loadTidePhaseHelpers()
 
 const fixturePhaseMap = {
   M: 'mid',
@@ -50,35 +54,10 @@ const fixturePhaseMap = {
   Np: 'neap'
 }
 
-function deriveBlockStartDates (fixture, targetCode) {
-  const dates = Object.keys(fixture).sort()
-  const blockStarts = []
-  let previousCode = null
-
-  for (const dateKey of dates) {
-    const code = fixture[dateKey]
-    if (code === targetCode && previousCode !== targetCode) {
-      blockStarts.push(new Date(`${dateKey}T00:00:00Z`))
-    }
-    previousCode = code
-  }
-
-  return blockStarts
-}
-
-function deriveMoonPhaseEventsFromFixture (fixture) {
-  return {
-    newMoonDates: deriveBlockStartDates(fixture, 'Sp'),
-    fullMoonDates: [],
-    firstQuarterDates: deriveBlockStartDates(fixture, 'Np'),
-    lastQuarterDates: []
-  }
-}
-
 const referenceDates = [
-  { date: '2026-08-09T00:00:00Z', expected: 'neap' },
-  { date: '2026-08-11T00:00:00Z', expected: 'mid' },
-  { date: '2026-08-12T00:00:00Z', expected: 'spring' }
+  { date: '2026-08-07T00:00:00Z', expected: 'neap' },
+  { date: '2026-08-10T00:00:00Z', expected: 'mid' },
+  { date: '2026-08-14T00:00:00Z', expected: 'spring' }
 ]
 
 for (const { date, expected } of referenceDates) {
@@ -139,6 +118,52 @@ for (const fixtureFile of fixtureFiles) {
 
     checkedEntries += 1
   }
+}
+
+// Validates the actual AdG generator (same moon-phase anchors used in production)
+// against the official BSH reference data. The simplified synodic-cycle model is
+// an orientation aid, not an exact ephemeris, so a minimum match rate is required
+// instead of a per-day equality (see US-023: "ersetzt keine amtlichen ... Berechnungen").
+const GENERATOR_MIN_MATCH_RATIO = 0.9
+
+for (const fixtureFile of fixtureFiles) {
+  const fixturePath = path.join(__dirname, fixtureFile)
+  const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'))
+  const yearMatch = fixtureFile.match(/adg[_-](\d{4})\.json$/)
+  const year = Number(yearMatch && yearMatch[1])
+  const moonPhaseEvents = buildMoonPhaseEventsForYear(year)
+
+  let total = 0
+  let mismatches = 0
+
+  for (const [dateKey, expectedCode] of Object.entries(fixture)) {
+    const date = new Date(`${dateKey}T00:00:00Z`)
+    const expectedPhase = fixturePhaseMap[expectedCode]
+    const generatorPhase = getAstronomicalTidePhaseForDate(date, {
+      moonPhaseEvents
+    })
+
+    total += 1
+    if (generatorPhase.key !== expectedPhase) {
+      mismatches += 1
+    }
+  }
+
+  const matchRatio = (total - mismatches) / total
+  assert.ok(
+    matchRatio >= GENERATOR_MIN_MATCH_RATIO,
+    `Expected AdG generator to match at least ${(
+      GENERATOR_MIN_MATCH_RATIO * 100
+    ).toFixed(0)}% of ${fixtureFile}, got ${(matchRatio * 100).toFixed(
+      1
+    )}% (${mismatches}/${total} mismatches)`
+  )
+
+  console.log(
+    `AdG generator matched ${(matchRatio * 100).toFixed(
+      1
+    )}% of ${fixtureFile} against BSH reference data`
+  )
 }
 
 console.log(

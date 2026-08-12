@@ -887,9 +887,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const GEOZEIT_MOON_CYCLE_DAYS = 29.530588853
   const GEOZEIT_REFERENCE_NEW_MOON_UTC_MS = Date.UTC(2000, 0, 6, 18, 14, 0)
   const GEOZEIT_DAY_MS = 24 * 60 * 60 * 1000
-  const GEOZEIT_SPRING_THRESHOLD = 0.75
-  const GEOZEIT_NEAP_THRESHOLD = 0.25
-  const GEOZEIT_SPRING_RETARDATION_DAYS = 2
+  // Meeus (Astronomical Algorithms, ch. 49) new-moon anchor: JDE at cycle k=0 and the JD/UTC epoch.
+  const GEOZEIT_MEEUS_REFERENCE_JDE = 2451550.09766
+  const GEOZEIT_JULIAN_DAY_EPOCH_MS = Date.UTC(2000, 0, 1, 12, 0, 0)
+  // Thresholds derived analytically for a 4-day spring/neap window (cos/sin of 2 days on the 29.53d cycle).
+  const GEOZEIT_SPRING_THRESHOLD = 0.91
+  const GEOZEIT_NEAP_THRESHOLD = 0.41
+  const GEOZEIT_SPRING_RETARDATION_DAYS = 1
 
   // Embedded BSH AdG reference data (Sp/M/Np per UTC calendar day) for AK2.
   const GEOZEIT_ADG_REFERENCE_DATA_BY_YEAR = {}
@@ -929,6 +933,67 @@ document.addEventListener('DOMContentLoaded', () => {
   function getCircularDistance (valueA, valueB, period) {
     const absoluteDistance = Math.abs(valueA - valueB)
     return Math.min(absoluteDistance, period - absoluteDistance)
+  }
+
+  function degreesToRadians (degrees) {
+    return (degrees * Math.PI) / 180
+  }
+
+  function normalizeDegrees (degrees) {
+    return ((degrees % 360) + 360) % 360
+  }
+
+  // Truncated Meeus (Astronomical Algorithms, ch. 49) periodic correction for
+  // New/Full Moon timing. A pure fixed synodic period drifts by up to ~0.4 days
+  // per cycle against the real (elliptical-orbit) Moon; this correction removes
+  // most of that drift and noticeably improves the match against BSH reference data.
+  function getMeeusMoonPhaseCorrectionDays (cycleIndex) {
+    const centuries = cycleIndex / 1236.85
+    const eccentricityFactor =
+      1 - 0.002516 * centuries - 0.0000074 * centuries * centuries
+    const sunMeanAnomaly = degreesToRadians(
+      normalizeDegrees(2.5534 + 29.1053567 * cycleIndex)
+    )
+    const moonMeanAnomaly = degreesToRadians(
+      normalizeDegrees(201.5643 + 385.81693528 * cycleIndex)
+    )
+    const moonArgumentOfLatitude = degreesToRadians(
+      normalizeDegrees(160.7108 + 390.67050284 * cycleIndex)
+    )
+
+    return (
+      -0.4072 * Math.sin(moonMeanAnomaly) +
+      0.17241 * eccentricityFactor * Math.sin(sunMeanAnomaly) +
+      0.01608 * Math.sin(2 * moonMeanAnomaly) +
+      0.01039 * Math.sin(2 * moonArgumentOfLatitude) +
+      0.00739 *
+        eccentricityFactor *
+        Math.sin(moonMeanAnomaly - sunMeanAnomaly) -
+      0.00514 *
+        eccentricityFactor *
+        Math.sin(moonMeanAnomaly + sunMeanAnomaly) +
+      0.00208 *
+        eccentricityFactor *
+        eccentricityFactor *
+        Math.sin(2 * sunMeanAnomaly)
+    )
+  }
+
+  // UTC timestamp (ms) of the moon phase at cycleIndex (0 = new moon anchor;
+  // add 0.25/0.5/0.75 for first quarter/full moon/last quarter).
+  function getMeeusMoonPhaseTimeMs (cycleIndex) {
+    const centuries = cycleIndex / 1236.85
+    const meanJulianEphemerisDay =
+      GEOZEIT_MEEUS_REFERENCE_JDE +
+      GEOZEIT_MOON_CYCLE_DAYS * cycleIndex +
+      0.00015437 * centuries * centuries
+    const correctedJulianEphemerisDay =
+      meanJulianEphemerisDay + getMeeusMoonPhaseCorrectionDays(cycleIndex)
+
+    return (
+      GEOZEIT_JULIAN_DAY_EPOCH_MS +
+      (correctedJulianEphemerisDay - 2451545.0) * GEOZEIT_DAY_MS
+    )
   }
 
   function getNearestMoonPhaseLabel (ageDays) {
@@ -1199,29 +1264,16 @@ document.addEventListener('DOMContentLoaded', () => {
       return getGeneratorTidePhaseForDate(date, options.moonPhaseEvents)
     }
 
-    const ageDays = getTideAgeDays(date)
-    if (!Number.isFinite(ageDays)) {
-      return getTidePhaseByKey('unknown')
-    }
-
-    // Spring intensity is maximal near new/full moon and minimal near quarter moon.
-    // The German Bight shows a noticeable spring retardation, so the phase should be
-    // evaluated with a small lag relative to the pure lunar cycle.
-    const effectiveAgeDays =
-      (ageDays - GEOZEIT_SPRING_RETARDATION_DAYS + GEOZEIT_MOON_CYCLE_DAYS) %
-      GEOZEIT_MOON_CYCLE_DAYS
-    const moonAngle = (2 * Math.PI * effectiveAgeDays) / GEOZEIT_MOON_CYCLE_DAYS
-    const springness = Math.abs(Math.cos(moonAngle))
-
-    if (springness >= GEOZEIT_SPRING_THRESHOLD) {
-      return getTidePhaseByKey('spring')
-    }
-
-    if (springness <= GEOZEIT_NEAP_THRESHOLD) {
-      return getTidePhaseByKey('neap')
-    }
-
-    return getTidePhaseByKey('mid')
+    // No explicit anchors supplied: derive them from the same Meeus-based
+    // generator so there is a single source of truth for the phase logic
+    // (instead of a separate, less accurate age-modulo-cycle approximation).
+    const fallbackYear = date.getUTCFullYear()
+    const fallbackMoonPhaseEvents = buildMoonPhaseEventsForYears([
+      fallbackYear - 1,
+      fallbackYear,
+      fallbackYear + 1
+    ])
+    return getGeneratorTidePhaseForDate(date, fallbackMoonPhaseEvents)
   }
 
   // Computes synthetic new/full/quarter-moon anchors for one calendar year
@@ -1254,27 +1306,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let cycleIndex = startCycleIndex
     while (true) {
-      const newMoonMs =
-        GEOZEIT_REFERENCE_NEW_MOON_UTC_MS +
-        cycleIndex * GEOZEIT_MOON_CYCLE_DAYS * GEOZEIT_DAY_MS
+      const newMoonMs = getMeeusMoonPhaseTimeMs(cycleIndex)
       if (newMoonMs > yearEndMs) {
         break
       }
 
       const candidates = [
         [events.newMoonDates, newMoonMs],
-        [
-          events.firstQuarterDates,
-          newMoonMs + (GEOZEIT_MOON_CYCLE_DAYS / 4) * GEOZEIT_DAY_MS
-        ],
-        [
-          events.fullMoonDates,
-          newMoonMs + (GEOZEIT_MOON_CYCLE_DAYS / 2) * GEOZEIT_DAY_MS
-        ],
-        [
-          events.lastQuarterDates,
-          newMoonMs + ((GEOZEIT_MOON_CYCLE_DAYS * 3) / 4) * GEOZEIT_DAY_MS
-        ]
+        [events.firstQuarterDates, getMeeusMoonPhaseTimeMs(cycleIndex + 0.25)],
+        [events.fullMoonDates, getMeeusMoonPhaseTimeMs(cycleIndex + 0.5)],
+        [events.lastQuarterDates, getMeeusMoonPhaseTimeMs(cycleIndex + 0.75)]
       ]
 
       candidates.forEach(([targetArray, eventMs]) => {
