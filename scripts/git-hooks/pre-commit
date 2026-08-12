@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Runs the full test suite before allowing a commit. Install via
+# scripts/setup-git-hooks.sh (sets core.hooksPath to this directory).
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+"$repo_root/scripts/run-tests.sh"

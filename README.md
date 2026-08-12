@@ -35,6 +35,22 @@ Aktualisierungen orientieren sich an den Veröffentlichungszyklen der verwendete
 - Service Worker für Cache- und Offline-Unterstützung
 - Deployment über Cloudflare Pages
 
+## Tests
+
+Alle Tests liegen in `tests/` und laufen ohne zusätzliche Abhängigkeiten (nur Node.js und Python 3):
+
+```bash
+bash scripts/run-tests.sh
+```
+
+Damit kein fehlerhafter Stand committet oder gepusht wird, gibt es versionierte Git-Hooks, die den gesamten Testlauf automatisch vor jedem `commit`/`push` ausführen und diesen bei Fehlern abbrechen. Einmalig aktivieren:
+
+```bash
+bash scripts/setup-git-hooks.sh
+```
+
+Zusätzlich läuft die Testsuite über GitHub Actions bei jedem Push/PR auf `main` (`.github/workflows/tests.yml`) als serverseitiges Sicherheitsnetz.
+
 ## Entwicklung
 
 Dieses Projekt wurde mit Unterstützung von KI entwickelt. Die Idee, Konzeption, Priorisierung der Funktionen sowie die fachliche Ausrichtung stammen vom Autor. KI wurde als Werkzeug zur Unterstützung von Entwurf, Implementierung, Dokumentation und Qualitätssicherung eingesetzt. Alle fachlichen und gestalterischen Entscheidungen wurden durch den Autor getroffen.
