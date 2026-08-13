@@ -1768,10 +1768,12 @@ Die AdG-Klassifikation soll auf einen generischen AdG-Generator zurückgreifen. 
 
 ---
 
-### 🔧 Umsetzungsstand Generator-Genauigkeit (Stand 2026-08-12)
+### 🔧 Umsetzungsstand Generator-Genauigkeit (Stand 2026-08-13)
 
 - Retardation und Schwellenwerte (`GEOZEIT_SPRING_RETARDATION_DAYS`, `GEOZEIT_SPRING_THRESHOLD`, `GEOZEIT_NEAP_THRESHOLD` in `js/app.js`) sind analytisch für ein 4-Tage-Springfenster mit ca. 1 Tag Verspätung hergeleitet
-- Neu-/Vollmond-Zeitpunkte werden über eine gekürzte Meeus-Approximation (`getMeeusMoonPhaseTimeMs`) statt einer rein linearen Zyklusrechnung bestimmt, was die Übereinstimmung mit den offiziellen BSH-Referenzdaten von ca. 65 % auf **ca. 93 %** (723 geprüfte Tage in `tests/adg_2026.json` / `tests/adg_2027.json`) angehoben hat
+- Neu-/Vollmond-Zeitpunkte werden über eine gekürzte Meeus-Approximation (`getMeeusMoonPhaseTimeMs`) statt einer rein linearen Zyklusrechnung bestimmt, was die Übereinstimmung mit den offiziellen BSH-Referenzdaten von ca. 65 % auf **ca. 93 %** (730 geprüfte Tage in `tests/gezeiten-bsh-helgoland-2026.json` / `tests/gezeiten-bsh-helgoland-2027.json`, konkret 93,7 % bzw. 92,6 %) angehoben hat
+- Die BSH-Referenzdaten (`tests/gezeiten-bsh-helgoland-{2026,2027}.{txt,json}`) sind die alleinige Testquelle: die `.txt` ist die unveränderte BSH-Rohexport-Datei (Zeitzone UTC), die `.json` ist eine geprüfte 1:1-Konvertierung (inkl. `_meta` mit Quelle/Legende) und ersetzt die früheren, separat gepflegten `adg_2026.json`/`adg_2027.json`/`mondphasen_*.json`-Fixtures. Dabei wurde eine Lücke der alten `adg_2027.json` gefunden und behoben (7 fehlende Tage, 25.–31.07.2027)
+- Zusätzlich prüft `tests/tide-phase.test.js` die exakten UTC-Zeitpunkte der Mondphasen-Anker (`moonPhase`-Feld aus den BSH-Markern 🌑🌓🌕🌗, 99 geprüfte Ereignisse über beide Jahre) sowie `getTideAgeDays` gegen diese Referenz (Toleranz 30 h bzw. 2 Tage)
 - Es gibt nur noch einen einzigen Generator-Pfad (kein separater, abweichender Fallback mehr) – `tests/tide-phase.test.js` prüft die Generator-Ausgabe direkt gegen die BSH-Referenzdaten mit einer Mindesttrefferquote statt exakter Gleichheit
 - Bewusste Entscheidung: Die verbleibende Abweichung (~7 %) entsteht durch real variable Springzeit-Verzögerung (u. a. Mond-Perigäum/Apogäum, Deklination), die ein Modell mit fester Retardationskonstante grundsätzlich nicht abbilden kann. Eine Untersuchung (Rundung der Mondphasen-Zeitpunkte auf Kalendertage) verschlechterte die Gesamttrefferquote (93,1 % → 86,2 %) und wurde verworfen. Eine variable, distanzabhängige Retardation wäre der nächste sinnvolle Schritt, wurde aber als Aufwand/Risiko (Overfitting auf nur 2 Referenzjahre) bewusst zurückgestellt
 - Die Darstellung bleibt damit, wie im Phasenmodell beschrieben, eine Orientierungshilfe und ersetzt keine amtlichen BSH-Gezeitenvorausberechnungen
