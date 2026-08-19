@@ -28,7 +28,7 @@ function loadWetterlageExtractionHelpers () {
   const source = fs.readFileSync(path.join(__dirname, '../js/app.js'), 'utf8')
 
   const match = source.match(
-    /function normalizeWetterlageText \([\s\S]*?function extractSeewetterberichtSection \(rawHtml\) \{[\s\S]*?\n {2}\}/
+    /function normalizeWetterlageText \([\s\S]*?function extractRegionalWetterlageSection \(rawHtml\) \{[\s\S]*?\n {2}\}/
   )
 
   if (!match) {
@@ -44,12 +44,17 @@ function loadWetterlageExtractionHelpers () {
 
   return {
     extractWetterlageSection: context.extractWetterlageSection,
-    extractSeewetterberichtSection: context.extractSeewetterberichtSection
+    extractSeewetterberichtSection: context.extractSeewetterberichtSection,
+    extractRegionalWetterlageSection:
+      context.extractRegionalWetterlageSection
   }
 }
 
-const { extractWetterlageSection, extractSeewetterberichtSection } =
-  loadWetterlageExtractionHelpers()
+const {
+  extractWetterlageSection,
+  extractSeewetterberichtSection,
+  extractRegionalWetterlageSection
+} = loadWetterlageExtractionHelpers()
 
 // --- extractWetterlageSection (raw FQEN50-style text feed) ---
 
@@ -167,6 +172,40 @@ assert.strictEqual(
   extractSeewetterberichtSection(''),
   '',
   'Expected empty HTML input to yield an empty section'
+)
+
+// --- extractRegionalWetterlageSection (US-020 AK7) ---
+
+const nordseeRegionalHtml = `
+  <h1>Seewettervorhersagen Nordsee</h1>
+  <b>Wetterlage und -entwicklung:</b><br />
+  <p>Nordsee: Ein Tief zieht ostwaerts.</p>
+  <p>Vorhersagen von Mi, 19.08.2026 12 UTC</p>
+  <h1>Ergänzende Informationen</h1>
+`
+
+const ostseeRegionalHtml = `
+  <h1>Seewettervorhersagen Ostsee</h1>
+  <b>Wetterlage und -entwicklung:</b><br />
+  <p>Ostsee: Schwacher Wind aus Ost.</p>
+  <p>Vorhersagen von Mi, 19.08.2026 12 UTC</p>
+  <h1>Ergänzende Informationen</h1>
+`
+
+const nordseeRegionalSection = extractRegionalWetterlageSection(
+  nordseeRegionalHtml
+)
+const ostseeRegionalSection = extractRegionalWetterlageSection(
+  ostseeRegionalHtml
+)
+
+assert.ok(nordseeRegionalSection.includes('Nordsee: Ein Tief zieht ostwaerts.'))
+assert.ok(ostseeRegionalSection.includes('Ostsee: Schwacher Wind aus Ost.'))
+assert.ok(!nordseeRegionalSection.includes('Ostsee:'))
+assert.ok(!ostseeRegionalSection.includes('Nordsee: Ein Tief'))
+assert.ok(
+  !nordseeRegionalSection.includes('Vorhersagen von'),
+  'Expected the North Sea forecast table to be excluded'
 )
 
 console.log('Wetterlage text-extraction regression checks passed')

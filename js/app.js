@@ -55,6 +55,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const OSTSEE_TS_UPDATED_AT_CACHE_KEY = 'dwdOstseeTimeseriesUpdatedAt'
   const NORDSEE_TS_CACHE_KEY = 'dwdNordseeTimeseriesCache'
   const NORDSEE_TS_UPDATED_AT_CACHE_KEY = 'dwdNordseeTimeseriesUpdatedAt'
+  const REGIONAL_WETTERLAGE_CACHE_KEYS = {
+    nordsee: {
+      text: 'dwdNordseeWetterlageText',
+      run: 'dwdNordseeWetterlageModelRun',
+      source: 'dwdNordseeWetterlageSource',
+      updatedAt: 'dwdNordseeWetterlageUpdatedAt'
+    },
+    ostsee: {
+      text: 'dwdOstseeWetterlageText',
+      run: 'dwdOstseeWetterlageModelRun',
+      source: 'dwdOstseeWetterlageSource',
+      updatedAt: 'dwdOstseeWetterlageUpdatedAt'
+    }
+  }
   const DWD_SEEWETTERBERICHT_URL =
     'https://www.dwd.de/DE/leistungen/seewetternordostsee/seewetternordostsee.html'
   const DWD_MARITIME_FORECAST_URL =
@@ -225,25 +239,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function getCachedWetterlageText () {
+  function getWetterlageCacheKeys (regionKey) {
+    return REGIONAL_WETTERLAGE_CACHE_KEYS[regionKey] || {
+      text: WETTERLAGE_TEXT_CACHE_KEY,
+      run: WETTERLAGE_RUN_CACHE_KEY,
+      source: WETTERLAGE_SOURCE_CACHE_KEY,
+      updatedAt: WETTERLAGE_UPDATED_AT_CACHE_KEY
+    }
+  }
+
+  function getCachedWetterlageText (regionKey) {
+    const cacheKeys = getWetterlageCacheKeys(regionKey)
     try {
-      return localStorage.getItem(WETTERLAGE_TEXT_CACHE_KEY)
+      return localStorage.getItem(cacheKeys.text)
     } catch {
       return null
     }
   }
 
-  function getCachedWetterlageRun () {
+  function getCachedWetterlageRun (regionKey) {
+    const cacheKeys = getWetterlageCacheKeys(regionKey)
     try {
-      return localStorage.getItem(WETTERLAGE_RUN_CACHE_KEY)
+      return localStorage.getItem(cacheKeys.run)
     } catch {
       return null
     }
   }
 
-  function getCachedWetterlageUpdatedAt () {
+  function getCachedWetterlageUpdatedAt (regionKey) {
+    const cacheKeys = getWetterlageCacheKeys(regionKey)
     try {
-      return localStorage.getItem(WETTERLAGE_UPDATED_AT_CACHE_KEY)
+      return localStorage.getItem(cacheKeys.updatedAt)
     } catch {
       return null
     }
@@ -302,13 +328,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function setCachedWetterlagePayload (payload) {
+  function setCachedWetterlagePayload (payload, regionKey) {
+    const cacheKeys = getWetterlageCacheKeys(regionKey)
     try {
-      localStorage.setItem(WETTERLAGE_TEXT_CACHE_KEY, payload.text)
-      localStorage.setItem(WETTERLAGE_RUN_CACHE_KEY, payload.modelRunId)
-      localStorage.setItem(WETTERLAGE_SOURCE_CACHE_KEY, payload.sourceUrl)
+      localStorage.setItem(cacheKeys.text, payload.text)
+      localStorage.setItem(cacheKeys.run, payload.modelRunId)
+      localStorage.setItem(cacheKeys.source, payload.sourceUrl)
       localStorage.setItem(
-        WETTERLAGE_UPDATED_AT_CACHE_KEY,
+        cacheKeys.updatedAt,
         String(payload.updatedAt)
       )
     } catch {
@@ -1521,11 +1548,11 @@ document.addEventListener('DOMContentLoaded', () => {
       .join('')
 
     const updatedLabel = formatTimestamp(payload.updatedAt)
-    const cachedWetterlageText = getCachedWetterlageText()
+    const cachedWetterlageText = getCachedWetterlageText(regionKey)
     const wetterlageMarkup = cachedWetterlageText
       ? buildWetterlageOverlayMarkup(
           `${cachedWetterlageText}\n\nStand: ${formatTimestamp(
-            getCachedWetterlageUpdatedAt()
+            getCachedWetterlageUpdatedAt(regionKey)
           )}`
         )
       : ''
@@ -1554,7 +1581,9 @@ document.addEventListener('DOMContentLoaded', () => {
       cachedUpdatedAt &&
       Date.now() - cachedUpdatedAt <= OSTSEE_TS_CACHE_TTL_MS
     const wetterlageRefreshPromise = navigator.onLine
-      ? refreshWetterlageCacheIfNeeded().catch(() => null)
+      ? refreshWetterlageCacheIfNeeded({ regionKey: config.key }).catch(
+          () => null
+        )
       : Promise.resolve(null)
 
     const rerenderCachedTimeseries = () => {
@@ -1745,7 +1774,11 @@ document.addEventListener('DOMContentLoaded', () => {
           return ''
         }
 
-        if (/^(Aktuelle\s+)?Wetterlage\s*:?\s*$/i.test(trimmedLine)) {
+        if (
+          /^(Aktuelle\s+)?Wetterlage(?:\s+und\s+-?entwicklung)?\s*:?\s*$/i.test(
+            trimmedLine
+          )
+        ) {
           return `<span class="weatherlage-section-title">${escapeHtml(
             trimmedLine
           )}</span>`
@@ -1933,6 +1966,22 @@ document.addEventListener('DOMContentLoaded', () => {
     return ''
   }
 
+  function extractRegionalWetterlageSection (rawHtml) {
+    if (!rawHtml) {
+      return ''
+    }
+
+    const parsedDocument = new DOMParser().parseFromString(rawHtml, 'text/html')
+    const pageText = normalizeWetterlageText(
+      parsedDocument.body?.textContent || ''
+    )
+    return extractTextBlockBetweenHeadings(
+      pageText,
+      /Wetterlage\s+und\s+-?entwicklung\s*:/i,
+      /\n\s*(?:Vorhersagen\s+von|Ergänzende\s+Informationen|Verwandte\s+Leistungen|INHATSVERZEICHNIS)\b/i
+    )
+  }
+
   async function fetchWetterlageFromFeed () {
     const textResponse = await fetch(DWD_MARITIME_FORECAST_URL, {
       cache: 'no-cache'
@@ -1954,27 +2003,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function fetchWetterlageFromSeewetterbericht () {
-    const response = await fetch(DWD_SEEWETTERBERICHT_URL, {
+  async function fetchWetterlageFromRegionalPage (regionKey) {
+    const regionalUrl =
+      regionKey === 'nordsee' ? DWD_NORDSEE_3DAY_URL : DWD_OSTSEE_3DAY_URL
+    const regionLabel = regionKey === 'nordsee' ? 'Nordsee' : 'Ostsee'
+    const response = await fetch(regionalUrl, {
       cache: 'no-cache'
     })
     if (!response.ok) {
-      throw new Error('Seewetterbericht nicht erreichbar')
+      throw new Error(`${regionLabel}-Wetterlage nicht erreichbar`)
     }
 
     const htmlText = await response.text()
-    const weatherlageText = extractSeewetterberichtSection(htmlText)
+    const weatherlageText = extractRegionalWetterlageSection(htmlText)
     if (!weatherlageText) {
-      throw new Error('Aktuelle Wetterlage im Seewetterbericht nicht gefunden')
+      throw new Error(`${regionLabel}-Wetterlage nicht gefunden`)
     }
 
     return {
       text: weatherlageText,
-      sourceUrl: DWD_SEEWETTERBERICHT_URL
+      sourceUrl: regionalUrl
     }
   }
 
-  async function fetchRelevantWetterlage () {
+  async function fetchRelevantWetterlage (regionKey) {
+    if (regionKey) {
+      return fetchWetterlageFromRegionalPage(regionKey)
+    }
+
     try {
       return await fetchWetterlageFromSeewetterbericht()
     } catch {
@@ -1982,27 +2038,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function refreshWetterlageCacheIfNeeded ({ force = false } = {}) {
+  async function refreshWetterlageCacheIfNeeded ({
+    force = false,
+    regionKey
+  } = {}) {
     if (!navigator.onLine) {
       return null
     }
 
     const activeSeewetterCycleId = getActiveSeewetterCycleId()
-    const cachedRunId = getCachedWetterlageRun()
-    const cachedText = getCachedWetterlageText()
+    const cachedRunId = getCachedWetterlageRun(regionKey)
+    const cachedText = getCachedWetterlageText(regionKey)
 
     if (!force && cachedText && activeSeewetterCycleId === cachedRunId) {
       return null
     }
 
-    const payload = await fetchRelevantWetterlage()
+    const payload = await fetchRelevantWetterlage(regionKey)
     const cachePayload = {
       text: payload.text,
       modelRunId: activeSeewetterCycleId,
       sourceUrl: payload.sourceUrl,
       updatedAt: Date.now()
     }
-    setCachedWetterlagePayload(cachePayload)
+    setCachedWetterlagePayload(cachePayload, regionKey)
 
     return cachePayload
   }
