@@ -12,6 +12,7 @@
 
 - US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 - US-017 – UI-Texte für Internationalisierung strukturieren
+- US-020 – Textuelle Wetterlage vor der DWD-Seewetter-Zeitreihe ergänzen
 
 ## 🟨 DOING
 
@@ -36,7 +37,6 @@ _(aktuell keine Story in Bearbeitung)_
 - US-016 – Wetterlage-Overlay mit Offline-Unterstützung integrieren
 - US-018 – Seewetter-Overlay lesbarer strukturieren
 - US-019 – Seewettertext vorab online cachen
-- US-020 – Kompakte Darstellung von DWD-Seewetter-Zeitreihen
 - US-021 – Kompaktes Inhaltsfenster in der gezoomten Seegang-Ostsee-Lightbox
 - US-022 – Kompakte Nordsee-Zeitreihe in der Seegang-Nordsee-Lightbox
 - US-023 – AdG-Gezeitenindikator in der DWD-Nordsee-Zeitreihe
@@ -1460,7 +1460,7 @@ Nachteile:
 
 ## 🌬️ US-020 – Kompakte Darstellung von DWD-Seewetter-Zeitreihen
 
-**Status:** DONE  
+**Status:** TODO
 **Priorität:** Hoch
 
 ---
@@ -1481,6 +1481,8 @@ damit ich Wind, Böen, Seegang und Wetterentwicklung über mehrere Tage schnell 
 - Windrichtung als meteorologische Herkunftsrichtung visualisiert
 - Wellenhöhe numerisch in Metern
 - Wetterereignisse als Kürzel oder Symbol
+- Textuelle Wetterlage unmittelbar vor der Zeitreihen-Tabelle
+- Wetterlage und Zeitreihe beziehen sich auf denselben DWD-Datenstand
 
 ---
 
@@ -1580,11 +1582,26 @@ Hinweis:
 - [x] Wenn Vorhersagen erzeugt werden
 - [x] Dann sollen ausschließlich die bereits vom DWD interpretierten Text- und Zeitreihenprodukte verwendet werden und keine eigene Wetterinterpretation aus Wetterkarten erfolgen
 
+**AK7 – Textuelle Wetterlage**
+
+- [ ] Gegeben ein verfügbarer DWD-Seewetterbericht
+- [ ] Wenn die Zeitreihe dargestellt wird
+- [ ] Dann wird die textuelle Wetterlage unmittelbar vor der Tabelle angezeigt
+- [ ] Der Zeitstempel `Stand:` ist sichtbar
+- [ ] Wetterlage und Zeitreihe beziehen sich auf denselben Bericht bzw. Datenstand
+- [ ] Der Text bleibt vollständig lesbar und scrollbar
+- [ ] Der zuletzt verfügbare Text wird im Offline-Modus aus dem bestehenden Cache angezeigt
+- [ ] Wenn kein Text verfügbar ist, bleibt die Zeitreihe dennoch nutzbar
+
 ---
 
 ### 📈 Nutzen
 
-Der Anwender erhält eine kompakte, nautisch nutzbare Übersicht, die eine schnelle Lesbarkeit mit der fachlichen Qualität der vom DWD bereitgestellten Seewettervorhersagen kombiniert.
+Der Anwender erhält eine kompakte, nautisch nutzbare Übersicht, die die
+textuelle Wetterlage mit der schnellen Lesbarkeit und fachlichen Qualität der
+vom DWD bereitgestellten Zeitreihen verbindet. Die Wetterlage liefert den
+meteorologischen Kontext zur erwarteten Entwicklung und erleichtert dadurch
+die Einordnung der tabellarischen Einzelwerte.
 
 ---
 
@@ -1759,12 +1776,11 @@ Die AdG-Klassifikation soll auf einen generischen AdG-Generator zurückgreifen. 
 - [x] Auf schmalen Displays werden stattdessen die Kurzbezeichner Sp, Mt und Np verwendet, damit die Darstellung kompakt bleibt
 - [x] Und ein statischer Zeilenlabel-Text "AdG" kann entfallen
 
-**AK9 – Tooltip (optional detailliert)**
+**AK9 – Tooltip**
 
 - [x] Gegeben der Nutzer bewegt den Mauszeiger über ein Segment
 - [x] Wenn ein Segment fokussiert wird
 - [x] Dann werden mindestens Datum/Uhrzeit und Phase angezeigt
-- [x] Und optional kann zusätzlich ein numerischer AdG-Wert angezeigt werden
 
 ---
 
@@ -1823,4 +1839,7 @@ Ergänzung des Dashboards um Gezeiten- und Strömungsdaten für die Nordsee zur 
 
 **Idee:** Offline-Nutzung verbessern
 👉 **Mögliche Umsetzung:** basiert auf bestehendem Service Worker (`sw.js`)
+
+```
+
 ```

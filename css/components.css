@@ -448,6 +448,17 @@
   overflow: hidden;
 }
 
+.ostsee-ts-weatherlage {
+  flex: 0 1 auto;
+  max-height: min(9rem, 22vh);
+  margin: 0 0 6px;
+  padding: 0 4px 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  touch-action: auto;
+}
+
 .ostsee-ts-shell.is-collapsed .ostsee-ts-content {
   display: none;
 }

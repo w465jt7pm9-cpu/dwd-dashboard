@@ -1387,7 +1387,6 @@ document.addEventListener('DOMContentLoaded', () => {
           referenceDataByYear: GEOZEIT_ADG_REFERENCE_DATA_BY_YEAR,
           moonPhaseEvents
         })
-        const ageLabel = Number.isFinite(ageDays) ? ageDays.toFixed(1) : 'n/a'
         const moonPhaseLabel = Number.isFinite(ageDays)
           ? getNearestMoonPhaseLabel(ageDays)
           : 'Unbekannt'
@@ -1409,9 +1408,7 @@ document.addEventListener('DOMContentLoaded', () => {
             : '·'
         const tooltipLabel = `${formatUtcSlotLabel(
           slotDate
-        )}\nAdG: ${ageLabel}\nMondphase: ${moonPhaseLabel}\nPhase: ${
-          phase.label
-        }`
+        )}\nMondphase: ${moonPhaseLabel}\nPhase: ${phase.label}`
 
         return `<td class="ostsee-ts-tide-cell"><span class="ostsee-ts-tide-segment ${
           phase.className
@@ -1524,11 +1521,22 @@ document.addEventListener('DOMContentLoaded', () => {
       .join('')
 
     const updatedLabel = formatTimestamp(payload.updatedAt)
+    const cachedWetterlageText = getCachedWetterlageText()
+    const wetterlageMarkup = cachedWetterlageText
+      ? buildWetterlageOverlayMarkup(
+          `${cachedWetterlageText}\n\nStand: ${formatTimestamp(
+            getCachedWetterlageUpdatedAt()
+          )}`
+        )
+      : ''
 
     return [
       `<span class="weatherlage-stand">DWD ${escapeHtml(
         regionLabel
       )} Zeitreihe · Stand ${escapeHtml(updatedLabel)}</span>`,
+      wetterlageMarkup
+        ? `<section class="ostsee-ts-weatherlage" aria-label="Textuelle Wetterlage">${wetterlageMarkup}</section>`
+        : '',
       '<div class="ostsee-ts-wrap">',
       '<table class="ostsee-ts-table">',
       `<thead><tr><th scope="col"></th>${tableHeaderMarkup}</tr>${tideHeaderRowMarkup}</thead>`,
