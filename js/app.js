@@ -1553,6 +1553,35 @@ document.addEventListener('DOMContentLoaded', () => {
       cachedPayload &&
       cachedUpdatedAt &&
       Date.now() - cachedUpdatedAt <= OSTSEE_TS_CACHE_TTL_MS
+    const wetterlageRefreshPromise = navigator.onLine
+      ? refreshWetterlageCacheIfNeeded().catch(() => null)
+      : Promise.resolve(null)
+
+    const rerenderCachedTimeseries = () => {
+      const latestPayload = getCachedSeaTimeseriesPayload(config.key)
+      if (!latestPayload || !isLightboxOpen) {
+        return
+      }
+
+      const currentImageElement = getCurrentLightboxImageElement()
+      const activeConfig =
+        getSeaTimeseriesConfigForImageElement(currentImageElement)
+      if (!activeConfig || activeConfig.key !== config.key) {
+        return
+      }
+
+      renderWetterlageOverlay(
+        buildSeaTimeseriesOverlayMarkup(latestPayload, {
+          regionLabel: config.label,
+          regionKey: config.key
+        }),
+        {
+          visible: true,
+          useRawMarkup: true,
+          mode: 'ostsee-timeseries'
+        }
+      )
+    }
 
     if (cachedPayload) {
       renderWetterlageOverlay(
@@ -1574,6 +1603,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (!navigator.onLine || isCacheFresh) {
+      await wetterlageRefreshPromise
+      rerenderCachedTimeseries()
+
       if (!cachedPayload && !navigator.onLine) {
         renderWetterlageOverlay(config.offlineLabel, {
           visible: true,
@@ -1609,6 +1641,9 @@ document.addEventListener('DOMContentLoaded', () => {
           mode: 'ostsee-timeseries'
         }
       )
+
+      await wetterlageRefreshPromise
+      rerenderCachedTimeseries()
     } catch {
       if (!cachedPayload) {
         renderWetterlageOverlay(config.unavailableLabel, {

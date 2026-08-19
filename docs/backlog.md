@@ -12,7 +12,6 @@
 
 - US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 - US-017 – UI-Texte für Internationalisierung strukturieren
-- US-020 – Textuelle Wetterlage vor der DWD-Seewetter-Zeitreihe ergänzen
 
 ## 🟨 DOING
 
@@ -40,6 +39,7 @@ _(aktuell keine Story in Bearbeitung)_
 - US-021 – Kompaktes Inhaltsfenster in der gezoomten Seegang-Ostsee-Lightbox
 - US-022 – Kompakte Nordsee-Zeitreihe in der Seegang-Nordsee-Lightbox
 - US-023 – AdG-Gezeitenindikator in der DWD-Nordsee-Zeitreihe
+- US-020 – Textuelle Wetterlage vor der DWD-Seewetter-Zeitreihe ergänzen
 
 ---
 
@@ -141,7 +141,7 @@ Land, Höhe und Seegang sollen nicht mehr als Text dargestellt werden.
 
 ## 🌊 US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 
-**Status:** TODO
+**Status:** DONE
 **Priorität:** Hoch
 
 👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Wind gegen Strom“
@@ -1584,14 +1584,14 @@ Hinweis:
 
 **AK7 – Textuelle Wetterlage**
 
-- [ ] Gegeben ein verfügbarer DWD-Seewetterbericht
-- [ ] Wenn die Zeitreihe dargestellt wird
-- [ ] Dann wird die textuelle Wetterlage unmittelbar vor der Tabelle angezeigt
-- [ ] Der Zeitstempel `Stand:` ist sichtbar
-- [ ] Wetterlage und Zeitreihe beziehen sich auf denselben Bericht bzw. Datenstand
-- [ ] Der Text bleibt vollständig lesbar und scrollbar
-- [ ] Der zuletzt verfügbare Text wird im Offline-Modus aus dem bestehenden Cache angezeigt
-- [ ] Wenn kein Text verfügbar ist, bleibt die Zeitreihe dennoch nutzbar
+- [x] Gegeben ein verfügbarer DWD-Seewetterbericht
+- [x] Wenn die Zeitreihe dargestellt wird
+- [x] Dann wird die textuelle Wetterlage unmittelbar vor der Tabelle angezeigt
+- [x] Der Zeitstempel `Stand:` ist sichtbar
+- [x] Wetterlage und Zeitreihe beziehen sich auf denselben Bericht bzw. Datenstand
+- [x] Der Text bleibt vollständig lesbar und scrollbar
+- [x] Der zuletzt verfügbare Text wird im Offline-Modus aus dem bestehenden Cache angezeigt
+- [x] Wenn kein Text verfügbar ist, bleibt die Zeitreihe dennoch nutzbar
 
 ---
 
