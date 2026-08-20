@@ -500,6 +500,14 @@
     font-size: 0.76rem;
   }
 
+  .lightbox-weatherlage.ostsee-timeseries:not(.is-collapsed) {
+    max-height: min(72dvh, 72vh);
+  }
+
+  .ostsee-ts-weatherlage {
+    max-height: min(16rem, 36vh);
+  }
+
   .ostsee-ts-tide-segment[data-label-compact] {
     font-size: 0;
     line-height: 0;
