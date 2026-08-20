@@ -1550,11 +1550,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const updatedLabel = formatTimestamp(payload.updatedAt)
     const cachedWetterlageText = getCachedWetterlageText(regionKey)
     const wetterlageMarkup = cachedWetterlageText
-      ? buildWetterlageOverlayMarkup(
-          `${cachedWetterlageText}\n\nStand: ${formatTimestamp(
-            getCachedWetterlageUpdatedAt(regionKey)
-          )}`
-        )
+      ? buildWetterlageOverlayMarkup(cachedWetterlageText)
       : ''
 
     return [
@@ -1753,8 +1749,43 @@ document.addEventListener('DOMContentLoaded', () => {
       ? normalizedMessage.slice(0, standMatch.index).trimEnd()
       : normalizedMessage
 
-    const renderedLines = textBody
-      .split('\n')
+    const textLines = textBody.split('\n')
+    const weatherlageTitleIndex = textLines.findIndex(line =>
+      /^(Aktuelle\s+)?Wetterlage(?:\s+und\s+-?entwicklung)?\s*:?\s*$/i.test(
+        line.trim()
+      )
+    )
+    const forecastTitleIndex = textLines.findIndex(
+      (line, index) =>
+        index > weatherlageTitleIndex &&
+        /^Vorhersage(?:\s+f[uü]r.*)?\s*:?\s*$/i.test(line.trim())
+    )
+
+    const hasCompactWeatherlageTitle =
+      weatherlageTitleIndex >= 0 &&
+      /Wetterlage\s+und\s+-?entwicklung/i.test(
+        textLines[weatherlageTitleIndex]
+      )
+
+    if (hasCompactWeatherlageTitle) {
+      const weatherlageEndIndex =
+        forecastTitleIndex >= 0 ? forecastTitleIndex : textLines.length
+      const compactWeatherlageText = textLines
+        .slice(weatherlageTitleIndex + 1, weatherlageEndIndex)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .join(' ')
+
+      textLines.splice(
+        weatherlageTitleIndex,
+        weatherlageEndIndex - weatherlageTitleIndex,
+        [textLines[weatherlageTitleIndex].trim(), compactWeatherlageText]
+          .filter(Boolean)
+          .join(' ')
+      )
+    }
+
+    const renderedLines = textLines
       .map((line, index, lines) => {
         const trimmedLine = line.trim()
         if (!trimmedLine) {
@@ -1772,6 +1803,17 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           return ''
+        }
+
+        const compactWeatherlageMatch = trimmedLine.match(
+          /^((?:Aktuelle\s+)?Wetterlage(?:\s+und\s+-?entwicklung)?)\s*:\s*(.+)$/i
+        )
+        if (compactWeatherlageMatch) {
+          return `<span class="weatherlage-section-title">${escapeHtml(
+            compactWeatherlageMatch[1]
+          )}:</span> ${highlightSeewetterKeywords(
+            escapeHtml(compactWeatherlageMatch[2])
+          )}`
         }
 
         if (
@@ -1849,7 +1891,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const isOstseeTimeseries = mode === 'ostsee-timeseries'
-    const shouldStartCollapsed = false
+    const shouldStartCollapsed = true
 
     lightboxWeatherlageElement.classList.toggle(
       'ostsee-timeseries',
@@ -1865,8 +1907,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <button
             class="ostsee-ts-toggle"
             type="button"
-            aria-expanded="true"
-          >Zeitreihe schließen</button>
+            aria-expanded="false"
+          >Zeitreihe öffnen</button>
           <div class="ostsee-ts-content">${renderedContent}</div>
         </div>`
       : renderedContent

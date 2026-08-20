@@ -427,6 +427,10 @@
   padding-bottom: 10px;
 }
 
+.lightbox-weatherlage.ostsee-timeseries:not(.is-collapsed) {
+  max-height: min(56dvh, 56vh);
+}
+
 .lightbox-weatherlage.ostsee-timeseries.is-collapsed .ostsee-ts-content,
 .ostsee-ts-shell.is-collapsed .ostsee-ts-content {
   display: none;
@@ -449,8 +453,8 @@
 }
 
 .ostsee-ts-weatherlage {
-  flex: 0 1 auto;
-  max-height: min(9rem, 22vh);
+  flex: 0 0 auto;
+  max-height: min(14rem, 40vh);
   margin: 0 0 6px;
   padding: 0 4px 4px;
   overflow-x: hidden;
@@ -552,6 +556,8 @@
 }
 
 .ostsee-ts-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: auto;
   touch-action: auto;

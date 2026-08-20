@@ -1483,6 +1483,7 @@ damit ich Wind, Böen, Seegang und Wetterentwicklung über mehrere Tage schnell 
 - Wetterereignisse als Kürzel oder Symbol
 - Textuelle Wetterlage unmittelbar vor der Zeitreihen-Tabelle
 - Wetterlage und Zeitreihe beziehen sich auf denselben DWD-Datenstand
+- Die Zeitreihe ist beim initialen Öffnen eingeklappt und kann bewusst geöffnet werden
 
 ---
 
@@ -1587,8 +1588,12 @@ Hinweis:
 - [x] Gegeben ein verfügbarer DWD-Seewetterbericht
 - [x] Wenn die Zeitreihe dargestellt wird
 - [x] Dann wird die textuelle Wetterlage unmittelbar vor der Tabelle angezeigt
-- [x] Der Zeitstempel `Stand:` ist sichtbar
+- [x] Der Zeitstempel `Stand:` ist in der kombinierten Ansicht genau einmal sichtbar
 - [x] Wetterlage und Zeitreihe beziehen sich auf denselben Bericht bzw. Datenstand
+- [x] Der Abschnitt `Wetterlage und -entwicklung:` wird ohne unnötige Zeilenumbrüche kompakt mit dem anschließenden Text dargestellt
+- [x] Der Wetterlage-Bereich passt seine Höhe dynamisch an die Textmenge an und erzeugt bei kurzen Texten keinen unnötigen Leerraum
+- [x] Die Zeitreihe nutzt den verbleibenden verfügbaren Platz und bleibt unabhängig scrollbar
+- [x] Die Zeitreihe ist beim initialen Öffnen eingeklappt und wird erst durch die Öffnen-Aktion angezeigt
 - [x] Der Text bleibt vollständig lesbar und scrollbar
 - [x] Der zuletzt verfügbare Text wird im Offline-Modus aus dem bestehenden Cache angezeigt
 - [x] Wenn kein Text verfügbar ist, bleibt die Zeitreihe dennoch nutzbar
