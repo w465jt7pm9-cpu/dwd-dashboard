@@ -1157,6 +1157,7 @@ Der Text wird nicht als strukturierte API (JSON), sondern als Klartext geliefert
 - [x] Overlay wird im Zoom-Modus der Bodenwetterkarte angezeigt
 - [x] Darstellung ist dezent (halbtransparent, unten positioniert)
 - [x] Text ist scrollbar und gut lesbar
+- [x] Der Berichtstext wird ohne unnötige führende Leerzeilen dargestellt, auch bei bereits gecachtem Inhalt
 - [x] Overlay beeinträchtigt Zoom- und Pan-Gesten nicht
 
 ---

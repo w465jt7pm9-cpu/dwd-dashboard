@@ -176,6 +176,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function getWetterlageSourceTimestamp (text, fallbackTimestamp = null) {
+    const publicationMatch = String(text || '').match(
+      /\bam\s+(\d{1,2})\.(\d{1,2})\.(\d{4}),?\s+(\d{1,2}):(\d{2})\s*(MESZ|MEZ|UTC|GMT)?/i
+    )
+    if (!publicationMatch) {
+      return fallbackTimestamp
+    }
+
+    const [, day, month, year, hour, minute, timezone = 'UTC'] = publicationMatch
+    const timezoneOffsetHours =
+      timezone.toUpperCase() === 'MESZ'
+        ? 2
+        : timezone.toUpperCase() === 'MEZ'
+          ? 1
+          : 0
+    const timestamp = Date.UTC(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hour) - timezoneOffsetHours,
+      Number(minute)
+    )
+
+    return Number.isFinite(timestamp) ? timestamp : fallbackTimestamp
+  }
+
   function formatWetterlageStand (timestamp) {
     const formattedTimestamp = formatTimestamp(timestamp)
     const numericTimestamp = Number(timestamp)
@@ -274,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function getCachedWetterlageText (regionKey) {
     const cacheKeys = getWetterlageCacheKeys(regionKey)
     try {
-      return localStorage.getItem(cacheKeys.text)
+      return normalizeWetterlageText(localStorage.getItem(cacheKeys.text))
     } catch {
       return null
     }
@@ -1872,7 +1898,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     return `<span class="weatherlage-stand">Stand: ${escapeHtml(
       standText
-    )}</span>\n\n${renderedLines}`
+    )}</span>\n${renderedLines}`
   }
 
   function setOstseeTimeseriesToggleState (isCollapsed) {
@@ -2068,6 +2094,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  async function fetchWetterlageFromSeewetterbericht () {
+    const response = await fetch(DWD_SEEWETTERBERICHT_URL, {
+      cache: 'no-cache'
+    })
+    if (!response.ok) {
+      throw new Error('Seewetterbericht nicht erreichbar')
+    }
+
+    const htmlText = await response.text()
+    const weatherlageText = extractSeewetterberichtSection(htmlText)
+    if (!weatherlageText) {
+      throw new Error('Seewetterbericht konnte nicht extrahiert werden')
+    }
+
+    return {
+      text: weatherlageText,
+      sourceUrl: DWD_SEEWETTERBERICHT_URL
+    }
+  }
+
   async function fetchWetterlageFromRegionalPage (regionKey) {
     const regionalUrl =
       regionKey === 'nordsee' ? DWD_NORDSEE_3DAY_URL : DWD_OSTSEE_3DAY_URL
@@ -2152,7 +2198,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const cachedUpdatedAt = getCachedWetterlageUpdatedAt()
 
     if (cachedText) {
-      const standLabel = formatWetterlageStand(cachedUpdatedAt)
+      const standTimestamp = getWetterlageSourceTimestamp(
+        cachedText,
+        cachedUpdatedAt
+      )
+      const standLabel = formatWetterlageStand(standTimestamp)
       renderWetterlageOverlay(`${cachedText}\n\n${standLabel}`, {
         visible: true
       })
@@ -2187,7 +2237,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return
       }
 
-      const standLabel = formatWetterlageStand(cachePayload.updatedAt)
+      const standTimestamp = getWetterlageSourceTimestamp(
+        cachePayload.text,
+        cachePayload.updatedAt
+      )
+      const standLabel = formatWetterlageStand(standTimestamp)
       renderWetterlageOverlay(
         `${cachePayload.text}\n\n${standLabel}`,
         { visible: true }
