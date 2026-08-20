@@ -1165,6 +1165,7 @@ Der Text wird nicht als strukturierte API (JSON), sondern als Klartext geliefert
 
 - [x] Letzter geladener Seewetterbericht wird im Cache gespeichert
 - [x] Im Offline-Modus wird der zuletzt verfügbare Text angezeigt
+- [x] Ein älterer gecachter Stand wird im sichtbaren `Stand:`-Hinweis ab 24 Stunden als `VERALTET` mit Altersangabe gekennzeichnet
 - [x] Wenn kein Cache vorhanden ist, wird ein sinnvoller Fallback angezeigt
 
 ---

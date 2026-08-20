@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const DWD_NORDSEE_3DAY_URL =
     'https://www.dwd.de/DE/leistungen/seevorhersagenordsee/seevorhersagennordsee.html?nn=16102'
   const OSTSEE_TS_CACHE_TTL_MS = 3 * 60 * 60 * 1000
+  const WETTERLAGE_STALE_AFTER_MS = 24 * 60 * 60 * 1000
   const LAST_KNOWN_IMAGE_URL_KEY_PREFIX = 'dwdImageLastKnownUrl:'
   const THEME_STORAGE_KEY = 'dwdTheme'
 
@@ -173,6 +174,28 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch {
       return '-'
     }
+  }
+
+  function formatWetterlageStand (timestamp) {
+    const formattedTimestamp = formatTimestamp(timestamp)
+    const numericTimestamp = Number(timestamp)
+
+    if (!Number.isFinite(numericTimestamp)) {
+      return `Stand: ${formattedTimestamp}`
+    }
+
+    const ageMs = Math.max(0, Date.now() - numericTimestamp)
+    if (ageMs < WETTERLAGE_STALE_AFTER_MS) {
+      return `Stand: ${formattedTimestamp}`
+    }
+
+    const ageHours = Math.floor(ageMs / (60 * 60 * 1000))
+    const ageLabel =
+      ageHours >= 48
+        ? `${Math.floor(ageHours / 24)} Tage alt`
+        : `${ageHours} Stunden alt`
+
+    return `Stand: ${formattedTimestamp} · VERALTET (${ageLabel})`
   }
 
   function getLastSuccessfulRefresh () {
@@ -2070,7 +2093,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function fetchRelevantWetterlage (regionKey) {
     if (regionKey) {
-      return fetchWetterlageFromRegionalPage(regionKey)
+      try {
+        return await fetchWetterlageFromRegionalPage(regionKey)
+      } catch {
+        return fetchWetterlageFromFeed()
+      }
     }
 
     try {
@@ -2125,8 +2152,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const cachedUpdatedAt = getCachedWetterlageUpdatedAt()
 
     if (cachedText) {
-      const updatedLabel = formatTimestamp(cachedUpdatedAt)
-      renderWetterlageOverlay(`${cachedText}\n\nStand: ${updatedLabel}`, {
+      const standLabel = formatWetterlageStand(cachedUpdatedAt)
+      renderWetterlageOverlay(`${cachedText}\n\n${standLabel}`, {
         visible: true
       })
     } else {
@@ -2160,9 +2187,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return
       }
 
-      const updatedLabel = formatTimestamp(cachePayload.updatedAt)
+      const standLabel = formatWetterlageStand(cachePayload.updatedAt)
       renderWetterlageOverlay(
-        `${cachePayload.text}\n\nStand: ${updatedLabel}`,
+        `${cachePayload.text}\n\n${standLabel}`,
         { visible: true }
       )
     } catch {
