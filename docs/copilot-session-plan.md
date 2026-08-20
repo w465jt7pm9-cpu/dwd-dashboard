@@ -1,152 +1,106 @@
 # Copilot Session Plan – DWD Dashboard
 
-> Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
+> Release-1.6 (2026-08-20): Dieser Ablaufplan beschreibt den aktuellen Arbeitsprozess. US-006 (Wind-gegen-Strom-Erkennung) bleibt eine geplante Idee und ist nicht implementiert.
 
 ## Zweck
 
-Diese Datei ist ein kurzer Ablaufplan für die Arbeit mit GitHub Copilot in VS Code.
-Sie legt fest, **welcher Prompt in welcher Datei** am sinnvollsten ausgeführt wird.
+Diese Datei beschreibt einen wiederverwendbaren Ablauf für Arbeiten am DWD
+Dashboard mit GitHub Copilot in VS Code. Sie ergänzt:
 
----
+- [copilot-checklist.md](copilot-checklist.md) mit Regeln und Prüfpunkten
+- [copilot-prompts.md](copilot-prompts.md) mit thematischen Arbeits-Prompts
 
-## Empfohlene Reihenfolge
+Der Plan ist kein historisches Änderungsprotokoll. Bereits abgeschlossene
+Umbauten werden nicht erneut als Umsetzungsschritte vorgeschlagen.
 
-### Schritt 1 – Analyse
+## Arbeitsablauf
 
-**Datei öffnen:** `index.html` und `app.js`  
-**Prompt verwenden:** Analyse aus `copilot-checklist.md`
+### 1. Aufgabe und Codepfad klären
 
-**Ziel:**
+**Dateien öffnen:** direkt betroffene Datei sowie benachbarte Tests
 
-- betroffene DOM-Elemente identifizieren
-- betroffene Funktionen identifizieren
-- minimale Änderungsstrategie festlegen
-- Risiken vorab sichtbar machen
+**Vorgehen:**
 
----
+- konkrete Anforderung und betroffene Oberfläche festhalten
+- steuernde Funktion oder Datenstruktur identifizieren
+- eine lokale Hypothese und einen kleinen diskriminierenden Test formulieren
+- bestehende Änderungen im Arbeitsbaum berücksichtigen
 
-### Schritt 2 – Sichtbare Steuerleisten entfernen
+**Prompt:** `Analyse zuerst` aus [copilot-prompts.md](copilot-prompts.md)
 
-**Datei öffnen:** `index.html`  
-**Dann zusätzlich:** `app.js`  
-**Prompt verwenden:** „Topbar + Thumbbar entfernen“
+### 2. Kleinste Änderung umsetzen
 
-**Ziel:**
+**Vorgehen:**
 
-- `#topbar` entfernen oder unsichtbar machen
-- `.thumbbar` entfernen oder unsichtbar machen
-- sichtbare `pageTitle`, `status`, `pageSummary` entfernen bzw. ausblenden
-- Event-Listener in `app.js` defensiv bereinigen
+- vorhandene Muster und Hilfsfunktionen wiederverwenden
+- nur den direkt verantwortlichen Codepfad ändern
+- keine neue Bibliothek und keine unbeauftragten Refactorings einführen
+- nach der ersten Änderung sofort den fokussierten Test ausführen
 
----
+### 3. Fachliche Daten- und UI-Prüfung
 
-### Schritt 3 – Zyklische Navigation umsetzen
+Je nach Aufgabe den passenden Prompt verwenden:
 
-**Datei öffnen:** `app.js`  
-**Prompt verwenden:** „Navigation zyklisch machen“
+- Seewetter-Zeitreihen für Nordsee und Ostsee
+- Wetterlage-Overlay und Offline-Cache
+- Gezeitenphase ausschließlich in der Nordsee-Zeitreihe
+- gemeinsames Seegang-Inhaltsfenster mit getrennten Regionalansichten
+- Datenzyklus, Cache und Offline-Verhalten
 
-**Ziel:**
+Die relevanten Prompts stehen in [copilot-prompts.md](copilot-prompts.md).
 
-- `goToPage()` so anpassen, dass die Seitennavigation zyklisch wird
-- ArrowLeft / ArrowRight, Swipe und Edge-Tap konsistent halten
-- Lightbox-Navigation nicht verändern
+### 4. Interaktionen und Regressionen prüfen
 
----
+Bei Änderungen an UI, Daten oder Lightbox kontrollieren:
 
-### Schritt 4 – Pull-to-Refresh ergänzen
+- Carousel-Navigation per Tastatur, Swipe und Edge-Tap
+- getrennte Lightbox-Navigation
+- Zoom, Pan, Peek und Schließen
+- Pull-to-Refresh und Refresh-Zyklus
+- System-Dark-Mode
+- Karten-Badges und Offline-Fallbacks
+- Accessibility-Texte wie `aria-label` und `alt`
 
-**Datei öffnen:** `app.js`  
-**Prompt verwenden:** „Pull-to-Refresh statt Buttons“
+### 5. Dokumentation synchronisieren
 
-**Ziel:**
+Nach einer fachlichen oder sichtbaren Änderung prüfen:
 
-- Refresh-Button-Logik als Bedienkonzept ersetzen
-- Pull-to-Refresh nur auf Seiten `0–2`
-- nur im oberen Startzustand
-- kein zusätzliches visuelles Feedback
-- Lightbox unberührt lassen
+- [README.md](../README.md)
+- [docs/backlog.md](backlog.md)
+- [docs/UI-Struktur.md](UI-Struktur.md)
+- [docs/Gesamtarchitektur.md](Gesamtarchitektur.md)
+- [docs/copilot-checklist.md](copilot-checklist.md)
+- [docs/copilot-prompts.md](copilot-prompts.md)
 
----
+Begriffe wie „Gezeitenphase“, Release-Stand und Story-Status müssen überall
+konsistent sein. US-006 darf nicht als umgesetzt erscheinen.
 
-### Schritt 5 – Theme auf Systemsteuerung umstellen
+### 6. Abschlussvalidierung
 
-**Datei öffnen:** `app.js`  
-**Prompt verwenden:** „Theme automatisch aus dem System“
+```text
+1. Fokussierten Test für den geänderten Codepfad ausführen.
+2. bash scripts/run-tests.sh ausführen.
+3. git diff --check ausführen.
+4. git diff auf unbeabsichtigte Änderungen prüfen.
+5. Status und Begriffe in der relevanten Dokumentation abgleichen.
+6. Manuelle UI-Prüfung auf Desktop und Touch durchführen, wenn Interaktion
+   oder Layout betroffen ist.
+```
 
-**Ziel:**
+## Aktuelle fachliche Leitplanken
 
-- `prefers-color-scheme` verwenden
-- live auf Systemwechsel reagieren
-- manuelle Theme-Toggle-Logik entfernen oder stilllegen
-
----
-
-### Schritt 6 – Redundante Statuslogik bereinigen
-
-**Datei öffnen:** `app.js`  
-**Prompt verwenden:** „Redundante Statuslogik bereinigen“
-
-**Ziel:**
-
-- keine globale sichtbare Status-/Summary-Anzeige mehr
-- Karten-Badges beibehalten
-- Offline-/Refresh-Stabilität erhalten
-
----
-
-### Schritt 7 – Abschluss-Review
-
-**Datei öffnen:** `index.html` und `app.js`  
-**Prompt verwenden:** „Abschluss-Review“
-
-**Ziel:**
-
-- Regressionen erkennen
-- tote Logik finden
-- letzte Bereinigungen planen
-- manuelle Testliste durchgehen
-
----
+- Die App bleibt eine Vanilla-JavaScript-Anwendung ohne Framework.
+- Bildquellen, Service Worker und bestehende Cache-Strategie bleiben stabil.
+- Seewettertexte und Zeitreihen werden aus DWD-Produkten aufbereitet.
+- Die Gezeitenphase ist eine begrenzte eigene Ableitung und ersetzt keine
+  amtliche Gezeitenvorausberechnung.
+- US-006 ist nur Konzept: keine Mock-Bewertung und kein Produktionscode ohne
+  geklärte Datenquellen und Produktentscheidung.
 
 ## Praktischer Einsatz in VS Code
 
-### Schnellster Workflow
-
-1. `copilot-checklist.md` offen lassen
-2. die jeweils betroffene Datei öffnen
-3. Kurzprompt kopieren
-4. Copilot Chat nur für **einen Änderungsschritt gleichzeitig** verwenden
-5. nach jedem Schritt manuell testen
-6. erst dann zum nächsten Schritt gehen
-
----
-
-## Empfehlung zur Ablage
-
-### Sinnvoll ins Projekt aufnehmen
-
-**Ja, aber am besten nicht im Runtime-Pfad der App.**
-
-Empfohlene Ablage:
-
-- `docs/copilot-prompts.md`
-- `docs/copilot-checklist.md`
-- `docs/copilot-session-plan.md`
-
-### Warum diese Ablage sinnvoll ist
-
-- bleibt versionierbar
-- hilft bei späteren Änderungen
-- dokumentiert Entscheidungen für dich selbst
-- stört weder HTML, JS noch Deployment-Struktur
-
-### Wenn du es besonders schlank halten willst
-
-Dann kannst du die Dateien auch **außerhalb** des eigentlichen App-Ordners halten, z. B. in einem separaten Notiz-/Arbeitsordner.
-
----
-
-## Empfehlung
-
-Für dein Solo-Projekt würde ich diese Dateien **aufnehmen, aber in einen `docs/`-Ordner legen**.
-Nicht neben `index.html`, `app.js` oder produktiven Assets, sondern klar getrennt als Arbeits- und Projektdokumentation.
+1. `copilot-checklist.md` als Regeln geöffnet lassen.
+2. `copilot-prompts.md` für den konkreten Arbeitsbereich verwenden.
+3. Pro Copilot-Schritt nur eine klar abgegrenzte Änderung anfordern.
+4. Nach jeder Änderung fokussiert testen.
+5. Erst nach erfolgreicher Prüfung den nächsten Code- oder Dokumentationsschritt beginnen.

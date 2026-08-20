@@ -1,6 +1,6 @@
 # 📊 DWD Dashboard – Mini Backlog
 
-> Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
+> Release-1.6 (2026-08-20): Testsuite erfolgreich abgeschlossen; US-015, US-016, US-020, US-022 und US-023 sind umgesetzt.
 
 ---
 
@@ -38,8 +38,8 @@ _(aktuell keine Story in Bearbeitung)_
 - US-019 – Seewettertext vorab online cachen
 - US-021 – Kompaktes Inhaltsfenster in der gezoomten Seegang-Ostsee-Lightbox
 - US-022 – Kompakte Nordsee-Zeitreihe in der Seegang-Nordsee-Lightbox
-- US-023 – AdG-Gezeitenindikator in der DWD-Nordsee-Zeitreihe
-- US-020 – Textuelle Wetterlage vor der DWD-Seewetter-Zeitreihe ergänzen
+- US-023 – Gezeitenphasenindikator in der DWD-Nordsee-Zeitreihe
+- US-020 – Kompakte Darstellung von DWD-Seewetter-Zeitreihen
 
 ---
 
@@ -141,7 +141,7 @@ Land, Höhe und Seegang sollen nicht mehr als Text dargestellt werden.
 
 ## 🌊 US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 
-**Status:** DONE
+**Status:** TODO
 **Priorität:** Hoch
 
 👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Wind gegen Strom“
@@ -1462,7 +1462,7 @@ Nachteile:
 
 ## 🌬️ US-020 – Kompakte Darstellung von DWD-Seewetter-Zeitreihen
 
-**Status:** TODO
+**Status:** DONE
 **Priorität:** Hoch
 
 ---
@@ -1700,7 +1700,7 @@ damit ich Wind, Böen, Seegang und Wetterentwicklung auch für die Nordsee schne
 
 ---
 
-## 🌊 US-023 – AdG-Gezeitenindikator in der DWD-Nordsee-Zeitreihe
+## 🌊 US-023 – Gezeitenphasenindikator in der DWD-Nordsee-Zeitreihe
 
 **Status:** DONE  
 **Priorität:** Mittel
@@ -1713,14 +1713,14 @@ Als Nutzer eines Nordsee-Wetterdashboards (Segler, Skipper, Offshore-Nutzer)
 möchte ich den aktuellen Stand des Spring-Nipp-Zyklus direkt in der DWD-Zeitreihe sehen  
 damit ich Wind, Welle und Wetter im Zusammenhang mit den erwarteten Gezeiten- und Strömungsverhältnissen bewerten kann.
 
-Die AdG-Klassifikation soll auf einen generischen AdG-Generator zurückgreifen. Tests sichern die Ergebnisse des AdG-Generators gegen offizielle BSH-Referenzdaten ab.
+Die Gezeitenphasen-Klassifikation verwendet technisch einen generischen AdG-Generator. Tests sichern die Ergebnisse des Generators gegen offizielle BSH-Referenzdaten ab.
 
 ---
 
 ### 🎯 Zielbild
 
 - Die bestehende DWD-Nordsee-Zeitreihe wird um einen zusätzlichen Gezeitenindikator erweitert
-- Es wird ein AdG-Generator verwendet, der auf Neumond-, Vollmond-, Erstem-Viertel- und Letztem-Viertel-Daten aufbaut
+- Die Gezeitenphase wird mit einem Generator bestimmt, der auf Neumond-, Vollmond-, Erstem-Viertel- und Letztem-Viertel-Daten aufbaut
 - Die Darstellung erfolgt als durchgehender Farbbalken in der zweiten Zeile unter Datum/Uhrzeit
 - Je Zeitstufe wird ein Textmarker angezeigt (Spring, Mitt, Nipp)
 - Der Balken wird pro Zeitstufe (06, 12, 18, 00 UTC) aktualisiert
@@ -1729,7 +1729,7 @@ Die AdG-Klassifikation soll auf einen generischen AdG-Generator zurückgreifen. 
 
 ### 🧭 Phasenmodell (astronomisch vereinfacht)
 
-- Das AdG/Gezeitenalter wird als kontinuierliches Mondalter seit einem Referenz-Neumond berechnet und auf die synodische Mondperiode von rund 29,53 Tagen bezogen
+- Das technische Gezeitenalter wird als kontinuierliches Mondalter seit einem Referenz-Neumond berechnet und auf die synodische Mondperiode von rund 29,53 Tagen bezogen
 - Die Springzeit dauert 4 Tage, sie entsteht aus Springereignissen rund um Neumond und Vollmond mit einer Springverspätung von ca. 1 Tag
 - Nippzeit entsteht aus Nippereignissen rund um Erstes und Letztes Viertel
 - Mittzeit ist die Übergangsphase zwischen Springzeit und Nippzeit
@@ -1757,7 +1757,7 @@ Die AdG-Klassifikation soll auf einen generischen AdG-Generator zurückgreifen. 
 
 - [x] Gegeben ein Prognosezeitpunkt
 - [x] Wenn die Zeitreihe erzeugt wird
-- [x] Dann wird die Phase aus der AdG-Generatorlogik abgeleitet
+- [x] Dann wird die Gezeitenphase aus der Generatorlogik abgeleitet
 - [x] Und Ubergangsbereiche werden als Mittzeit klassifiziert
 
 **AK6 – Farbcodierung**
@@ -1781,7 +1781,7 @@ Die AdG-Klassifikation soll auf einen generischen AdG-Generator zurückgreifen. 
 - [x] Dann bleibt die zweite Zeile unter der Datums-/Uhrzeitzeile sichtbar und spalten-synchron ausgerichtet
 - [x] Und die Phasenkennzeichnung ist je Zeitstufe als Textmarker (Spring, Mitt, Nipp) erkennbar
 - [x] Auf schmalen Displays werden stattdessen die Kurzbezeichner Sp, Mt und Np verwendet, damit die Darstellung kompakt bleibt
-- [x] Und ein statischer Zeilenlabel-Text "AdG" kann entfallen
+- [x] Und ein statischer Zeilenlabel-Text kann entfallen
 
 **AK9 – Tooltip**
 

@@ -1,6 +1,6 @@
 # 📂 docs – Copilot & Arbeitsdokumentation
 
-> Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
+> Release-1.6 (2026-08-20): Testsuite erfolgreich abgeschlossen; US-015, US-016, US-020, US-022 und US-023 sind umgesetzt. US-006 bleibt eine geplante Idee.
 
 ## Zweck dieses Ordners
 
@@ -19,17 +19,17 @@ Die Dateien sind **kein Bestandteil der laufenden Anwendung**, sondern dienen au
 
 ### 1. `copilot-prompts.md`
 
-Enthält ausführliche, strukturierte Prompts für GitHub Copilot.
+Enthält aktuelle, strukturierte Prompts für GitHub Copilot.
 
 ✅ Zweck:
 
-- vollständige Beschreibung aller geplanten Änderungen
-- detaillierte Anforderungen und Randbedingungen
-- geeignet für komplexe oder erste Implementierungen
+- Analyse vor Änderungen
+- Prüfungen für Zeitreihen, Wetterlage, Gezeitenphase und Offline-Verhalten
+- technische Leitplanken für die weiterhin geplante US-006
 
 👉 Nutzung:
 
-- wenn du Änderungen **verstehen oder neu aufsetzen** willst
+- wenn du einen fachlich abgegrenzten Änderungs- oder Prüf-Prompt brauchst
 
 ---
 
@@ -71,7 +71,7 @@ High-Level-Systemübersicht (Mermaid) für Komponenten und Datenfluss.
 ✅ Zweck:
 
 - visuelle Struktur des Carousels und der Kern-Interaktionen
-- Bezug zu releaseten UX-Updates (z. B. US-009 bis US-014)
+- Bezug zu den aktuellen UX- und Zeitreihen-Updates
 
 👉 Nutzung:
 
@@ -96,13 +96,13 @@ Spezifische Interaktionslogik der Lightbox (Zoom, Pan, Peek, Navigation).
 
 ### 6. `copilot-checklist.md`
 
-Kompakte Version der Prompts in Form einer Schritt-für-Schritt-Checkliste.
+Aktuelle Kurz-Checkliste für Analyse, Umsetzung und Review.
 
 ✅ Zweck:
 
 - schneller Copy-&-Paste in Copilot Chat
-- reduzierte Komplexität im Alltag
-- Fokus auf einzelne Änderungen
+- Fokus auf kleine, überprüfbare Änderungen
+- Release-1.6-Regeln und US-006-Abgrenzung
 
 👉 Nutzung:
 
@@ -112,13 +112,13 @@ Kompakte Version der Prompts in Form einer Schritt-für-Schritt-Checkliste.
 
 ### 7. `copilot-session-plan.md`
 
-Definiert die optimale **Reihenfolge und Struktur** für die Arbeit mit Copilot.
+Definiert den aktuellen **Ablauf und die Struktur** für die Arbeit mit Copilot.
 
 ✅ Zweck:
 
-- klare Schrittfolge
+- klare Schrittfolge für Analyse, Änderung, Test und Dokumentationsabgleich
 - minimiert Fehler und unnötige Refactorings
-- sorgt für stabile, inkrementelle Änderungen
+- verhindert, dass abgeschlossene Schritte erneut umgesetzt werden
 
 👉 Nutzung:
 
@@ -126,15 +126,33 @@ Definiert die optimale **Reihenfolge und Struktur** für die Arbeit mit Copilot.
 
 ---
 
+### 8. `TESTING.md`
+
+Zentrale Dokumentation für automatisierte und manuelle Qualitätssicherung.
+
+✅ Zweck:
+
+- Testbereiche und fokussierte Testbefehle erklären
+- manuelle Prüfung von Navigation, Lightbox, Offline-Verhalten und Darstellung
+- CI- und Git-Hook-Ausführung dokumentieren
+- Grenzen der automatisierten Tests festhalten
+
+👉 Nutzung:
+
+- nach jeder Codeänderung und vor einem Release
+
+---
+
 ## 🧠 Empfohlener Workflow
 
-1. `backlog.md` öffnen und aktives Ziel (US) prüfen
+1. `backlog.md` öffnen und aktives Ziel (US) prüfen; US-006 ist derzeit nur eine Idee
 2. `Gesamtarchitektur.md` und `UI-Struktur.md` für den betroffenen Bereich querlesen
 3. bei Lightbox-/Gesten-Themen zusätzlich `Lightbox-Interaktionen.md` prüfen
 4. passenden Prompt aus `copilot-prompts.md` oder `copilot-checklist.md` wählen
-5. Änderung umsetzen lassen
-6. direkt im Browser testen (inkl. Regression der Kerninteraktionen)
-7. Backlog-Status und Akzeptanzkriterien aktualisieren
+5. kleinste Änderung umsetzen lassen
+6. fokussierten Test ausführen und anschließend `bash scripts/run-tests.sh` starten
+7. direkt im Browser testen, wenn UI oder Interaktion betroffen ist
+8. Backlog-Status und Akzeptanzkriterien aktualisieren
 
 ---
 

@@ -11,7 +11,7 @@
 > Update US-014: Offline-Zugriff nutzt den letzten erfolgreichen Bildstand pro Karte, auch nach Resize- oder Orientation-Änderungen.
 > Update US-020/US-021: In der gezoomten Ostsee-Lightbox wird pro Karte ein kompaktes Inhaltsfenster eingeblendet; es zeigt eine kompakte Zeitreihen-Ansicht mit Wind, Böen, Welle und Wetter und lässt sich bei Bedarf zusammenklappen.
 > Update US-022: Für die Nordsee-Lightbox wird eine analoge, kompakte Zeitreihen-Ansicht ergänzt.
-> Update US-023: Die Nordsee-Zeitreihe enthält zusätzlich einen AdG-Gezeitenindikator mit farbigen Segmenten und Kurzbezeichnern (Sp/Mt/Np) auf schmalen Displays.
+> Update US-023: Die Nordsee-Zeitreihe enthält zusätzlich eine Gezeitenphase mit farbigen Segmenten und Kurzbezeichnern (Sp/Mt/Np) auf schmalen Displays.
 
 ```mermaid
 flowchart TD
@@ -29,10 +29,14 @@ flowchart TD
   Lightbox --> Arrows[Pfeile dynamisch]
   Lightbox --> Elastic[Elastic Pan + Soft Clamp]
   Lightbox --> Overlay[Hintergrund / Overlay]
-  Lightbox --> OstseeWindow[Inhaltsfenster Seegang Ostsee]
-  OstseeWindow --> Meteogram[Zeitreihe links nach rechts]
-  OstseeWindow --> Areas[Seegebiete untereinander]
-  OstseeWindow --> Tide[AdG-Gezeitenindikator]
+  Lightbox --> SeaWindow[Inhaltsfenster Seegang]
+  SeaWindow --> NordseeWindow[Nordsee-Zeitreihe]
+  SeaWindow --> OstseeWindow[Ostsee-Zeitreihe]
+  NordseeWindow --> Meteogram[Zeitreihe links nach rechts]
+  NordseeWindow --> Areas[Seegebiete untereinander]
+  NordseeWindow --> Tide[Gezeitenphase]
+  OstseeWindow --> Meteogram
+  OstseeWindow --> Areas
   App --> Gestures[Gesten / Pfeiltasten]
   App --> Theme[Automatischer Dark Mode]
   App --> Refresh[Auto-Zyklus + Pull-to-Refresh]

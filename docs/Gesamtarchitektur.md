@@ -1,6 +1,6 @@
 ## Gesamtarchitektur
 
-> Teststatus (2026-08-06): Die aktuelle Dokumentation wurde auf die reale Projektstruktur und die umgesetzten Features des Dashboards abgestimmt.
+> Release-1.6 (2026-08-20): Die Dokumentation ist auf die reale Projektstruktur und die umgesetzten Features des Dashboards abgestimmt. Die Wind-gegen-Strom-Erkennung (US-006) bleibt eine geplante Idee und ist nicht Teil der aktuellen Architektur.
 
 Das DWD Dashboard ist eine leichte, browserbasierte Web-App für Desktop- und Touch-Nutzung. Sie kombiniert Wetterkarten, Seewettertexte, Seegangsvorhersagen und ergänzende Zeitreihen-Ansichten in einem single-pageartigen Carousel-Workflow. Die Architektur ist bewusst minimal-invasiv, ohne Framework, und orientiert sich an einer robusten, offline-fähigen Nutzung im maritimen Einsatzkontext.
 
@@ -64,7 +64,7 @@ Die eigentliche Anwendungslogik liegt in [js/app.js](../js/app.js). Sie steuert:
 - Refresh- und Zykluslogik für Karteninhalte
 - Theme-Logik basierend auf dem System-Theme
 - Offline- und Statuszustände pro Karte
-- Zeitreihen-Overlays und spezielle Feature-Integrationen wie AdG-/Gezeitenindikatoren
+- Zeitreihen-Overlays und spezielle Feature-Integrationen wie Gezeitenphasenindikatoren
 
 Die App ist bewusst als zentrale Zustands- und Interaktionsschicht aufgebaut, damit neue Features ohne Framework-Einbindung ergänzt werden können.
 
@@ -96,7 +96,7 @@ Die Anwendung bezieht Inhalte aus DWD-Produktquellen, insbesondere:
 - Seewettertexte und Vorhersageinhalte
 - Zeitreihen- und Prognoseinformationen
 
-Die fachliche Darstellung bleibt dabei bewusst an die verfügbaren DWD-Produkte gekoppelt; die App transformiert diese Inhalte nur für die Anzeige, ohne eigene fachliche Interpretation zu erzeugen.
+Die fachliche Darstellung bleibt dabei bewusst an die verfügbaren DWD-Produkte gekoppelt; die App transformiert diese Inhalte überwiegend nur für die Anzeige. Eine begrenzte eigene Ableitung ist die Gezeitenphase, die aus astronomischen Mondphasen und BSH-Referenzdaten berechnet und als Orientierungshilfe dargestellt wird. Eine Wind-gegen-Strom-Bewertung ist derzeit nicht implementiert.
 
 ### Datenfluss im Überblick
 

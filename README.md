@@ -3,6 +3,12 @@
 Das DWD Wetter Dashboard ist eine touch-freundliche Übersicht für Wetterkarten, Seewetterberichte und Seegangsvorhersagen des Deutschen Wetterdienstes.
 Es ist für die Nutzung vor dem Ablegen und unterwegs auf dem Wasser gedacht. Zuletzt geladene Inhalte bleiben auch bei eingeschränkter Verbindung verfügbar.
 
+## Aktueller Release
+
+`Release-1.6` umfasst kompakte DWD-Seewetter-Zeitreihen für Nord- und Ostsee,
+die textuelle Wetterlage sowie die Gezeitenphase für die Nordsee. Die
+zugehörigen Daten bleiben über die bestehende Cache- und Offline-Logik verfügbar.
+
 ## Live-Version
 
 [Live-Dashboard](https://dwd-dashboard.pages.dev)
@@ -11,6 +17,9 @@ Es ist für die Nutzung vor dem Ablegen und unterwegs auf dem Wasser gedacht. Zu
 
 - Wetterkarten, Seewetterberichte und Seegangsvorhersagen für Nordsee und Ostsee.
 - Seegangsübersichten mit mehreren Zeitpunkten und Seegebieten.
+- Kompakte Zeitreihen für Wind, Böen, Welle und Wetterentwicklung.
+- Textuelle Wetterlage als Kontext zur Seewetter-Zeitreihe.
+- Gezeitenphase mit Spring-, Mitt- und Nipp-Phasen in der Nordsee-Zeitreihe.
 - Navigation per Wischen, Tippen, Tastatur und Zoom.
 - Vergrößerte Kartenansicht mit Wechsel zwischen Nachbarkarten.
 - Offline-Nutzung zuletzt geladener Karten und Texte.
@@ -38,6 +47,9 @@ Aktualisierungen orientieren sich an den Veröffentlichungszyklen der verwendete
 ## Tests
 
 Alle Tests liegen in `tests/` und laufen ohne zusätzliche Abhängigkeiten (nur Node.js und Python 3):
+
+Die vollständige Testbeschreibung mit Testbereichen, manueller UI-Prüfung und
+CI-/Git-Hook-Verhalten steht in [docs/TESTING.md](docs/TESTING.md).
 
 ```bash
 bash scripts/run-tests.sh

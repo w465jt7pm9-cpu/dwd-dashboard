@@ -1,125 +1,78 @@
 # Copilot Checklist – Kurzprompts für das DWD Dashboard
 
-> Teststatus (2026-06-20): Erfolgreich abgeschlossen (US-015/US-016, End-to-End geprueft).
+> Release-1.6 (2026-08-20): Testsuite erfolgreich abgeschlossen; US-015, US-016, US-020, US-022 und US-023 sind umgesetzt. US-006 bleibt eine geplante Idee.
 
-## 1) Analyse zuerst
+## 1) Vor jeder Änderung
 
 ```text
-Analysiere index.html und app.js für diese Änderungen, aber schreibe noch keinen Code:
-- Topbar (#topbar) entfernen
-- Thumbbar (.thumbbar) entfernen
-- sichtbare Titel, Status und Summary entfernen
-- Accessibility-Texte (aria-label, alt) beibehalten
-- Edge-Tap beibehalten
-- Navigation zyklisch machen
-- Pull-to-Refresh auf Seiten 0–2, nur am oberen Startzustand, ohne visuelles Feedback
-- Theme automatisch aus prefers-color-scheme ableiten und live auf Systemwechsel reagieren
-- Lightbox unverändert funktionsfähig lassen
+Analysiere zuerst die betroffenen Dateien, Symbole und vorhandenen Tests.
+Schreibe noch keinen Code, bis du:
+- den direkt steuernden Codepfad identifiziert hast,
+- eine konkrete lokale Ursache oder Verhaltensannahme benennen kannst,
+- einen möglichst kleinen diskriminierenden Test festgelegt hast.
 
-Liefere nur:
-- betroffene DOM-Elemente,
-- betroffene Funktionen,
-- minimale Änderungsstrategie,
-- Risiken,
-- kurze Teststrategie.
+Behalte bestehende Karten-, Lightbox-, Navigations-, Cache- und Offline-Logik
+unverändert, sofern die Aufgabe sie nicht ausdrücklich betrifft.
+Nutze vorhandene Vanilla-JavaScript- und CSS-Muster.
 ```
 
-## 2) Topbar + Thumbbar entfernen
+## 2) Release-1.6 – Zeitreihen und Gezeitenphase
 
 ```text
-Implementiere in index.html und app.js minimal-invasiv:
-- #topbar entfernen oder vollständig unsichtbar machen
-- .thumbbar entfernen oder vollständig unsichtbar machen
-- pageTitle, status und pageSummary für Nutzer unsichtbar machen
-- aria-label und alt unverändert lassen
-- Navigation per ArrowLeft / ArrowRight, Swipe und Edge-Tap weiter funktionsfähig lassen
-- Lightbox nicht beschädigen
-
-Bitte direkt im Code umsetzen und nur kurz kommentieren.
+Prüfe die aktuellen Seewetter-Zeitreihen und ihre Lightbox-Integration:
+- Nordsee- und Ostsee-Zeitreihen in den jeweiligen Seegang-Lightboxen prüfen
+- Zeitachse, Seegebiete, Wind, Böen, Wellenhöhe und Wetterereignisse prüfen
+- textuelle Wetterlage vor der Zeitreihe und gemeinsamen Datenstand prüfen
+- Zeitreihe initial eingeklappt und unabhängig scrollbar halten
+- Gezeitenphase nur in der Nordsee-Zeitreihe anzeigen
+- Spring-, Mitt- und Nipp-Phasen inklusive mobiler Kurzbezeichner Sp/Mt/Np prüfen
+- bestehende Zoom-, Pan-, Swipe- und Offline-Logik nicht beeinträchtigen
+- keine Wind-gegen-Strom-Bewertung ergänzen: US-006 ist noch nicht umgesetzt
 ```
 
-## 3) Navigation zyklisch machen
+## 3) UI- und Interaktionsregeln
 
 ```text
-Passe app.js minimal-invasiv an:
-- Dashboard-Seiten zyklisch navigierbar machen
-- letzte Seite -> erste Seite
-- erste Seite -> letzte Seite
-- gültig für ArrowLeft / ArrowRight, Swipe, Edge-Tap und bestehende goToPage(currentPageIndex +/- 1)-Pfade
-- Lightbox-Navigation unverändert lassen
-
-Bitte nur die minimal nötigen Änderungen in app.js vornehmen.
+Bei Änderungen an der Oberfläche prüfen:
+- Navigation per Pfeiltasten, Swipe und Edge-Tap bleibt funktionsfähig
+- Lightbox-Navigation bleibt von der Seitennavigation getrennt
+- Pull-to-Refresh bleibt auf den vorgesehenen Seiten und Zuständen begrenzt
+- System-Dark-Mode reagiert weiterhin live
+- sichtbare Status- und Summary-Elemente werden nicht wieder eingeführt
+- aria-label- und alt-Texte bleiben erhalten
+- keine neue Bibliothek und keine unnötige UI-Komplexität einführen
 ```
 
-## 4) Pull-to-Refresh statt Buttons
+## 4) Daten, Cache und Offline
 
 ```text
-Ersetze in app.js das manuelle Aktualisieren per Buttons durch Pull-to-Refresh als primäres Bedienkonzept:
-- für Touch-Geräte und Desktop-Trackpad-Gesten
-- nur auf Seiten 0 bis 2
-- nur wenn die Ansicht am oberen Rand im Startzustand ist
-- ohne zusätzliches visuelles Feedback
-- refreshVisibleImages() wiederverwenden
-- Lightbox unverändert lassen
-- horizontale Swipe-Navigation nicht unnötig stören
-- keine neue Bibliothek verwenden
-
-Bitte direkt im Code umsetzen und kurz erläutern, welche Event-Logik ergänzt wurde.
+Bei Änderungen an Daten oder Aktualisierung prüfen:
+- DWD-Veröffentlichungszyklen und vorhandene Refresh-Logik beibehalten
+- offline keine neuen Requests erzwingen
+- gecachte Karten und Seewettertexte weiterhin anzeigen
+- veraltete Cache-Inhalte sichtbar, aber verständlich kennzeichnen
+- Service Worker und App-Logik nicht doppelt für denselben Cache-Fall zuständig machen
 ```
 
-## 5) Theme automatisch aus dem System
+## 5) Abschluss-Review
 
 ```text
-Stelle die Theme-Logik in app.js minimal-invasiv um:
-- kein manueller Theme-Schalter mehr
-- Theme aus window.matchMedia('(prefers-color-scheme: dark)') ableiten
-- live auf Systemwechsel reagieren
-- lokale Theme-Persistenz nicht mehr als führende Quelle verwenden
-- applyTheme(theme) weiterverwenden, falls sinnvoll
-- falls modeBtn und thumbMode im DOM entfernt wurden, dürfen keine Fehler entstehen
-
-Bitte direkt im Code umsetzen und tote Theme-Logik bereinigen.
+Prüfe nach der Änderung:
+1. Nur der angeforderte Codepfad wurde verändert.
+2. Bestehende Lightbox-, Navigations- und Offline-Funktionen sind unverändert nutzbar.
+3. README.md, docs/backlog.md, docs/UI-Struktur.md und docs/Gesamtarchitektur.md
+   verwenden konsistente Begriffe und Statusangaben.
+4. US-006 wird nicht als umgesetzt dargestellt.
+5. bash scripts/run-tests.sh läuft erfolgreich durch.
+6. git diff --check meldet keine Formatfehler.
 ```
 
-## 6) Redundante Statuslogik bereinigen
+## 6) Reihenfolge in VS Code
 
 ```text
-Bereinige in app.js die sichtbare Status- und Zusammenfassungslogik minimal-invasiv:
-- kein global sichtbarer Zeitstempel "Aktualisiert ..."
-- keine global sichtbare Zusammenfassung wie "lädt / offline / Fehler"
-- card-status pro Bild beibehalten
-- Offline-Funktionalität stabil halten
-- keine Laufzeitfehler durch entfernte Status-Elemente
-
-Analysiere kurz, ob status / pageSummary besser gar nicht mehr beschrieben oder nur unsichtbar gehalten werden sollen, und setze dann die minimal-invasive Lösung um.
-```
-
-## 7) Abschluss-Review
-
-```text
-Prüfe die umgesetzten Änderungen in index.html und app.js auf Regressionen und Konsistenz:
-1. keine Fehler durch entfernte Menüelemente?
-2. Navigation zyklisch für ArrowLeft / ArrowRight, Swipe und Edge-Tap?
-3. Pull-to-Refresh nur auf Seiten 0 bis 2 und nur am oberen Startzustand?
-4. Lightbox vollständig funktionsfähig?
-5. Theme reagiert live auf prefers-color-scheme-Wechsel?
-6. alte Theme- und Refresh-Button-Pfade sauber entfernt oder defensiv abgesichert?
-7. keine unnötigen Refactorings?
-
-Liefere:
-- kurze Liste mit Risiken,
-- kleine Bereinigungsvorschläge,
-- manuelle Testcheckliste.
-```
-
-## 8) Reihenfolge in VS Code
-
-```text
-1. Analyse
-2. Topbar + Thumbbar entfernen
-3. Navigation zyklisch
-4. Pull-to-Refresh
-5. Theme-Automatik
-6. Statuslogik bereinigen
-7. Abschluss-Review
+1. Analyse und lokales Hypothesen-/Testpaar bilden
+2. Kleinste Änderung umsetzen
+3. Fokussierten Test ausführen
+4. Benachbarte Dokumentation und Statusangaben prüfen
+5. Gesamte Testsuite und git diff --check ausführen
 ```
