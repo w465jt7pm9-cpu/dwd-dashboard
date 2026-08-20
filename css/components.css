@@ -501,7 +501,7 @@
   }
 
   .lightbox-weatherlage.ostsee-timeseries:not(.is-collapsed) {
-    max-height: min(72dvh, 72vh);
+    max-height: min(86dvh, 86vh);
   }
 
   .ostsee-ts-weatherlage {
