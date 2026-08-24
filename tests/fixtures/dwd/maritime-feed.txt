@@ -1,0 +1,12 @@
+FQEN50 EDZW 120500
+Seewetterbericht
+
+Aktuelle Wetterlage
+Ein kraeftiges Tief bestimmt die Lage. Maessiger Wind aus Suedwest.
+
+Vorhersage bis morgen frueh:
+Wind: SW 6-7, spaeter 8.
+
+Deutscher Wetterdienst
+Copyright DWD 2026
+$$

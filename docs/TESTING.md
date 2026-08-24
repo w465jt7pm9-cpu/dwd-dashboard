@@ -31,9 +31,73 @@ Pakete werden nicht benötigt.
 | `wetterlage-text-extraction.test.js` | Extraktion von Wetterlage und vollständigem Vorhersageblock |
 | `wind-weather-rendering.test.js` | Rendering von Wind- und Wetterwerten in Zeitreihen |
 | `smoke_nordsee_tide_test.py` | Smoke-Prüfung des Nordsee-Gezeiten-Markups |
+| `dwd-source-format-contracts.test.js` | DWD-Quellformat-Verträge und Regressionen bei geänderten Markern |
 
 Die BSH-Referenzdateien in `tests/` sind Bestandteil der Regressionstests und
 sollen bei fachlichen Änderungen nicht stillschweigend ersetzt werden.
+
+### DWD-Quellformat-Verträge (US-024)
+
+Mehrere Parser hängen an stabilen Text- und HTML-Markern der DWD-Quellen. Diese
+Annahmen werden vor der Implementierung von US-024 als explizite Verträge
+dokumentiert und anschließend mit versionierten, anonymisierten Fixtures
+abgesichert. Die Tests dürfen keine Live-DWD-Seite benötigen, damit ein
+vorübergehender Netz- oder Seitenfehler nicht mit einer Formatänderung
+verwechselt wird.
+
+Mindestens abzusichern sind:
+
+- Feed: Abschnitt `Aktuelle Wetterlage`, vollständiger Vorhersageblock und
+  Abschlussmarker vor Footer/Copyright.
+- Seewetterbericht-HTML: Überschrift `Seewetterbericht für Nord- und Ostsee`,
+  Start bei `Aktuelle Wetterlage` und bekannte Endmarker.
+- Regionale HTML-Seiten: `Wetterlage und -entwicklung:` sowie der Beginn der
+  Vorhersagetabelle bei `Vorhersagen von`.
+- Zeitreihen-HTML: Tabellenzeilen, Gebietszeile mit Position und `WT:`,
+  Wochentag, zweistellige Stunde sowie die sieben erwarteten Datenzellen.
+- Zeichensatz: Latin-1-Decodierung des OpenData-Feeds einschließlich mindestens
+  eines deutschen Sonderzeichens.
+
+Jeder Vertrag soll mindestens einen positiven Fall, den Erhalt des relevanten
+Inhalts und einen Negativfall für einen fehlenden oder veränderten Marker
+enthalten. Eine Fixture darf nur zusammen mit einer bewussten Parser- oder
+Vertragsänderung aktualisiert werden; die Änderung muss im Test und im
+Backlog nachvollziehbar bleiben.
+
+Die US-024-Fixtures decken deshalb den Feed-Endmarker `$$`, alle bekannten
+HTML-Endmarker, getrennte Nordsee- und Ostsee-Varianten sowie sämtliche
+Zeitreihenfelder ab. Die Nordsee-Fixture ergänzt die bestehende Ostsee-Fixture;
+die zusätzlichen Varianten sind absichtlich klein gehalten, damit Änderungen
+an einzelnen Quellformat-Verträgen im Testdiff eindeutig erkennbar bleiben.
+
+### Live-Smoke-Test als Frühwarnsystem
+
+Der optionale Live-Test ruft die aktuell konfigurierten DWD-Quellen ab und
+prüft HTTP-Erreichbarkeit, Antwortgröße und die wichtigsten Quellformatmarker:
+
+```bash
+node scripts/live-dwd-smoke-test.js
+```
+
+Der Standardlauf meldet Abweichungen, ohne den Aufruf als Fehler zu beenden.
+Für einen automatisierten Überwachungsjob beendet `--strict` den Prozess mit
+Exit-Code 1, sobald eine Quelle nicht erreichbar ist oder ein Marker fehlt:
+
+```bash
+node scripts/live-dwd-smoke-test.js --strict
+```
+
+Der Test darf niemals automatisch Fixtures aktualisieren. Eine gemeldete
+Abweichung wird zunächst als Netzwerk-/Verfügbarkeitsproblem oder als echte
+Quellformatänderung bewertet. Erst danach werden Parseränderung, Fixture und
+Regressionstest bewusst als separate Änderung eingeplant.
+
+Beim ersten Lauf am 24.08.2026 waren die regionalen Nordsee- und Ostseequellen
+erreichbar. Der maritime Feed wich jedoch vom lokalen Vertrag ab und lieferte
+unter anderem `FQDL50`, `Wetterlage:` und den Abschlussmarker `=` statt der
+bisher erwarteten Struktur. Dieser Befund ist ein offener Prüfpunkt für eine
+gezielte Parseranpassung; die lokalen Regressionstests bleiben unverändert
+maßgeblich.
 
 ## Tests nach Änderungen
 

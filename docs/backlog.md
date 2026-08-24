@@ -40,6 +40,7 @@ _(aktuell keine Story in Bearbeitung)_
 - US-022 – Kompakte Nordsee-Zeitreihe in der Seegang-Nordsee-Lightbox
 - US-023 – Gezeitenphasenindikator in der DWD-Nordsee-Zeitreihe
 - US-020 – Kompakte Darstellung von DWD-Seewetter-Zeitreihen
+- US-024 – DWD-Quellformat-Verträge und Parser-Regressionstests
 
 ---
 
@@ -1205,7 +1206,7 @@ Der Text wird nicht als strukturierte API (JSON), sondern als Klartext geliefert
 
 ## 🌍 US-017 – UI-Texte für Internationalisierung strukturieren
 
-**Status:** TODO  
+**Status:** TODO
 **Priorität:** Mittel
 
 ---
@@ -1802,6 +1803,63 @@ Die Gezeitenphasen-Klassifikation verwendet technisch einen generischen AdG-Gene
 - Die Darstellung bleibt damit, wie im Phasenmodell beschrieben, eine Orientierungshilfe und ersetzt keine amtlichen BSH-Gezeitenvorausberechnungen
 
 ---
+
+## 🧪 US-024 – DWD-Quellformat-Verträge und Parser-Regressionstests
+
+**Status:** DONE
+**Priorität:** Hoch
+
+### Beschreibung
+
+Als Betreiber des Dashboards
+möchte ich die bekannten Text- und HTML-Annahmen unserer DWD-Parser als
+ausführbare Verträge dokumentieren und gegen versionierte Fixtures testen
+damit Änderungen an DWD-Websites oder OpenData-Formaten frühzeitig auffallen,
+bevor Wetterlage oder Zeitreihen unvollständig angezeigt werden.
+
+### Zielbild
+
+- Parser-relevante DWD-Marker sind zentral dokumentiert.
+- Tests laufen reproduzierbar ohne Live-Netzwerk und ohne zusätzliche Library.
+- Eine Änderung oder das Fehlen eines Markers führt zu einem klaren Testfehler.
+- Fixture-Aktualisierungen sind bewusst, reviewbar und nicht automatisch.
+
+### Bekannte Vertragsmarker
+
+- `Aktuelle Wetterlage` als Beginn des Wetterlage-Abschnitts
+- `Wetterlage und -entwicklung:` auf regionalen Nordsee-/Ostsee-Seiten
+- `Vorhersagen von` als Ende des regionalen Wetterlage-Texts
+- `Ergänzende Informationen`, `Verwandte Leistungen` und
+  `INHATSVERZEICHNIS` als bekannte HTML-Endmarker
+- `Deutscher Wetterdienst`, `Copyright` und `$$` als Feed-Endmarker
+- Zeitreihen-Gebietszeile im Format `Gebiet (Position) WT: Temperatur`
+- Zeitreihenzeilen mit Wochentag, zweistelliger Stunde und Wind-/Böen-/Wellen-/
+  Wetterspalten
+- Latin-1 als Zeichensatz des maritimen OpenData-Feeds
+
+### Akzeptanzkriterien
+
+- [x] Eine eigene Regressionstest-Datei oder klar abgegrenzte Tests sichern die
+  genannten Verträge gegen lokale Fixtures ab.
+- [x] Positive Fixtures prüfen, dass Wetterlage, Vorhersage und Zeitreihenwerte
+  vollständig extrahiert werden.
+- [x] Negativtests schlagen bei fehlenden, verschobenen oder geänderten
+  Schlüsselmarkern kontrolliert fehl.
+- [x] Nordsee- und Ostsee-Varianten werden getrennt berücksichtigt, wo ihre
+  Quellen unterschiedliche Seitenstrukturen haben.
+- [x] Mindestens ein Latin-1-Sonderzeichen wird durch den Decodierpfad geprüft.
+- [x] Tests verwenden keine Live-DWD-Anfragen und benötigen keine neue
+  Abhängigkeit.
+- [x] Änderungen an Fixtures oder Verträgen werden in Test und Dokumentation
+  begründet.
+
+### Abgrenzung
+
+- Keine Änderung an Parserlogik, Datenquellen, Cache- oder Refresh-Verhalten.
+- Keine Garantie, dass eine Live-DWD-Seite unverändert bleibt; abgesichert wird
+  die erkannte Vertragsannahme reproduzierbar gegen einen bekannten Stand.
+- Ein optionaler späterer Smoke-Test gegen die Live-Quelle wäre separat zu
+  bewerten und dürfte die lokale Regressionstestsuite nicht ersetzen.
 
 # 💡 IDEEN (UNSORTIERT)
 
