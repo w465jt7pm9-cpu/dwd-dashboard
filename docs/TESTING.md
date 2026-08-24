@@ -95,9 +95,10 @@ Regressionstest bewusst als separate Änderung eingeplant.
 Beim ersten Lauf am 24.08.2026 waren die regionalen Nordsee- und Ostseequellen
 erreichbar. Der maritime Feed wich jedoch vom lokalen Vertrag ab und lieferte
 unter anderem `FQDL50`, `Wetterlage:` und den Abschlussmarker `=` statt der
-bisher erwarteten Struktur. Dieser Befund ist ein offener Prüfpunkt für eine
-gezielte Parseranpassung; die lokalen Regressionstests bleiben unverändert
-maßgeblich.
+bisher erwarteten Struktur. Der Live-Test prüft für diesen Feed deshalb den
+technischen Rahmen zwischen `0x01` und `0x03` sowie den enthaltenen Textinhalt,
+statt veraltete Footer-Marker zu verlangen. Die lokalen Regressionstests
+bleiben unverändert maßgeblich.
 
 ## Tests nach Änderungen
 

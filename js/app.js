@@ -2039,7 +2039,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullSection = extractTextBlockBetweenHeadings(
       pageText,
       /Seewetterbericht\s+für\s+Nord-\s*und\s*Ostsee[\s\S]*?Aktuelle\s+Wetterlage/i,
-      /\n\s*(?:Ergänzende\s+Informationen|Verwandte\s+Leistungen|INHATSVERZEICHNIS)\b/i
+      /\n\s*(?:Ergänzende\s+Informationen|Verwandte\s+Leistungen|INHALTSVERZEICHNIS)\b/i
     )
     if (fullSection) {
       return fullSection
@@ -2048,7 +2048,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const compactSection = extractTextBlockBetweenHeadings(
       pageText,
       /Aktuelle\s+Wetterlage/i,
-      /\n\s*(?:Ergänzende\s+Informationen|Verwandte\s+Leistungen|INHATSVERZEICHNIS)\b/i
+      /\n\s*(?:Ergänzende\s+Informationen|Verwandte\s+Leistungen|INHALTSVERZEICHNIS)\b/i
     )
     if (compactSection) {
       return compactSection
@@ -2069,7 +2069,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return extractTextBlockBetweenHeadings(
       pageText,
       /Wetterlage\s+und\s+-?entwicklung\s*:/i,
-      /\n\s*(?:Vorhersagen\s+von|Ergänzende\s+Informationen|Verwandte\s+Leistungen|INHATSVERZEICHNIS)\b/i
+      /\n\s*(?:Vorhersagen\s+von|Ergänzende\s+Informationen|Verwandte\s+Leistungen|INHALTSVERZEICHNIS)\b/i
     )
   }
 

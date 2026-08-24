@@ -5,13 +5,10 @@ const SOURCES = [
     name: 'Maritime forecast feed',
     url: 'https://opendata.dwd.de/weather/maritime/forecast/german/FQEN50_EDZW_LATEST',
     encoding: 'latin1',
-    markers: [
-      'Aktuelle Wetterlage',
-      'Vorhersage',
-      'Deutscher Wetterdienst',
-      'Copyright',
-      '$$'
-    ]
+    // DWD payload is framed by ASCII SOH (0x01) and ETX (0x03).
+    frameStart: '\x01',
+    frameEnd: '\x03',
+    contentMarkers: ['Seewetterbericht', 'Vorhersage']
   },
   {
     name: 'Seewetterbericht Nord- und Ostsee',
@@ -25,7 +22,7 @@ const SOURCES = [
     endMarkers: [
       'Ergänzende Informationen',
       'Verwandte Leistungen',
-      'INHATSVERZEICHNIS'
+      'INHALTSVERZEICHNIS'
     ]
   },
   {
@@ -72,9 +69,25 @@ async function fetchSource (source) {
       return
     }
 
+    let content = body
+    if (source.frameStart || source.frameEnd) {
+      const start = source.frameStart ? body.indexOf(source.frameStart) : 0
+      const end = source.frameEnd ? body.indexOf(source.frameEnd, start + 1) : body.length
+      if (start < 0 || end < 0 || end <= start) {
+        findings.push(`${source.name}: invalid control-character frame`)
+        return
+      }
+      content = body.slice(start + source.frameStart.length, end)
+    }
+
     for (const marker of source.markers || []) {
-      if (!body.includes(marker)) {
+      if (!content.includes(marker)) {
         findings.push(`${source.name}: missing marker ${JSON.stringify(marker)}`)
+      }
+    }
+    for (const marker of source.contentMarkers || []) {
+      if (!content.includes(marker)) {
+        findings.push(`${source.name}: missing content ${JSON.stringify(marker)}`)
       }
     }
     for (const alternatives of source.markerAlternatives || []) {
@@ -94,7 +107,14 @@ async function fetchSource (source) {
     const alternativeCount = (source.markerAlternatives || []).filter(alternatives =>
       alternatives.some(marker => body.includes(marker))
     ).length
-    report(`  markers: ${markerCount + alternativeCount}/${(source.markers || []).length + (source.markerAlternatives || []).length}`)
+    const contentCount = (source.contentMarkers || []).filter(marker => content.includes(marker)).length
+    const markerTotal = (source.markers || []).length + (source.markerAlternatives || []).length
+    if (markerTotal) {
+      report(`  markers: ${markerCount + alternativeCount}/${markerTotal}`)
+    }
+    if ((source.contentMarkers || []).length) {
+      report(`  content: ${contentCount}/${source.contentMarkers.length}`)
+    }
     if (source.encoding === 'latin1') {
       report('  decoding: latin1')
     }

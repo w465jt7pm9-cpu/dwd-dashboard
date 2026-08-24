@@ -116,7 +116,7 @@ assert.ok(!report.includes('Impressum'))
 for (const endMarker of [
   'Ergänzende Informationen',
   'Verwandte Leistungen',
-  'INHATSVERZEICHNIS'
+  'INHALTSVERZEICHNIS'
 ]) {
   const reportVariant = readFixture('seewetterbericht.html')
     .replace('Ergänzende Informationen', endMarker)

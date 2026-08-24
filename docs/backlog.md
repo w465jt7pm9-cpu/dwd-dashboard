@@ -1830,7 +1830,7 @@ bevor Wetterlage oder Zeitreihen unvollständig angezeigt werden.
 - `Wetterlage und -entwicklung:` auf regionalen Nordsee-/Ostsee-Seiten
 - `Vorhersagen von` als Ende des regionalen Wetterlage-Texts
 - `Ergänzende Informationen`, `Verwandte Leistungen` und
-  `INHATSVERZEICHNIS` als bekannte HTML-Endmarker
+  `INHALTSVERZEICHNIS` als bekannter HTML-Endmarker
 - `Deutscher Wetterdienst`, `Copyright` und `$$` als Feed-Endmarker
 - Zeitreihen-Gebietszeile im Format `Gebiet (Position) WT: Temperatur`
 - Zeitreihenzeilen mit Wochentag, zweistelliger Stunde und Wind-/Böen-/Wellen-/
