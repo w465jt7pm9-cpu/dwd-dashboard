@@ -1,6 +1,6 @@
 ## UI-Struktur
 
-> Teststatus (2026-08-06): Die UI-Struktur wurde auf den aktuellen Stand der Implementierung angepasst.
+> Teststatus (2026-09-23): Die UI-Struktur wurde auf den aktuellen Stand der Implementierung angepasst.
 
 > Release 1.0: Fokus auf ruhige, bildschirmfüllende Wetterkarten ohne sichtbares Menü, mit natürlicher Navigation und automatischem Dark Mode.
 > Update US-009: Die Lightbox zeigt subtile Peek-Nachbarn und nutzt zyklische, weiche Bildnavigation mit elastischem Pan- und Snap-Back-Verhalten.
@@ -12,6 +12,7 @@
 > Update US-020/US-021: In der gezoomten Ostsee-Lightbox wird pro Karte ein kompaktes Inhaltsfenster eingeblendet; es zeigt eine kompakte Zeitreihen-Ansicht mit Wind, Böen, Welle und Wetter und lässt sich bei Bedarf zusammenklappen.
 > Update US-022: Für die Nordsee-Lightbox wird eine analoge, kompakte Zeitreihen-Ansicht ergänzt.
 > Update US-023: Die Nordsee-Zeitreihe enthält zusätzlich eine Gezeitenphase mit farbigen Segmenten und Kurzbezeichnern (Sp/Mt/Np) auf schmalen Displays.
+> Update US-025: Das Nordsee-Zeitreihenfenster berücksichtigt Safe-Area-Insets und nutzt im kompakten Landscape-Modus den verfügbaren vertikalen Raum, ohne die iPad-Darstellung zu verändern.
 
 ```mermaid
 flowchart TD
@@ -30,6 +31,7 @@ flowchart TD
   Lightbox --> Elastic[Elastic Pan + Soft Clamp]
   Lightbox --> Overlay[Hintergrund / Overlay]
   Lightbox --> SeaWindow[Inhaltsfenster Seegang]
+  SeaWindow --> SafeArea[Responsive Safe Area]
   SeaWindow --> NordseeWindow[Nordsee-Zeitreihe]
   SeaWindow --> OstseeWindow[Ostsee-Zeitreihe]
   NordseeWindow --> Meteogram[Zeitreihe links nach rechts]

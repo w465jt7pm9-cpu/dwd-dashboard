@@ -1,6 +1,6 @@
 # 📊 DWD Dashboard – Mini Backlog
 
-> Release-1.6 (2026-08-20): Testsuite erfolgreich abgeschlossen; US-015, US-016, US-020, US-022 und US-023 sind umgesetzt.
+> Release-1.7 (2026-09-23): Testsuite und US-025 erfolgreich abgeschlossen; US-015, US-016, US-020, US-022 und US-023 sind ebenfalls umgesetzt.
 
 ---
 
@@ -12,7 +12,6 @@
 
 - US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 - US-017 – UI-Texte für Internationalisierung strukturieren
-- US-025 – Responsive Safe Area für die Nordsee-Zeitreihe
 
 ## 🟨 DOING
 
@@ -42,6 +41,7 @@ _(aktuell keine Story in Bearbeitung)_
 - US-023 – Gezeitenphasenindikator in der DWD-Nordsee-Zeitreihe
 - US-020 – Kompakte Darstellung von DWD-Seewetter-Zeitreihen
 - US-024 – DWD-Quellformat-Verträge und Parser-Regressionstests
+- US-025 – Responsive Safe Area für die Nordsee-Zeitreihe
 
 ---
 
@@ -1866,7 +1866,7 @@ bevor Wetterlage oder Zeitreihen unvollständig angezeigt werden.
 
 ## 📱 US-025 – Responsive Safe Area für die Nordsee-Zeitreihe
 
-**Status:** TODO
+**Status:** DONE
 **Priorität:** Mittel
 
 ### Beschreibung
@@ -1893,62 +1893,64 @@ künftigen iPhone-Formaten ohne gerätespezifische Anpassungen lesbar bleibt.
 
 **Safe Area und Sichtbarkeit des Inhaltsfensters**
 
-- [ ] Gegeben ein iPhone mit Dynamic Island im Landscape-Modus
-- [ ] Wenn die Nordsee-Zeitreihe aus US-022 geöffnet wird
-- [ ] Dann liegt kein wesentlicher Inhalt des Inhaltsfensters unter der Dynamic
+- [x] Gegeben ein iPhone mit Dynamic Island im Landscape-Modus
+- [x] Wenn die Nordsee-Zeitreihe aus US-022 geöffnet wird
+- [x] Dann liegt kein wesentlicher Inhalt des Inhaltsfensters unter der Dynamic
       Island oder einer seitlichen bzw. oberen Safe Area.
-- [ ] Die seitlichen Insets werden über die standardisierten CSS-Safe-Area-
+- [x] Die seitlichen Insets werden über die standardisierten CSS-Safe-Area-
       Werte des Geräts berücksichtigt und fallen auf `0px` zurück, wenn sie nicht
       verfügbar sind.
-- [ ] Das Inhaltsfenster bleibt bei unterschiedlichen Geräteabmessungen,
+- [x] Das Inhaltsfenster bleibt bei unterschiedlichen Geräteabmessungen,
       Ausrichtungen und vom Betriebssystem gelieferten Safe-Area-Inset-Werten
       vollständig erreichbar.
 
 **Responsive Layout und Zukunftssicherheit**
 
-- [ ] Breite, Höhe und Position werden aus dem verfügbaren Viewport berechnet;
+- [x] Breite, Höhe und Position werden aus dem verfügbaren Viewport berechnet;
       feste Werte für iPhone 17e oder andere konkrete Modelle sind nicht zulässig.
-- [ ] Ein Wechsel zwischen Portrait und Landscape führt weder zu abgeschnittenen
+- [x] Ein Wechsel zwischen Portrait und Landscape führt weder zu abgeschnittenen
       Inhalten noch zu horizontalem oder vertikalem Seitenüberlauf.
-- [ ] Neue iPhone-Auflösungen und Seitenverhältnisse benötigen keine erneute
+- [x] Neue iPhone-Auflösungen und Seitenverhältnisse benötigen keine erneute
       gerätespezifische Codeanpassung.
-- [ ] Das ausgeklappte Inhaltsfenster nutzt im kompakten Landscape-Modus den
-  verfügbaren vertikalen Raum bis zu `min(86dvh, 86vh)` und fällt nicht auf
-  die allgemeine `56dvh`-Begrenzung zurück.
-- [ ] Die bestehende Darstellung und Lesbarkeit auf iPad und Desktop bleibt
+- [x] Das ausgeklappte Inhaltsfenster nutzt im kompakten Landscape-Modus den
+      verfügbaren vertikalen Raum bis zu `min(86dvh, 86vh)` und fällt nicht auf
+      die allgemeine `56dvh`-Begrenzung zurück.
+- [x] Die bestehende Darstellung und Lesbarkeit auf iPad und Desktop bleibt
       erhalten.
 
 **Nicht-Regressionsschutz**
 
-- [ ] Lightbox, Zoom, Pan, Peek und Lightbox-Navigation bleiben unverändert
+- [x] Lightbox, Zoom, Pan, Peek und Lightbox-Navigation bleiben unverändert
       bedienbar.
-- [ ] Die Nordsee-Zeitreihe bleibt unabhängig scrollbar und die Zeitspalten
+- [x] Die Nordsee-Zeitreihe bleibt unabhängig scrollbar und die Zeitspalten
       bleiben synchron ausgerichtet.
-- [ ] Pull-to-Refresh bleibt nur auf den vorgesehenen Seiten und Zuständen aktiv.
-- [ ] Offline-Karten, Cache-Status und bestehende Bildquellen bleiben unverändert.
-- [ ] Bestehende `aria-label`- und `alt`-Texte werden nicht verändert.
+- [x] Pull-to-Refresh bleibt nur auf den vorgesehenen Seiten und Zuständen aktiv.
+- [x] Offline-Karten, Cache-Status und bestehende Bildquellen bleiben unverändert.
+- [x] Bestehende `aria-label`- und `alt`-Texte werden nicht verändert.
 
 ### 🧪 Testabschnitt
 
 **Pflichtprüfung auf Geräten**
 
-- [ ] Das betroffene iPhone 17e wird im Landscape-Modus in beiden
+- [x] Das betroffene iPhone 17e wird im Landscape-Modus in beiden
       Ausrichtungen geprüft.
-- [ ] Das ausgeklappte Inhaltsfenster nimmt auf dem iPhone 17e im Landscape-
-  Modus deutlich mehr als die bisher beobachteten ca. 50 % der Viewport-Höhe
-  ein und bleibt vollständig scrollbar.
-- [ ] Die Nordsee-Zeitreihe wird ein- und ausgeklappt; das Inhaltsfenster bleibt
+- [x] Das ausgeklappte Inhaltsfenster nimmt auf dem iPhone 17e im Landscape-
+      Modus deutlich mehr als die bisher beobachteten ca. 50 % der Viewport-Höhe
+      ein und bleibt vollständig scrollbar.
+- [x] Die Nordsee-Zeitreihe wird ein- und ausgeklappt; das Inhaltsfenster bleibt
       vollständig erreichbar und scrollbar.
-- [ ] Ein Wechsel zwischen Portrait und Landscape erzeugt keinen abgeschnittenen
+- [x] Ein Wechsel zwischen Portrait und Landscape erzeugt keinen abgeschnittenen
       Inhalt und keinen horizontalen oder vertikalen Seitenüberlauf.
-- [ ] Ein iPad wird in Portrait und Landscape geprüft; Größe, Position,
+- [x] Ein iPad wird in Portrait und Landscape geprüft; Größe, Position,
       Scrollbarkeit und Zeitspalten-Synchronität bleiben unverändert.
+- [x] Die Zeitreihe und der letzte Kartenstand bleiben nach einem Wechsel in den
+      Offline-Modus sowie nach einer Orientierungsänderung verfügbar.
 
 **Bestehende automatisierte Prüfungen**
 
-- [ ] `bash scripts/run-tests.sh` läuft nach der Umsetzung erfolgreich durch.
-- [ ] `git diff --check` meldet keine Formatfehler.
-- [ ] Die Prüfung erfordert keine neue Browser-Testabhängigkeit; eine spätere
+- [x] `bash scripts/run-tests.sh` läuft nach der Umsetzung erfolgreich durch.
+- [x] `git diff --check` meldet keine Formatfehler.
+- [x] Die Prüfung erfordert keine neue Browser-Testabhängigkeit; eine spätere
       Browser-Automation ist optional und ersetzt den Gerätetest nicht.
 
 ### Abgrenzung

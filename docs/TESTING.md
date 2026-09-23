@@ -1,6 +1,6 @@
 # Tests und Qualitätssicherung
 
-> Release-1.6 (2026-08-20): Die vollständige automatisierte Testsuite ist erfolgreich durchgelaufen.
+> Release-1.7 (2026-09-23): Die vollständige automatisierte Testsuite und die manuelle US-025-Geräteprüfung sind erfolgreich durchgelaufen.
 
 ## Zweck
 
@@ -22,16 +22,16 @@ Pakete werden nicht benötigt.
 
 ### Testbereiche
 
-| Testdatei | Prüft |
-| --- | --- |
-| `boden-refresh-cycle.test.js` | Veröffentlichungs- und Modelllauf-Zyklen für Bodenwetterkarten |
-| `sea-timeseries-parsing.test.js` | Parsing und Struktur der DWD-Seewetter-Zeitreihen |
-| `seewetter-highlighting.test.js` | Strukturierung, Windwarnungen und Hervorhebungen im Seewettertext |
-| `tide-phase.test.js` | Gezeitenphasen-Generator gegen BSH-Referenzdaten und Mondphasen-Zeitpunkte |
-| `wetterlage-text-extraction.test.js` | Extraktion von Wetterlage und vollständigem Vorhersageblock |
-| `wind-weather-rendering.test.js` | Rendering von Wind- und Wetterwerten in Zeitreihen |
-| `smoke_nordsee_tide_test.py` | Smoke-Prüfung des Nordsee-Gezeiten-Markups |
-| `dwd-source-format-contracts.test.js` | DWD-Quellformat-Verträge und Regressionen bei geänderten Markern |
+| Testdatei                             | Prüft                                                                      |
+| ------------------------------------- | -------------------------------------------------------------------------- |
+| `boden-refresh-cycle.test.js`         | Veröffentlichungs- und Modelllauf-Zyklen für Bodenwetterkarten             |
+| `sea-timeseries-parsing.test.js`      | Parsing und Struktur der DWD-Seewetter-Zeitreihen                          |
+| `seewetter-highlighting.test.js`      | Strukturierung, Windwarnungen und Hervorhebungen im Seewettertext          |
+| `tide-phase.test.js`                  | Gezeitenphasen-Generator gegen BSH-Referenzdaten und Mondphasen-Zeitpunkte |
+| `wetterlage-text-extraction.test.js`  | Extraktion von Wetterlage und vollständigem Vorhersageblock                |
+| `wind-weather-rendering.test.js`      | Rendering von Wind- und Wetterwerten in Zeitreihen                         |
+| `smoke_nordsee_tide_test.py`          | Smoke-Prüfung des Nordsee-Gezeiten-Markups                                 |
+| `dwd-source-format-contracts.test.js` | DWD-Quellformat-Verträge und Regressionen bei geänderten Markern           |
 
 Die BSH-Referenzdateien in `tests/` sind Bestandteil der Regressionstests und
 sollen bei fachlichen Änderungen nicht stillschweigend ersetzt werden.
@@ -137,6 +137,18 @@ python3 tests/smoke_nordsee_tide_test.py
 - [ ] Nordsee- und Ostsee-Zeitreihen erscheinen in der richtigen Lightbox.
 - [ ] Die Gezeitenphase erscheint nur in der Nordsee-Zeitreihe.
 - [ ] Zeitreihen sind scrollbar und initial eingeklappt, wo vorgesehen.
+
+### Responsive Safe Area (US-025)
+
+- [x] Nordsee-Zeitreihe auf dem iPhone 17e in beiden Landscape-Ausrichtungen
+      prüfen.
+- [x] Ausgeklapptes Inhaltsfenster nutzt den verfügbaren vertikalen Raum und
+      bleibt scrollbar.
+- [x] Portrait-/Landscape-Wechsel erzeugt keinen Überlauf oder abgeschnittenen
+      Inhalt.
+- [x] iPad in Portrait und Landscape ohne Layout-Regression prüfen.
+- [x] Offline-Karten und letzter Kartenstand bleiben nach Orientierungswechsel
+      verfügbar.
 
 ### Offline und Aktualisierung
 

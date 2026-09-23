@@ -5,7 +5,7 @@ Es ist für die Nutzung vor dem Ablegen und unterwegs auf dem Wasser gedacht. Zu
 
 ## Aktueller Release
 
-`Release-1.6` umfasst kompakte DWD-Seewetter-Zeitreihen für Nord- und Ostsee,
+`Release-1.7` umfasst kompakte DWD-Seewetter-Zeitreihen für Nord- und Ostsee,
 die textuelle Wetterlage sowie die Gezeitenphase für die Nordsee. Die
 zugehörigen Daten bleiben über die bestehende Cache- und Offline-Logik verfügbar.
 
@@ -21,6 +21,7 @@ zugehörigen Daten bleiben über die bestehende Cache- und Offline-Logik verfüg
 - Textuelle Wetterlage als Kontext zur Seewetter-Zeitreihe.
 - Gezeitenphase mit Spring-, Mitt- und Nipp-Phasen in der Nordsee-Zeitreihe.
 - Navigation per Wischen, Tippen, Tastatur und Zoom.
+- Responsive Safe-Area-Darstellung der Nordsee-Zeitreihe im Landscape-Modus.
 - Vergrößerte Kartenansicht mit Wechsel zwischen Nachbarkarten.
 - Offline-Nutzung zuletzt geladener Karten und Texte.
 - Automatische Anpassung an den System-Dark-Mode.
