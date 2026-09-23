@@ -563,6 +563,23 @@
   }
 }
 
+/* Protect the timeseries overlay on compact landscape viewports. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .lightbox-weatherlage.ostsee-timeseries {
+    top: max(6px, calc(var(--safe-top) + 6px));
+    right: max(6px, calc(var(--safe-right) + 6px));
+    bottom: max(8px, calc(var(--safe-bottom) + 8px));
+    left: max(6px, calc(var(--safe-left) + 6px));
+    width: auto;
+    max-height: min(86dvh, 86vh);
+    transform: none;
+  }
+
+  .lightbox-weatherlage.ostsee-timeseries.is-collapsed {
+    max-height: 46px;
+  }
+}
+
 .ostsee-ts-wrap {
   flex: 1 1 auto;
   min-height: 0;

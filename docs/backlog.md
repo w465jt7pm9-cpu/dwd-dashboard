@@ -12,6 +12,7 @@
 
 - US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 - US-017 – UI-Texte für Internationalisierung strukturieren
+- US-025 – Responsive Safe Area für die Nordsee-Zeitreihe
 
 ## 🟨 DOING
 
@@ -1840,18 +1841,18 @@ bevor Wetterlage oder Zeitreihen unvollständig angezeigt werden.
 ### Akzeptanzkriterien
 
 - [x] Eine eigene Regressionstest-Datei oder klar abgegrenzte Tests sichern die
-  genannten Verträge gegen lokale Fixtures ab.
+      genannten Verträge gegen lokale Fixtures ab.
 - [x] Positive Fixtures prüfen, dass Wetterlage, Vorhersage und Zeitreihenwerte
-  vollständig extrahiert werden.
+      vollständig extrahiert werden.
 - [x] Negativtests schlagen bei fehlenden, verschobenen oder geänderten
-  Schlüsselmarkern kontrolliert fehl.
+      Schlüsselmarkern kontrolliert fehl.
 - [x] Nordsee- und Ostsee-Varianten werden getrennt berücksichtigt, wo ihre
-  Quellen unterschiedliche Seitenstrukturen haben.
+      Quellen unterschiedliche Seitenstrukturen haben.
 - [x] Mindestens ein Latin-1-Sonderzeichen wird durch den Decodierpfad geprüft.
 - [x] Tests verwenden keine Live-DWD-Anfragen und benötigen keine neue
-  Abhängigkeit.
+      Abhängigkeit.
 - [x] Änderungen an Fixtures oder Verträgen werden in Test und Dokumentation
-  begründet.
+      begründet.
 
 ### Abgrenzung
 
@@ -1860,6 +1861,96 @@ bevor Wetterlage oder Zeitreihen unvollständig angezeigt werden.
   die erkannte Vertragsannahme reproduzierbar gegen einen bekannten Stand.
 - Ein optionaler späterer Smoke-Test gegen die Live-Quelle wäre separat zu
   bewerten und dürfte die lokale Regressionstestsuite nicht ersetzen.
+
+---
+
+## 📱 US-025 – Responsive Safe Area für die Nordsee-Zeitreihe
+
+**Status:** TODO
+**Priorität:** Mittel
+
+### Beschreibung
+
+Als Nutzer eines iPhones mit Dynamic Island im Landscape-Modus
+möchte ich, dass die Nordsee-Zeitreihe aus US-022 die verfügbaren Safe Areas und
+die tatsächliche Viewport-Größe berücksichtigt,
+damit das Inhaltsfenster nicht von Systembereichen verdeckt wird und auch auf
+künftigen iPhone-Formaten ohne gerätespezifische Anpassungen lesbar bleibt.
+
+### Zielbild
+
+- Das Inhaltsfenster der Nordsee-Zeitreihe bleibt innerhalb der verfügbaren
+  horizontalen und vertikalen Safe Areas.
+- Die Größe und Position richten sich nach Viewport und Safe-Area-Insets, nicht
+  nach einem bestimmten iPhone-Modell, einer festen Auflösung oder einer
+  Dynamic-Island-Größe.
+- Die Darstellung bleibt im Portrait-Modus, auf Desktop und auf dem iPad
+  unverändert gut nutzbar.
+- Die Anpassung funktioniert ohne neue UI, neue Bibliothek oder zusätzliche
+  Interaktion.
+
+### Akzeptanzkriterien
+
+**Safe Area und Sichtbarkeit des Inhaltsfensters**
+
+- [ ] Gegeben ein iPhone mit Dynamic Island im Landscape-Modus
+- [ ] Wenn die Nordsee-Zeitreihe aus US-022 geöffnet wird
+- [ ] Dann liegt kein wesentlicher Inhalt des Inhaltsfensters unter der Dynamic
+      Island oder einer seitlichen bzw. oberen Safe Area.
+- [ ] Die seitlichen Insets werden über die standardisierten CSS-Safe-Area-
+      Werte des Geräts berücksichtigt und fallen auf `0px` zurück, wenn sie nicht
+      verfügbar sind.
+- [ ] Das Inhaltsfenster bleibt bei unterschiedlichen Geräteabmessungen,
+      Ausrichtungen und vom Betriebssystem gelieferten Safe-Area-Inset-Werten
+      vollständig erreichbar.
+
+**Responsive Layout und Zukunftssicherheit**
+
+- [ ] Breite, Höhe und Position werden aus dem verfügbaren Viewport berechnet;
+      feste Werte für iPhone 17e oder andere konkrete Modelle sind nicht zulässig.
+- [ ] Ein Wechsel zwischen Portrait und Landscape führt weder zu abgeschnittenen
+      Inhalten noch zu horizontalem oder vertikalem Seitenüberlauf.
+- [ ] Neue iPhone-Auflösungen und Seitenverhältnisse benötigen keine erneute
+      gerätespezifische Codeanpassung.
+- [ ] Die bestehende Darstellung und Lesbarkeit auf iPad und Desktop bleibt
+      erhalten.
+
+**Nicht-Regressionsschutz**
+
+- [ ] Lightbox, Zoom, Pan, Peek und Lightbox-Navigation bleiben unverändert
+      bedienbar.
+- [ ] Die Nordsee-Zeitreihe bleibt unabhängig scrollbar und die Zeitspalten
+      bleiben synchron ausgerichtet.
+- [ ] Pull-to-Refresh bleibt nur auf den vorgesehenen Seiten und Zuständen aktiv.
+- [ ] Offline-Karten, Cache-Status und bestehende Bildquellen bleiben unverändert.
+- [ ] Bestehende `aria-label`- und `alt`-Texte werden nicht verändert.
+
+### 🧪 Testabschnitt
+
+**Pflichtprüfung auf Geräten**
+
+- [ ] Das betroffene iPhone 17e wird im Landscape-Modus in beiden
+      Ausrichtungen geprüft.
+- [ ] Die Nordsee-Zeitreihe wird ein- und ausgeklappt; das Inhaltsfenster bleibt
+      vollständig erreichbar und scrollbar.
+- [ ] Ein Wechsel zwischen Portrait und Landscape erzeugt keinen abgeschnittenen
+      Inhalt und keinen horizontalen oder vertikalen Seitenüberlauf.
+- [ ] Ein iPad wird in Portrait und Landscape geprüft; Größe, Position,
+      Scrollbarkeit und Zeitspalten-Synchronität bleiben unverändert.
+
+**Bestehende automatisierte Prüfungen**
+
+- [ ] `bash scripts/run-tests.sh` läuft nach der Umsetzung erfolgreich durch.
+- [ ] `git diff --check` meldet keine Formatfehler.
+- [ ] Die Prüfung erfordert keine neue Browser-Testabhängigkeit; eine spätere
+      Browser-Automation ist optional und ersetzt den Gerätetest nicht.
+
+### Abgrenzung
+
+- Keine Änderung an DWD-Datenquellen, Parsern, Refresh-Zyklen oder Service Worker.
+- Keine Änderung am fachlichen Verhalten von US-006 oder an der Datenlogik von
+  US-022.
+- Keine zusätzliche sichtbare Status- oder Summary-Anzeige.
 
 # 💡 IDEEN (UNSORTIERT)
 
