@@ -1912,6 +1912,9 @@ künftigen iPhone-Formaten ohne gerätespezifische Anpassungen lesbar bleibt.
       Inhalten noch zu horizontalem oder vertikalem Seitenüberlauf.
 - [ ] Neue iPhone-Auflösungen und Seitenverhältnisse benötigen keine erneute
       gerätespezifische Codeanpassung.
+- [ ] Das ausgeklappte Inhaltsfenster nutzt im kompakten Landscape-Modus den
+  verfügbaren vertikalen Raum bis zu `min(86dvh, 86vh)` und fällt nicht auf
+  die allgemeine `56dvh`-Begrenzung zurück.
 - [ ] Die bestehende Darstellung und Lesbarkeit auf iPad und Desktop bleibt
       erhalten.
 
@@ -1931,6 +1934,9 @@ künftigen iPhone-Formaten ohne gerätespezifische Anpassungen lesbar bleibt.
 
 - [ ] Das betroffene iPhone 17e wird im Landscape-Modus in beiden
       Ausrichtungen geprüft.
+- [ ] Das ausgeklappte Inhaltsfenster nimmt auf dem iPhone 17e im Landscape-
+  Modus deutlich mehr als die bisher beobachteten ca. 50 % der Viewport-Höhe
+  ein und bleibt vollständig scrollbar.
 - [ ] Die Nordsee-Zeitreihe wird ein- und ausgeklappt; das Inhaltsfenster bleibt
       vollständig erreichbar und scrollbar.
 - [ ] Ein Wechsel zwischen Portrait und Landscape erzeugt keinen abgeschnittenen
