@@ -1,6 +1,6 @@
 # Tests und Qualitätssicherung
 
-> Release-1.7 (2026-09-23): Die vollständige automatisierte Testsuite und die manuelle US-025-Geräteprüfung sind erfolgreich durchgelaufen.
+> Stand 2026-10-10: Die vollständige automatisierte Testsuite sowie die manuellen Prüfungen für US-025 und US-026 sind erfolgreich durchgelaufen.
 
 ## Zweck
 
@@ -30,6 +30,7 @@ Pakete werden nicht benötigt.
 | `tide-phase.test.js`                  | Gezeitenphasen-Generator gegen BSH-Referenzdaten und Mondphasen-Zeitpunkte |
 | `wetterlage-text-extraction.test.js`  | Extraktion von Wetterlage und vollständigem Vorhersageblock                |
 | `wind-weather-rendering.test.js`      | Rendering von Wind- und Wetterwerten in Zeitreihen                         |
+| `us026-portrait-grid.test.js`         | CSS-Regeln für Kartenanzahl und Anordnung der Startseite im Portrait       |
 | `smoke_nordsee_tide_test.py`          | Smoke-Prüfung des Nordsee-Gezeiten-Markups                                 |
 | `dwd-source-format-contracts.test.js` | DWD-Quellformat-Verträge und Regressionen bei geänderten Markern           |
 
@@ -150,6 +151,15 @@ python3 tests/smoke_nordsee_tide_test.py
 - [x] Offline-Karten und letzter Kartenstand bleiben nach Orientierungswechsel
       verfügbar.
 
+### Startseiten-Grid (US-026)
+
+- [x] iPhone in Portrait zeigt die sechs vorgesehenen Startseitenkarten.
+- [x] Die beiden Europa-+36h-Karten stehen im Portrait im rechten Rasterbereich
+      untereinander.
+- [x] Wechsel zu Landscape und zurück aktualisiert die Darstellung ohne Reload:
+      zehn Karten im Landscape, sechs im Portrait.
+- [x] Sichtbare Karten bleiben vollständig und ohne horizontalen Seitenüberlauf.
+
 ### Offline und Aktualisierung
 
 - [ ] Gecachte Karten bleiben offline sichtbar.
@@ -169,8 +179,9 @@ python3 tests/smoke_nordsee_tide_test.py
 
 ## CI und Git-Hooks
 
-GitHub Actions führt die Testsuite bei jedem Push und Pull Request auf `main`
-aus: [.github/workflows/tests.yml](../.github/workflows/tests.yml).
+GitHub Actions führt die Testsuite bei jedem Push auf `main` und
+`feature/portrait-weather-grid` sowie bei Pull Requests nach `main` aus:
+[.github/workflows/tests.yml](../.github/workflows/tests.yml).
 
 Optional können die versionierten Hooks aktiviert werden:
 

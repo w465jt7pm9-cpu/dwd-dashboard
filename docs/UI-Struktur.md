@@ -13,6 +13,12 @@
 > Update US-022: Für die Nordsee-Lightbox wird eine analoge, kompakte Zeitreihen-Ansicht ergänzt.
 > Update US-023: Die Nordsee-Zeitreihe enthält zusätzlich eine Gezeitenphase mit farbigen Segmenten und Kurzbezeichnern (Sp/Mt/Np) auf schmalen Displays.
 > Update US-025: Das Nordsee-Zeitreihenfenster berücksichtigt Safe-Area-Insets und nutzt im kompakten Landscape-Modus den verfügbaren vertikalen Raum, ohne die iPad-Darstellung zu verändern.
+> Update US-026: Die Startseite zeigt im Mobiltelefon-Portrait sechs Karten; die beiden sichtbaren Europa-+36h-Karten stehen rechts neben der Bodenanalyse untereinander. Im Landscape bleiben alle zehn Karten sichtbar.
+
+Die responsive Startseitenregel ist auf Viewports bis 767 px im Portrait
+begrenzt. Sie blendet auf der ersten Seite vier Karten aus und ordnet die
+verbleibenden drei unteren Wetterkarten in drei gleich breite Spalten an.
+Andere Carousel-Seiten und ihre Raster bleiben unverändert.
 
 ```mermaid
 flowchart TD

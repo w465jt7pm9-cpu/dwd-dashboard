@@ -21,7 +21,8 @@ zugehörigen Daten bleiben über die bestehende Cache- und Offline-Logik verfüg
 - Textuelle Wetterlage als Kontext zur Seewetter-Zeitreihe.
 - Gezeitenphase mit Spring-, Mitt- und Nipp-Phasen in der Nordsee-Zeitreihe.
 - Navigation per Wischen, Tippen, Tastatur und Zoom.
-- Responsive Safe-Area-Darstellung der Nordsee-Zeitreihe im Landscape-Modus.
+- An die Bildschirmausrichtung angepasstes Startseitenraster: sechs Wetterkarten im Mobiltelefon-Portrait, alle zehn Karten im Landscape-Modus.
+- Die Nordsee-Zeitreihe nutzt im Querformat den verfügbaren Platz und hält Abstand zu Displayrändern und Aussparungen.
 - Vergrößerte Kartenansicht mit Wechsel zwischen Nachbarkarten.
 - Offline-Nutzung zuletzt geladener Karten und Texte.
 - Automatische Anpassung an den System-Dark-Mode.
@@ -62,7 +63,9 @@ Damit kein fehlerhafter Stand committet oder gepusht wird, gibt es versionierte 
 bash scripts/setup-git-hooks.sh
 ```
 
-Zusätzlich läuft die Testsuite über GitHub Actions bei jedem Push/PR auf `main` (`.github/workflows/tests.yml`) als serverseitiges Sicherheitsnetz.
+Zusätzlich läuft die Testsuite über GitHub Actions bei jedem Push auf `main` und
+`feature/portrait-weather-grid` sowie bei Pull Requests nach `main`
+(`.github/workflows/tests.yml`) als serverseitiges Sicherheitsnetz.
 
 ## Entwicklung
 
