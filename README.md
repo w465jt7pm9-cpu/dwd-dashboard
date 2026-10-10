@@ -24,6 +24,7 @@ zugehörigen Daten bleiben über die bestehende Cache- und Offline-Logik verfüg
 - Die vergrößerte Kartenansicht bewahrt beim Einpassen und Zoomen das
   natürliche Seitenverhältnis der Bildquelle.
 - An die Bildschirmausrichtung angepasstes Startseitenraster: sechs Wetterkarten im Mobiltelefon-Portrait, alle zehn Karten im Landscape-Modus.
+- Auf der Seewetter-Seite werden im Mobiltelefon-Portrait pro Zeile nur die ersten beiden Karten gezeigt; im Landscape bleiben alle vier sichtbar.
 - Die Nordsee-Zeitreihe nutzt im Querformat den verfügbaren Platz und hält Abstand zu Displayrändern und Aussparungen.
 - Vergrößerte Kartenansicht mit Wechsel zwischen Nachbarkarten.
 - Offline-Nutzung zuletzt geladener Karten und Texte.

@@ -19,6 +19,7 @@
 
 ## ✅ DONE
 
+- US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
 - US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
 - US-026 – Startseiten-Grid im Mobiltelefon-Portrait anpassen
 - US-001 – Menü vollständig entfernen
@@ -2092,6 +2093,73 @@ damit Kartenformen und Beschriftungen zuverlässig erkennbar bleiben.
 - Keine allgemeine Neugestaltung der Lightbox oder Änderung der Gestensteuerung,
   sofern die Diagnose nicht zeigt, dass sie für die unverzerrte Darstellung
   zwingend erforderlich ist.
+
+---
+
+## 🔍 US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
+
+**Status:** DONE
+**Priorität:** Mittel
+
+### Beschreibung
+
+Als Nutzer eines Mobiltelefons möchte ich auf der Seewetter-Seite im
+Portrait-Modus pro Kartenzeile nur die ersten beiden Vorhersagekarten sehen,
+damit die Karten auf dem schmalen Bildschirm größer und leichter bedienbar sind.
+
+### Zielbild
+
+- Im Mobiltelefon-Portrait werden pro Seewetter-Kartenzeile nur die ersten
+  beiden Karten angezeigt.
+- Die späteren Vorhersagekarten derselben Zeile bleiben im Landscape-Modus
+  sichtbar.
+- Andere Dashboard-Seiten und deren Kartenraster bleiben unverändert.
+
+### Akzeptanzkriterien
+
+- [x] Im Mobiltelefon-Portrait zeigt jede Seewetter-Kartenzeile mit vier
+  Vorhersagekarten ausschließlich die ersten beiden Karten.
+- [x] Im Landscape-Modus bleiben alle vier Karten jeder Seewetter-Zeile sichtbar.
+- [x] Die im Portrait sichtbaren Karten bleiben vollständig, unverzerrt und
+  ohne horizontales Scrollen bedienbar.
+- [x] Beim Wechsel zwischen Portrait und Landscape wird die Darstellung ohne
+  Neuladen aktualisiert.
+- [x] Andere Dashboard-Seiten, Navigation, Lightbox, Cache und Aktualisierung
+  bleiben unverändert.
+- [x] Die Umsetzung erfolgt auf dem eigenen Branch
+  `feature/us-028-seewetter-portrait-cards`, angelegt auf Basis des aktuellen
+  `main`; `main` bleibt bis zur Prüfung und Freigabe unverändert.
+- [x] Pushes auf den Feature-Branch führen die Testsuite aus und aktualisieren
+  eine eigene Cloudflare-Pages-Preview, getrennt von der Produktionsversion.
+- [x] Ein automatisierter Regressionstest prüft die Kartenanzahl im Portrait
+  und Landscape.
+- [x] Die manuelle Prüfung umfasst unterstützte Mobilgeräte mit iOS und Android
+  im Portrait und Landscape.
+- [x] `bash scripts/run-tests.sh` und `git diff --check` sind erfolgreich.
+
+### Technische Verifikation
+
+- Lokaler Browser und Cloudflare-Preview zeigen bei 390×844 zwei sichtbare
+  Karten pro Seewetter-Zeile ohne horizontalen Überlauf; bei 844×390 bleiben
+  alle vier Karten sichtbar. Der Wechsel funktioniert ohne Reload.
+- Die vollständige Testsuite, der GitHub-Actions-Lauf und das Cloudflare-Pages-
+  Preview-Deployment waren erfolgreich.
+- Manuelle Prüfungen auf iPads, iPhones und Android-Geräten waren im Portrait
+  und Landscape erfolgreich.
+
+### Abhängigkeiten und Bezug
+
+- Baut auf dem responsiven Startseitenraster aus US-026 auf, betrifft aber
+  ausschließlich die Seewetter-Seite.
+- Das allgemeine Lightbox-Verhalten aus US-009, US-010 und US-027 bleibt
+  unverändert.
+
+### Abgrenzung
+
+- Keine Änderung an der Startseite oder den Seegang-, Höhenwetter- und
+  Nordsee-/Ostsee-Zeitreihenseiten.
+- Keine Änderung an DWD-Datenquellen, Refresh-Zyklen oder Service Worker.
+- Keine Änderung an Kartenreihenfolge oder Vorhersageinhalten.
 
 ---
 
