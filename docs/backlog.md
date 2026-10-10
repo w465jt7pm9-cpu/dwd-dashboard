@@ -12,6 +12,7 @@
 
 - US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 - US-017 – UI-Texte für Internationalisierung strukturieren
+- US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
 
 ## 🟨 DOING
 
@@ -2092,6 +2093,63 @@ damit Kartenformen und Beschriftungen zuverlässig erkennbar bleiben.
 - Keine allgemeine Neugestaltung der Lightbox oder Änderung der Gestensteuerung,
   sofern die Diagnose nicht zeigt, dass sie für die unverzerrte Darstellung
   zwingend erforderlich ist.
+
+---
+
+## 🔍 US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
+
+**Status:** TODO
+**Priorität:** Mittel
+
+### Beschreibung
+
+Als Nutzer eines Mobiltelefons möchte ich auf der Seewetter-Seite im
+Portrait-Modus pro Kartenzeile nur die ersten beiden Vorhersagekarten sehen,
+damit die Karten auf dem schmalen Bildschirm größer und leichter bedienbar sind.
+
+### Zielbild
+
+- Im Mobiltelefon-Portrait werden pro Seewetter-Kartenzeile nur die ersten
+  beiden Karten angezeigt.
+- Die späteren Vorhersagekarten derselben Zeile bleiben im Landscape-Modus
+  sichtbar.
+- Andere Dashboard-Seiten und deren Kartenraster bleiben unverändert.
+
+### Akzeptanzkriterien
+
+- [ ] Im Mobiltelefon-Portrait zeigt jede Seewetter-Kartenzeile mit vier
+  Vorhersagekarten ausschließlich die ersten beiden Karten.
+- [ ] Im Landscape-Modus bleiben alle vier Karten jeder Seewetter-Zeile sichtbar.
+- [ ] Die im Portrait sichtbaren Karten bleiben vollständig, unverzerrt und
+  ohne horizontales Scrollen bedienbar.
+- [ ] Beim Wechsel zwischen Portrait und Landscape wird die Darstellung ohne
+  Neuladen aktualisiert.
+- [ ] Andere Dashboard-Seiten, Navigation, Lightbox, Cache und Aktualisierung
+  bleiben unverändert.
+- [ ] Die Umsetzung erfolgt auf dem eigenen Branch
+  `feature/us-028-seewetter-portrait-cards`, angelegt auf Basis des aktuellen
+  `main`; `main` bleibt bis zur Prüfung und Freigabe unverändert.
+- [ ] Pushes auf den Feature-Branch führen die Testsuite aus und aktualisieren
+  eine eigene Cloudflare-Pages-Preview, getrennt von der Produktionsversion.
+- [ ] Ein automatisierter Regressionstest prüft die Kartenanzahl im Portrait
+  und Landscape.
+- [ ] Die manuelle Prüfung umfasst unterstützte Mobilgeräte mit iOS und Android
+  im Portrait und Landscape.
+- [ ] `bash scripts/run-tests.sh` und `git diff --check` sind erfolgreich.
+
+### Abhängigkeiten und Bezug
+
+- Baut auf dem responsiven Startseitenraster aus US-026 auf, betrifft aber
+  ausschließlich die Seewetter-Seite.
+- Das allgemeine Lightbox-Verhalten aus US-009, US-010 und US-027 bleibt
+  unverändert.
+
+### Abgrenzung
+
+- Keine Änderung an der Startseite oder den Seegang-, Höhenwetter- und
+  Nordsee-/Ostsee-Zeitreihenseiten.
+- Keine Änderung an DWD-Datenquellen, Refresh-Zyklen oder Service Worker.
+- Keine Änderung an Kartenreihenfolge oder Vorhersageinhalten.
 
 ---
 

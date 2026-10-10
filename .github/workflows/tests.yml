@@ -2,7 +2,11 @@ name: Tests
 
 on:
   push:
-    branches: [main, feature/portrait-weather-grid, feature/us-027-lightbox-portrait]
+    branches:
+      - main
+      - feature/portrait-weather-grid
+      - feature/us-027-lightbox-portrait
+      - feature/us-028-seewetter-portrait-cards
   pull_request:
     branches: [main]
 
