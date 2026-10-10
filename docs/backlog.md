@@ -19,6 +19,7 @@
 
 ## ✅ DONE
 
+- US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
 - US-026 – Startseiten-Grid im Mobiltelefon-Portrait anpassen
 - US-001 – Menü vollständig entfernen
 - US-002 – Navigation über Gesten/Tasten
@@ -2008,6 +2009,89 @@ Im Landscape-Modus möchte ich dagegen wieder alle verfügbaren Wetterkarten auf
 - Die Logik nutzt gezielte CSS-Regeln für die ersten beiden Kartelemente oberhalb und die letzten drei unterhalb der Startseite, statt die komplette Dashboard-Struktur zu verändern.
 - Dadurch bleibt die App in Navigation, Lightbox, Refresh-Zyklus, Cache und anderen Seiten unverändert; nur die sichtbare Anzahl der Karten auf der Startseite wird reduziert.
 - Die übrigen Wetterkarten-Seiten und das globale Bild-Handling bleiben identisch, damit die vorhandenen Offline- und Swipe-Mechaniken unverändert weiterarbeiten.
+
+---
+
+## 🔍 US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
+
+**Status:** DONE
+**Priorität:** Mittel
+
+### Beschreibung
+
+Als Nutzer eines Mobilgeräts möchte ich die Bodenluftdruckkarte in der
+Lightbox auch im Portrait-Modus unverzerrt ansehen und weiter vergrößern können,
+damit Kartenformen und Beschriftungen zuverlässig erkennbar bleiben.
+
+### Zielbild
+
+- Die Karte wird beim Öffnen im Portrait passend in der Lightbox angezeigt.
+- Das natürliche Seitenverhältnis der DWD-Bildquelle bleibt beim Öffnen und
+  weiteren Zoomen erhalten.
+- Beschnitt durch die begrenzte Viewportfläche ist von tatsächlicher
+  Bildverzerrung und sichtbarer Quellauflösung unterscheidbar.
+- Das bereits gut dargestellte Landscape-Verhalten bleibt erhalten.
+
+### Akzeptanzkriterien
+
+- [x] Auf Mobilgeräten im Portrait entspricht das Verhältnis von Bildbreite zu
+  Bildhöhe in der Lightbox dem Verhältnis der geladenen Bildquelle; das Bild
+  wird in unterstützten mobilen Browsern nicht gestreckt.
+- [x] Beim weiteren Pinch- oder Double-Tap-Zoom bleibt das Seitenverhältnis
+  unverändert und die Karte lässt sich weiterhin erwartungsgemäß verschieben.
+- [x] Die anfängliche Darstellung macht den möglichen Beschnitt klar erkennbar;
+  nicht sichtbare Kartenbereiche lassen sich durch Zoom und Pan erreichen.
+- [x] Eine etwaige Qualitätsgrenze durch die Pixelauflösung der DWD-Quelle wird
+  nicht mit geometrischer Verzerrung verwechselt; die Bildquelle wird nicht
+  ohne gesonderte fachliche Entscheidung ersetzt.
+- [x] Das vorhandene Landscape-Verhalten der Bodenluftdruckkarte bleibt
+  unverändert.
+- [x] Lightbox-Navigation, Peek, Schließen sowie Zoom-/Pan-Gesten anderer Karten
+  bleiben funktionsfähig.
+- [x] Die Umsetzung erfolgt auf einem eigenen Branch
+  `feature/us-027-lightbox-portrait`, angelegt auf Basis des aktuellen `main`;
+  `main` bleibt bis zur Prüfung und Freigabe unverändert.
+- [x] Pushes auf den Feature-Branch führen die Testsuite aus und aktualisieren eine eigene Cloudflare-Pages-Preview, getrennt von der Produktionsversion.
+- [x] Die manuelle Prüfung umfasst Mobilgeräte mit iOS und Android in Portrait
+  und Landscape sowie die jeweils verfügbaren aktuellen Browser.
+- [x] Ein automatisierter Regressionstest prüft die Bildproportionen bei
+  initialer und gezoomter Darstellung.
+- [x] `bash scripts/run-tests.sh` und `git diff --check` sind erfolgreich.
+
+### Verifikation
+
+- Manuelle Tests auf iPhones und iPads sowie Android-Geräten in Portrait und
+  Landscape waren erfolgreich; Zoom, Pan und Lightbox-Navigation funktionieren.
+- Die Cloudflare-Pages-Preview und GitHub-Actions-Tests liefen erfolgreich.
+- Die vollständige lokale Testsuite und `git diff --check` liefen erfolgreich.
+
+### Abhängigkeiten und Bezug
+
+- Baut auf den allgemeinen Lightbox-/Zoom-Anforderungen aus US-009 und dem
+  Pan-/Zoom-Verhalten aus US-010 auf.
+- US-026 betrifft ausschließlich das Startseitenraster und bleibt von dieser
+  Story unberührt.
+- Falls nötig, müssen GitHub Actions und Cloudflare Pages für
+  `feature/us-027-lightbox-portrait` als Test- und Preview-Branch konfiguriert
+  werden; die Produktions-Branch-Konfiguration bleibt auf `main`.
+
+### Umsetzungslogik
+
+- Die Lightbox begrenzt das Bild auf 96 % der Viewport-Breite und -Höhe und
+  verwendet intrinsische Breite und Höhe. Dadurch wird die DWD-Quelle in ihrem
+  natürlichen Seitenverhältnis eingepasst, statt im Portrait durch eine feste
+  Höhe gestreckt zu werden.
+- `object-fit: contain` sichert die proportionale Darstellung innerhalb der
+  verfügbaren Maximalmaße; Zoom und Pan verwenden weiterhin die gemeinsame
+  Lightbox-Logik.
+
+### Abgrenzung
+
+- Keine Änderung an DWD-Datenquellen, Refresh-Zyklen oder Service Worker.
+- Keine Änderung am Startseitenraster aus US-026.
+- Keine allgemeine Neugestaltung der Lightbox oder Änderung der Gestensteuerung,
+  sofern die Diagnose nicht zeigt, dass sie für die unverzerrte Darstellung
+  zwingend erforderlich ist.
 
 ---
 
