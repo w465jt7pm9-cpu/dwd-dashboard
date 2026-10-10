@@ -16,6 +16,7 @@
 > Update US-026: Die Startseite zeigt im Mobiltelefon-Portrait sechs Karten; die beiden sichtbaren Europa-+36h-Karten stehen rechts neben der Bodenanalyse untereinander. Im Landscape bleiben alle zehn Karten sichtbar.
 > Update US-027: Die Lightbox passt Karten anhand ihrer intrinsischen Abmessungen in den Viewport ein und bewahrt das natürliche Bildseitenverhältnis auch beim Zoomen.
 > Update US-028: Auf der Seewetter-Seite sind im Mobiltelefon-Portrait je Zeile nur die ersten beiden Karten sichtbar; im Landscape bleiben alle vier Karten erhalten.
+> Update US-029: Auf der Höhenwetter-Seite sind im Mobiltelefon-Portrait je Zeile nur die ersten beiden Karten sichtbar; im Landscape bleiben alle vier Karten erhalten.
 
 Die responsive Startseitenregel ist auf Viewports bis 767 px im Portrait
 begrenzt. Sie blendet auf der ersten Seite vier Karten aus und ordnet die
