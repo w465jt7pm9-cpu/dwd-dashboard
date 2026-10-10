@@ -2197,13 +2197,23 @@ damit die Karten auf dem schmalen Bildschirm größer und leichter bedienbar sin
 - [x] Die Umsetzung erfolgt auf dem eigenen Branch
   `feature/us-029-upperair-portrait-cards`, angelegt auf Basis des aktuellen
   `main`; `main` bleibt bis zur Prüfung und Freigabe unverändert.
-- [ ] Pushes auf den Feature-Branch führen die Testsuite aus und aktualisieren
+- [x] Pushes auf den Feature-Branch führen die Testsuite aus und aktualisieren
   eine eigene Cloudflare-Pages-Preview, getrennt von der Produktionsversion.
 - [x] Ein automatisierter Regressionstest prüft die Kartenanzahl im Portrait
   und Landscape.
 - [ ] Die manuelle Prüfung umfasst unterstützte Mobilgeräte mit iOS und Android
   im Portrait und Landscape.
-- [ ] `bash scripts/run-tests.sh` und `git diff --check` sind erfolgreich.
+- [x] `bash scripts/run-tests.sh` und `git diff --check` sind erfolgreich.
+
+### Technische Verifikation
+
+- Lokaler Browser und Cloudflare-Preview zeigen bei 390×844 zwei sichtbare
+  Karten je Höhenwetter-Zeile ohne horizontalen Überlauf; bei 844×390 bleiben
+  alle vier Karten sichtbar.
+- Die vollständige Testsuite, der GitHub-Actions-Lauf und das Cloudflare-Pages-
+  Preview-Deployment waren erfolgreich.
+- Die manuelle Prüfung auf unterstützten iOS- und Android-Geräten steht noch
+  aus.
 
 ### Abhängigkeiten und Bezug
 
