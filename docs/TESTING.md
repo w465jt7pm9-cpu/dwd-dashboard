@@ -34,6 +34,7 @@ Pakete werden nicht benötigt.
 | `us026-portrait-grid.test.js`         | CSS-Regeln für Kartenanzahl und Anordnung der Startseite im Portrait       |
 | `us027-lightbox-aspect-ratio.test.js` | Proportionale Lightbox-Darstellung und einheitliche Zoom-Skalierung        |
 | `us028-seewetter-portrait-cards.test.js` | Kartenanzahl und Spaltenlayout der Seewetter-Seite im Portrait |
+| `us029-upperair-portrait-cards.test.js` | Kartenanzahl und Spaltenlayout der Höhenwetter-Seite im Portrait |
 | `smoke_nordsee_tide_test.py`          | Smoke-Prüfung des Nordsee-Gezeiten-Markups                                 |
 | `dwd-source-format-contracts.test.js` | DWD-Quellformat-Verträge und Regressionen bei geänderten Markern           |
 
@@ -183,6 +184,14 @@ python3 tests/smoke_nordsee_tide_test.py
       andere Dashboard-Seiten bleiben unverändert.
 - [x] Manuelle Prüfungen auf iPads, iPhones und Android-Geräten in Portrait und
       Landscape waren erfolgreich.
+
+### Höhenwetter-Karten im Portrait (US-029)
+
+- [ ] In jeder Höhenwetter-Zeile sind im Portrait nur die ersten beiden Karten
+      sichtbar.
+- [ ] Im Landscape sind wieder alle vier Karten je Zeile sichtbar.
+- [ ] Portrait-/Landscape-Wechsel aktualisiert die Darstellung ohne Reload;
+      andere Dashboard-Seiten bleiben unverändert.
 
 ### Offline und Aktualisierung
 

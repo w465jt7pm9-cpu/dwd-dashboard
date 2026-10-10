@@ -7,6 +7,7 @@ on:
       - feature/portrait-weather-grid
       - feature/us-027-lightbox-portrait
       - feature/us-028-seewetter-portrait-cards
+      - feature/us-029-upperair-portrait-cards
   pull_request:
     branches: [main]
 

@@ -149,6 +149,16 @@
   }
 }
 
+@media (max-width: 767px) and (orientation: portrait) {
+  .page[data-page='2'] .upper-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page[data-page='2'] .upper-row .card:nth-child(n + 3) {
+    display: none;
+  }
+}
+
 /* =========================
    GRID SECTIONS
    ========================= */

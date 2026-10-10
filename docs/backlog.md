@@ -15,7 +15,7 @@
 
 ## 🟨 DOING
 
-- Keine aktuellen Aufgaben
+- US-029 – Höhenwetter-Karten im Mobiltelefon-Portrait reduzieren
 
 ## ✅ DONE
 
@@ -2157,6 +2157,64 @@ damit die Karten auf dem schmalen Bildschirm größer und leichter bedienbar sin
 ### Abgrenzung
 
 - Keine Änderung an der Startseite oder den Seegang-, Höhenwetter- und
+  Nordsee-/Ostsee-Zeitreihenseiten.
+- Keine Änderung an DWD-Datenquellen, Refresh-Zyklen oder Service Worker.
+- Keine Änderung an Kartenreihenfolge oder Vorhersageinhalten.
+
+---
+
+## 🔍 US-029 – Höhenwetter-Karten im Mobiltelefon-Portrait reduzieren
+
+**Status:** DOING
+**Priorität:** Mittel
+
+### Beschreibung
+
+Als Nutzer eines Mobiltelefons möchte ich auf der Höhenwetter-Seite im
+Portrait-Modus pro Kartenzeile nur die ersten beiden Vorhersagekarten sehen,
+damit die Karten auf dem schmalen Bildschirm größer und leichter bedienbar sind.
+
+### Zielbild
+
+- Im Mobiltelefon-Portrait werden pro Höhenwetter-Kartenzeile nur die ersten
+  beiden Karten angezeigt.
+- Die späteren Vorhersagekarten derselben Zeile bleiben im Landscape-Modus
+  sichtbar.
+- Andere Dashboard-Seiten und deren Kartenraster bleiben unverändert.
+
+### Akzeptanzkriterien
+
+- [ ] Im Mobiltelefon-Portrait zeigt jede Höhenwetter-Kartenzeile mit vier
+  Karten ausschließlich die ersten beiden Karten.
+- [ ] Im Landscape-Modus bleiben alle vier Karten jeder Höhenwetter-Zeile
+  sichtbar.
+- [ ] Die im Portrait sichtbaren Karten bleiben vollständig und ohne
+  horizontalen Überlauf bedienbar.
+- [ ] Beim Wechsel zwischen Portrait und Landscape wird die Darstellung ohne
+  Neuladen aktualisiert.
+- [ ] Andere Dashboard-Seiten, Navigation, Lightbox, Cache und Aktualisierung
+  bleiben unverändert.
+- [x] Die Umsetzung erfolgt auf dem eigenen Branch
+  `feature/us-029-upperair-portrait-cards`, angelegt auf Basis des aktuellen
+  `main`; `main` bleibt bis zur Prüfung und Freigabe unverändert.
+- [ ] Pushes auf den Feature-Branch führen die Testsuite aus und aktualisieren
+  eine eigene Cloudflare-Pages-Preview, getrennt von der Produktionsversion.
+- [x] Ein automatisierter Regressionstest prüft die Kartenanzahl im Portrait
+  und Landscape.
+- [ ] Die manuelle Prüfung umfasst unterstützte Mobilgeräte mit iOS und Android
+  im Portrait und Landscape.
+- [ ] `bash scripts/run-tests.sh` und `git diff --check` sind erfolgreich.
+
+### Abhängigkeiten und Bezug
+
+- Baut auf den Portrait-Layouts aus US-026 und US-028 auf, betrifft aber
+  ausschließlich die Höhenwetter-Seite.
+- Das allgemeine Lightbox-Verhalten aus US-009, US-010 und US-027 bleibt
+  unverändert.
+
+### Abgrenzung
+
+- Keine Änderung an Startseite, Seewetter-, Seegang- oder
   Nordsee-/Ostsee-Zeitreihenseiten.
 - Keine Änderung an DWD-Datenquellen, Refresh-Zyklen oder Service Worker.
 - Keine Änderung an Kartenreihenfolge oder Vorhersageinhalten.
