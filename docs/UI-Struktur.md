@@ -1,6 +1,6 @@
 ## UI-Struktur
 
-> Teststatus (2026-09-23): Die UI-Struktur wurde auf den aktuellen Stand der Implementierung angepasst.
+> Teststatus (2026-10-10): Die manuelle UI-Prüfung für US-027 auf iPhones, iPads und Android-Geräten war erfolgreich.
 
 > Release 1.0: Fokus auf ruhige, bildschirmfüllende Wetterkarten ohne sichtbares Menü, mit natürlicher Navigation und automatischem Dark Mode.
 > Update US-009: Die Lightbox zeigt subtile Peek-Nachbarn und nutzt zyklische, weiche Bildnavigation mit elastischem Pan- und Snap-Back-Verhalten.
@@ -14,6 +14,7 @@
 > Update US-023: Die Nordsee-Zeitreihe enthält zusätzlich eine Gezeitenphase mit farbigen Segmenten und Kurzbezeichnern (Sp/Mt/Np) auf schmalen Displays.
 > Update US-025: Das Nordsee-Zeitreihenfenster berücksichtigt Safe-Area-Insets und nutzt im kompakten Landscape-Modus den verfügbaren vertikalen Raum, ohne die iPad-Darstellung zu verändern.
 > Update US-026: Die Startseite zeigt im Mobiltelefon-Portrait sechs Karten; die beiden sichtbaren Europa-+36h-Karten stehen rechts neben der Bodenanalyse untereinander. Im Landscape bleiben alle zehn Karten sichtbar.
+> Update US-027: Die Lightbox passt Karten anhand ihrer intrinsischen Abmessungen in den Viewport ein und bewahrt das natürliche Bildseitenverhältnis auch beim Zoomen.
 
 Die responsive Startseitenregel ist auf Viewports bis 767 px im Portrait
 begrenzt. Sie blendet auf der ersten Seite vier Karten aus und ordnet die
@@ -31,7 +32,7 @@ flowchart TD
   Pages --> Texte[Seewetter Texte]
   Pages --> Cards[Overlay Karten]
   Cards --> Lightbox[Lightbox]
-  Lightbox --> Image[Hauptbild - zoombar]
+  Lightbox --> Image[Hauptbild - Seitenverhältnis bleibt erhalten]
   Lightbox --> Peek[Peek links / rechts]
   Lightbox --> Arrows[Pfeile dynamisch]
   Lightbox --> Elastic[Elastic Pan + Soft Clamp]

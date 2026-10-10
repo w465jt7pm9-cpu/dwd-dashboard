@@ -1,6 +1,7 @@
 # Tests und Qualitätssicherung
 
-> Stand 2026-10-10: Die vollständige automatisierte Testsuite sowie die manuellen Prüfungen für US-025 und US-026 sind erfolgreich durchgelaufen.
+> Stand 2026-10-10: Die vollständige automatisierte Testsuite sowie die
+> manuellen Prüfungen für US-025, US-026 und US-027 sind erfolgreich durchgelaufen.
 
 ## Zweck
 
@@ -31,6 +32,7 @@ Pakete werden nicht benötigt.
 | `wetterlage-text-extraction.test.js`  | Extraktion von Wetterlage und vollständigem Vorhersageblock                |
 | `wind-weather-rendering.test.js`      | Rendering von Wind- und Wetterwerten in Zeitreihen                         |
 | `us026-portrait-grid.test.js`         | CSS-Regeln für Kartenanzahl und Anordnung der Startseite im Portrait       |
+| `us027-lightbox-aspect-ratio.test.js` | Proportionale Lightbox-Darstellung und einheitliche Zoom-Skalierung        |
 | `smoke_nordsee_tide_test.py`          | Smoke-Prüfung des Nordsee-Gezeiten-Markups                                 |
 | `dwd-source-format-contracts.test.js` | DWD-Quellformat-Verträge und Regressionen bei geänderten Markern           |
 
@@ -138,6 +140,10 @@ python3 tests/smoke_nordsee_tide_test.py
 - [ ] Nordsee- und Ostsee-Zeitreihen erscheinen in der richtigen Lightbox.
 - [ ] Die Gezeitenphase erscheint nur in der Nordsee-Zeitreihe.
 - [ ] Zeitreihen sind scrollbar und initial eingeklappt, wo vorgesehen.
+- [x] Bodenluftdruckkarte bleibt in Portrait und Landscape proportional; Zoom
+      und Pan funktionieren auf iPhones, iPads und Android-Geräten.
+- [x] Lightbox-Navigation, Peek, Schließen und Zoom-/Pan-Gesten weiterer Karten
+      wurden auf Mobilgeräten manuell geprüft.
 
 ### Responsive Safe Area (US-025)
 
@@ -160,6 +166,13 @@ python3 tests/smoke_nordsee_tide_test.py
       zehn Karten im Landscape, sechs im Portrait.
 - [x] Sichtbare Karten bleiben vollständig und ohne horizontalen Seitenüberlauf.
 
+### Lightbox-Bildproportionen (US-027)
+
+- [x] iPhones, iPads und Android-Geräte in Portrait und Landscape manuell prüfen.
+- [x] Zoom und Pan bewahren das Bildseitenverhältnis und funktionieren
+      erwartungsgemäß.
+- [x] Lightbox-Navigation und weitere Karten bleiben funktionsfähig.
+
 ### Offline und Aktualisierung
 
 - [ ] Gecachte Karten bleiben offline sichtbar.
@@ -179,8 +192,9 @@ python3 tests/smoke_nordsee_tide_test.py
 
 ## CI und Git-Hooks
 
-GitHub Actions führt die Testsuite bei jedem Push auf `main` und
-`feature/portrait-weather-grid` sowie bei Pull Requests nach `main` aus:
+GitHub Actions führt die Testsuite bei jedem Push auf `main`,
+`feature/portrait-weather-grid` und `feature/us-027-lightbox-portrait` sowie bei
+Pull Requests nach `main` aus:
 [.github/workflows/tests.yml](../.github/workflows/tests.yml).
 
 Optional können die versionierten Hooks aktiviert werden:
