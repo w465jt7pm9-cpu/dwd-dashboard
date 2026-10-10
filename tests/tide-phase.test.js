@@ -6,7 +6,7 @@ const vm = require('vm')
 function loadTidePhaseHelpers () {
   const source = fs.readFileSync(path.join(__dirname, '../js/app.js'), 'utf8')
   const match = source.match(
-    /const GEOZEIT_WEEKDAY_TO_UTC = \{[\s\S]*?function buildMoonPhaseEventsForYears \(years\) \{[\s\S]*?return merged\n  \}/
+    /const GEOZEIT_WEEKDAY_TO_UTC = \{[\s\S]*?function buildMoonPhaseEventsForYears \(years\) \{[\s\S]*?return merged\s*\}/
   )
 
   if (!match) {

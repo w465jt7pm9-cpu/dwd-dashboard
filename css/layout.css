@@ -123,6 +123,22 @@
   grid-template-columns: repeat(5, 1fr);
 }
 
+@media (max-width: 767px) and (orientation: portrait) {
+  .dashboard__top-right .card:nth-child(n + 3),
+  .dashboard__bottom .card:nth-child(n + 4) {
+    display: none;
+  }
+
+  .dashboard__top-right {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard__bottom {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 /* =========================
    GRID SECTIONS
    ========================= */

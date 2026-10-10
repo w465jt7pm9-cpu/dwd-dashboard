@@ -15,7 +15,7 @@
 
 ## 🟨 DOING
 
-_(aktuell keine Story in Bearbeitung)_
+- US-026 – Startseiten-Grid im Mobiltelefon-Portrait anpassen
 
 ## ✅ DONE
 
@@ -1959,6 +1959,56 @@ künftigen iPhone-Formaten ohne gerätespezifische Anpassungen lesbar bleibt.
 - Keine Änderung am fachlichen Verhalten von US-006 oder an der Datenlogik von
   US-022.
 - Keine zusätzliche sichtbare Status- oder Summary-Anzeige.
+
+---
+
+## 📱 US-026 – Startseiten-Grid im Mobiltelefon-Portrait anpassen
+
+**Status:** DOING
+**Priorität:** Mittel
+
+### Beschreibung
+
+Als Mobiltelefon-Nutzer möchte ich auf der Startseite im Portrait-Modus eine reduzierte Anzahl von Wetterkarten sehen, damit die verbleibenden Karten trotz der geringeren verfügbaren Bildschirmbreite in einer gut lesbaren und komfortabel nutzbaren Größe dargestellt werden können.
+Im Landscape-Modus möchte ich dagegen wieder alle verfügbaren Wetterkarten auf der Startseite sehen, da durch die größere Anzeigefläche genügend Platz für die vollständige Darstellung aller Karten vorhanden ist.
+
+### Zielbild
+
+- Im Portrait werden sechs Karten gezeigt: die Bodendruck-/Bodenanalysekarte, die ersten beiden Analyse-/Prognosekarten oben rechts sowie die ersten drei Wetterkarten darunter.
+- Die beiden sichtbaren Karten oben rechts stehen im Portrait untereinander, damit kein ungenutzter Rasterbereich entsteht.
+- Im Landscape werden alle zehn Startseitenkarten im bestehenden Raster gezeigt.
+- Die sichtbaren Karten behalten ihr Seitenverhältnis und werden nicht verzerrt oder abgeschnitten.
+- Die übrigen Wetterkarten-Seiten bleiben unverändert.
+
+### Akzeptanzkriterien
+
+- [ ] Im Mobiltelefon-Portrait sind genau diese sechs Startseitenkarten sichtbar: Bodendruck-/Bodenanalyse Europa, Europa +36h (12 Uhr Vortag), Europa +36h (00 UTC), Deutschland aktuell, Heute spät und Morgen früh.
+- [ ] Die beiden sichtbaren Europa-+36h-Karten stehen im Portrait untereinander und nutzen den verfügbaren Bereich rechts der Bodenanalysekarte.
+- [ ] Die übrigen vier Startseitenkarten werden im Portrait ausgeblendet.
+- [ ] Beim Wechsel zu Landscape erscheinen alle zehn Startseitenkarten ohne Neuladen; beim Zurückwechseln werden die vier Karten wieder ausgeblendet.
+- [ ] Die sichtbaren Karten behalten ihr Seitenverhältnis und sind vollständig sowie unverzerrt dargestellt.
+- [ ] Die im Portrait-Modus angezeigten Wetterkarten bleiben ohne horizontales Scrollen gut lesbar und bedienbar.
+- [ ] Andere Kartenseiten, Navigation, Lightbox, Cache und Aktualisierung bleiben unverändert.
+- [ ] Die Änderung wird auf `feature/portrait-weather-grid` entwickelt und getestet; die Produktionsversion auf `main` bleibt währenddessen unverändert.
+- [ ] Pushes auf den Feature-Branch führen die Testsuite aus und aktualisieren eine eigene öffentliche Cloudflare-Pages-Preview, parallel zur Produktionsversion.
+- [ ] `bash scripts/run-tests.sh` und `git diff --check` sind erfolgreich.
+- [ ] Portrait-/Landscape-Wechsel werden zusätzlich manuell auf einem Mobiltelefon geprüft.
+
+### Abhängigkeiten
+
+- Cloudflare Pages muss Git-Integration und automatische Preview-Deployments für den Feature-Branch aktiviert haben.
+- Der CI-Workflow führt für Pushes auf `main` und `feature/portrait-weather-grid` die Testsuite aus; Pull Requests nach `main` werden ebenfalls getestet.
+
+### Umsetzungslogik
+
+- Die erste Startseite bleibt das einzige betroffene Layout: die beiden oberen Analyse-/Prognosekarten rechts und die unteren drei Wetterkarten werden im Portrait-Modus ausgeblendet.
+- Die Ausblendung ist auf Mobiltelefone im Portrait (`max-width: 767px` und `orientation: portrait`) begrenzt; im Landscape-Modus bleibt das bestehende 10-Karten-Raster sichtbar.
+- Die beiden sichtbaren oberen rechten Karten werden im Portrait in einer Spalte mit zwei gleich hohen Zeilen angeordnet. So füllt die zweite Karte den zuvor leeren unteren Rasterbereich.
+- Die Logik nutzt gezielte CSS-Regeln für die ersten beiden Kartelemente oberhalb und die letzten drei unterhalb der Startseite, statt die komplette Dashboard-Struktur zu verändern.
+- Dadurch bleibt die App in Navigation, Lightbox, Refresh-Zyklus, Cache und anderen Seiten unverändert; nur die sichtbare Anzahl der Karten auf der Startseite wird reduziert.
+- Die übrigen Wetterkarten-Seiten und das globale Bild-Handling bleiben identisch, damit die vorhandenen Offline- und Swipe-Mechaniken unverändert weiterarbeiten.
+
+---
 
 # 💡 IDEEN (UNSORTIERT)
 

@@ -2,7 +2,7 @@ name: Tests
 
 on:
   push:
-    branches: [main]
+    branches: [main, feature/portrait-weather-grid]
   pull_request:
     branches: [main]
 
