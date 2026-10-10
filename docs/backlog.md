@@ -15,10 +15,11 @@
 
 ## 🟨 DOING
 
-- US-026 – Startseiten-Grid im Mobiltelefon-Portrait anpassen
+- Keine aktuellen Aufgaben
 
 ## ✅ DONE
 
+- US-026 – Startseiten-Grid im Mobiltelefon-Portrait anpassen
 - US-001 – Menü vollständig entfernen
 - US-002 – Navigation über Gesten/Tasten
 - US-003 – Aktualisierung per Pull-to-Refresh
@@ -1964,7 +1965,7 @@ künftigen iPhone-Formaten ohne gerätespezifische Anpassungen lesbar bleibt.
 
 ## 📱 US-026 – Startseiten-Grid im Mobiltelefon-Portrait anpassen
 
-**Status:** DOING
+**Status:** DONE
 **Priorität:** Mittel
 
 ### Beschreibung
@@ -1982,17 +1983,17 @@ Im Landscape-Modus möchte ich dagegen wieder alle verfügbaren Wetterkarten auf
 
 ### Akzeptanzkriterien
 
-- [ ] Im Mobiltelefon-Portrait sind genau diese sechs Startseitenkarten sichtbar: Bodendruck-/Bodenanalyse Europa, Europa +36h (12 Uhr Vortag), Europa +36h (00 UTC), Deutschland aktuell, Heute spät und Morgen früh.
-- [ ] Die beiden sichtbaren Europa-+36h-Karten stehen im Portrait untereinander und nutzen den verfügbaren Bereich rechts der Bodenanalysekarte.
-- [ ] Die übrigen vier Startseitenkarten werden im Portrait ausgeblendet.
-- [ ] Beim Wechsel zu Landscape erscheinen alle zehn Startseitenkarten ohne Neuladen; beim Zurückwechseln werden die vier Karten wieder ausgeblendet.
-- [ ] Die sichtbaren Karten behalten ihr Seitenverhältnis und sind vollständig sowie unverzerrt dargestellt.
-- [ ] Die im Portrait-Modus angezeigten Wetterkarten bleiben ohne horizontales Scrollen gut lesbar und bedienbar.
-- [ ] Andere Kartenseiten, Navigation, Lightbox, Cache und Aktualisierung bleiben unverändert.
-- [ ] Die Änderung wird auf `feature/portrait-weather-grid` entwickelt und getestet; die Produktionsversion auf `main` bleibt währenddessen unverändert.
-- [ ] Pushes auf den Feature-Branch führen die Testsuite aus und aktualisieren eine eigene öffentliche Cloudflare-Pages-Preview, parallel zur Produktionsversion.
-- [ ] `bash scripts/run-tests.sh` und `git diff --check` sind erfolgreich.
-- [ ] Portrait-/Landscape-Wechsel werden zusätzlich manuell auf einem Mobiltelefon geprüft.
+- [x] Im Mobiltelefon-Portrait sind genau diese sechs Startseitenkarten sichtbar: Bodendruck-/Bodenanalyse Europa, Europa +36h (12 Uhr Vortag), Europa +36h (00 UTC), Deutschland aktuell, Heute spät und Morgen früh.
+- [x] Die beiden sichtbaren Europa-+36h-Karten stehen im Portrait untereinander und nutzen den verfügbaren Bereich rechts der Bodenanalysekarte.
+- [x] Die übrigen vier Startseitenkarten werden im Portrait ausgeblendet.
+- [x] Beim Wechsel zu Landscape erscheinen alle zehn Startseitenkarten ohne Neuladen; beim Zurückwechseln werden die vier Karten wieder ausgeblendet.
+- [x] Die sichtbaren Karten behalten ihr Seitenverhältnis und sind vollständig sowie unverzerrt dargestellt.
+- [x] Die im Portrait-Modus angezeigten Wetterkarten bleiben ohne horizontales Scrollen gut lesbar und bedienbar.
+- [x] Andere Kartenseiten, Navigation, Lightbox, Cache und Aktualisierung bleiben unverändert.
+- [x] Die Änderung wird auf `feature/portrait-weather-grid` entwickelt und getestet; die Produktionsversion auf `main` bleibt währenddessen unverändert.
+- [x] Pushes auf den Feature-Branch führen die Testsuite aus und aktualisieren eine eigene öffentliche Cloudflare-Pages-Preview, parallel zur Produktionsversion.
+- [x] `bash scripts/run-tests.sh` und `git diff --check` sind erfolgreich.
+- [x] Portrait-/Landscape-Wechsel werden zusätzlich manuell auf einem Mobiltelefon geprüft.
 
 ### Abhängigkeiten
 
