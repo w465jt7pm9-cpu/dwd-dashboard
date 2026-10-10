@@ -1,6 +1,6 @@
 # 📊 DWD Dashboard – Mini Backlog
 
-> Release-1.7 (2026-09-23): Testsuite und US-025 erfolgreich abgeschlossen; US-015, US-016, US-020, US-022 und US-023 sind ebenfalls umgesetzt.
+> Release-1.8 (2026-10-10): US-026 bis US-029 sind umgesetzt und auf Mobilgeräten manuell geprüft; die vollständige Testsuite ist erfolgreich durchgelaufen.
 
 ---
 
@@ -19,10 +19,6 @@
 
 ## ✅ DONE
 
-- US-029 – Höhenwetter-Karten im Mobiltelefon-Portrait reduzieren
-- US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
-- US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
-- US-026 – Startseiten-Grid im Mobiltelefon-Portrait anpassen
 - US-001 – Menü vollständig entfernen
 - US-002 – Navigation über Gesten/Tasten
 - US-003 – Aktualisierung per Pull-to-Refresh
@@ -46,6 +42,10 @@
 - US-020 – Kompakte Darstellung von DWD-Seewetter-Zeitreihen
 - US-024 – DWD-Quellformat-Verträge und Parser-Regressionstests
 - US-025 – Responsive Safe Area für die Nordsee-Zeitreihe
+- US-026 – Startseiten-Grid im Mobiltelefon-Portrait anpassen
+- US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
+- US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
+- US-029 – Höhenwetter-Karten im Mobiltelefon-Portrait reduzieren
 
 ---
 
@@ -2001,7 +2001,7 @@ Im Landscape-Modus möchte ich dagegen wieder alle verfügbaren Wetterkarten auf
 ### Abhängigkeiten
 
 - Cloudflare Pages muss Git-Integration und automatische Preview-Deployments für den Feature-Branch aktiviert haben.
-- Der CI-Workflow führt für Pushes auf `main` und `feature/portrait-weather-grid` die Testsuite aus; Pull Requests nach `main` werden ebenfalls getestet.
+- Der CI-Workflow führt für Pushes auf `main`, `feature/portrait-weather-grid` und die Feature-Branches für US-027 bis US-029 die Testsuite aus; Pull Requests nach `main` werden ebenfalls getestet.
 
 ### Umsetzungslogik
 

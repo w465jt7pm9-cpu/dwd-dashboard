@@ -1,6 +1,6 @@
 # Tests und Qualitätssicherung
 
-> Stand 2026-10-10: Die vollständige automatisierte Testsuite sowie die
+> Release-1.8 (2026-10-10): Die vollständige automatisierte Testsuite sowie die
 > manuellen Prüfungen für US-025 bis US-029 sind erfolgreich durchgelaufen.
 
 ## Zweck
@@ -215,8 +215,9 @@ python3 tests/smoke_nordsee_tide_test.py
 ## CI und Git-Hooks
 
 GitHub Actions führt die Testsuite bei jedem Push auf `main`,
-`feature/portrait-weather-grid` und `feature/us-027-lightbox-portrait` sowie bei
-Pull Requests nach `main` aus:
+`feature/portrait-weather-grid`, `feature/us-027-lightbox-portrait`,
+`feature/us-028-seewetter-portrait-cards` und
+`feature/us-029-upperair-portrait-cards` sowie bei Pull Requests nach `main` aus:
 [.github/workflows/tests.yml](../.github/workflows/tests.yml).
 
 Optional können die versionierten Hooks aktiviert werden:
