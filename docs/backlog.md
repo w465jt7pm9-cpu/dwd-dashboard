@@ -15,10 +15,11 @@
 
 ## 🟨 DOING
 
-- US-029 – Höhenwetter-Karten im Mobiltelefon-Portrait reduzieren
+- Keine aktuellen Aufgaben
 
 ## ✅ DONE
 
+- US-029 – Höhenwetter-Karten im Mobiltelefon-Portrait reduzieren
 - US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
 - US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
 - US-026 – Startseiten-Grid im Mobiltelefon-Portrait anpassen
@@ -2184,15 +2185,15 @@ damit die Karten auf dem schmalen Bildschirm größer und leichter bedienbar sin
 
 ### Akzeptanzkriterien
 
-- [ ] Im Mobiltelefon-Portrait zeigt jede Höhenwetter-Kartenzeile mit vier
+- [x] Im Mobiltelefon-Portrait zeigt jede Höhenwetter-Kartenzeile mit vier
   Karten ausschließlich die ersten beiden Karten.
-- [ ] Im Landscape-Modus bleiben alle vier Karten jeder Höhenwetter-Zeile
+- [x] Im Landscape-Modus bleiben alle vier Karten jeder Höhenwetter-Zeile
   sichtbar.
-- [ ] Die im Portrait sichtbaren Karten bleiben vollständig und ohne
+- [x] Die im Portrait sichtbaren Karten bleiben vollständig und ohne
   horizontalen Überlauf bedienbar.
-- [ ] Beim Wechsel zwischen Portrait und Landscape wird die Darstellung ohne
+- [x] Beim Wechsel zwischen Portrait und Landscape wird die Darstellung ohne
   Neuladen aktualisiert.
-- [ ] Andere Dashboard-Seiten, Navigation, Lightbox, Cache und Aktualisierung
+- [x] Andere Dashboard-Seiten, Navigation, Lightbox, Cache und Aktualisierung
   bleiben unverändert.
 - [x] Die Umsetzung erfolgt auf dem eigenen Branch
   `feature/us-029-upperair-portrait-cards`, angelegt auf Basis des aktuellen
@@ -2201,7 +2202,7 @@ damit die Karten auf dem schmalen Bildschirm größer und leichter bedienbar sin
   eine eigene Cloudflare-Pages-Preview, getrennt von der Produktionsversion.
 - [x] Ein automatisierter Regressionstest prüft die Kartenanzahl im Portrait
   und Landscape.
-- [ ] Die manuelle Prüfung umfasst unterstützte Mobilgeräte mit iOS und Android
+- [x] Die manuelle Prüfung umfasst unterstützte Mobilgeräte mit iOS und Android
   im Portrait und Landscape.
 - [x] `bash scripts/run-tests.sh` und `git diff --check` sind erfolgreich.
 
@@ -2212,8 +2213,8 @@ damit die Karten auf dem schmalen Bildschirm größer und leichter bedienbar sin
   alle vier Karten sichtbar.
 - Die vollständige Testsuite, der GitHub-Actions-Lauf und das Cloudflare-Pages-
   Preview-Deployment waren erfolgreich.
-- Die manuelle Prüfung auf unterstützten iOS- und Android-Geräten steht noch
-  aus.
+- Manuelle Prüfungen auf iPads, iPhones und Android-Geräten waren im Portrait
+  und Landscape erfolgreich.
 
 ### Abhängigkeiten und Bezug
 
