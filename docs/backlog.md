@@ -12,14 +12,14 @@
 
 - US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 - US-017 – UI-Texte für Internationalisierung strukturieren
-- US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
 
 ## 🟨 DOING
 
-- US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
+- Keine aktuellen Aufgaben
 
 ## ✅ DONE
 
+- US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
 - US-026 – Startseiten-Grid im Mobiltelefon-Portrait anpassen
 - US-001 – Menü vollständig entfernen
 - US-002 – Navigation über Gesten/Tasten
@@ -2014,7 +2014,7 @@ Im Landscape-Modus möchte ich dagegen wieder alle verfügbaren Wetterkarten auf
 
 ## 🔍 US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
 
-**Status:** DOING
+**Status:** DONE
 **Priorität:** Mittel
 
 ### Beschreibung
@@ -2034,29 +2034,36 @@ damit Kartenformen und Beschriftungen zuverlässig erkennbar bleiben.
 
 ### Akzeptanzkriterien
 
-- [ ] Auf Mobilgeräten im Portrait entspricht das Verhältnis von Bildbreite zu
+- [x] Auf Mobilgeräten im Portrait entspricht das Verhältnis von Bildbreite zu
   Bildhöhe in der Lightbox dem Verhältnis der geladenen Bildquelle; das Bild
   wird in unterstützten mobilen Browsern nicht gestreckt.
-- [ ] Beim weiteren Pinch- oder Double-Tap-Zoom bleibt das Seitenverhältnis
+- [x] Beim weiteren Pinch- oder Double-Tap-Zoom bleibt das Seitenverhältnis
   unverändert und die Karte lässt sich weiterhin erwartungsgemäß verschieben.
-- [ ] Die anfängliche Darstellung macht den möglichen Beschnitt klar erkennbar;
+- [x] Die anfängliche Darstellung macht den möglichen Beschnitt klar erkennbar;
   nicht sichtbare Kartenbereiche lassen sich durch Zoom und Pan erreichen.
-- [ ] Eine etwaige Qualitätsgrenze durch die Pixelauflösung der DWD-Quelle wird
+- [x] Eine etwaige Qualitätsgrenze durch die Pixelauflösung der DWD-Quelle wird
   nicht mit geometrischer Verzerrung verwechselt; die Bildquelle wird nicht
   ohne gesonderte fachliche Entscheidung ersetzt.
-- [ ] Das vorhandene Landscape-Verhalten der Bodenluftdruckkarte bleibt
+- [x] Das vorhandene Landscape-Verhalten der Bodenluftdruckkarte bleibt
   unverändert.
-- [ ] Lightbox-Navigation, Peek, Schließen sowie Zoom-/Pan-Gesten anderer Karten
+- [x] Lightbox-Navigation, Peek, Schließen sowie Zoom-/Pan-Gesten anderer Karten
   bleiben funktionsfähig.
-- [ ] Die Umsetzung erfolgt auf einem eigenen Branch
+- [x] Die Umsetzung erfolgt auf einem eigenen Branch
   `feature/us-027-lightbox-portrait`, angelegt auf Basis des aktuellen `main`;
   `main` bleibt bis zur Prüfung und Freigabe unverändert.
-- [ ] Pushes auf den Feature-Branch führen die Testsuite aus und aktualisieren eine eigene Cloudflare-Pages-Preview, getrennt von der Produktionsversion.
-- [ ] Die manuelle Prüfung umfasst Mobilgeräte mit iOS und Android in Portrait
+- [x] Pushes auf den Feature-Branch führen die Testsuite aus und aktualisieren eine eigene Cloudflare-Pages-Preview, getrennt von der Produktionsversion.
+- [x] Die manuelle Prüfung umfasst Mobilgeräte mit iOS und Android in Portrait
   und Landscape sowie die jeweils verfügbaren aktuellen Browser.
-- [ ] Ein automatisierter Regressionstest prüft die Bildproportionen bei
+- [x] Ein automatisierter Regressionstest prüft die Bildproportionen bei
   initialer und gezoomter Darstellung.
-- [ ] `bash scripts/run-tests.sh` und `git diff --check` sind erfolgreich.
+- [x] `bash scripts/run-tests.sh` und `git diff --check` sind erfolgreich.
+
+### Verifikation
+
+- Manuelle Tests auf iPhones und iPads sowie Android-Geräten in Portrait und
+  Landscape waren erfolgreich; Zoom, Pan und Lightbox-Navigation funktionieren.
+- Die Cloudflare-Pages-Preview und GitHub-Actions-Tests liefen erfolgreich.
+- Die vollständige lokale Testsuite und `git diff --check` liefen erfolgreich.
 
 ### Abhängigkeiten und Bezug
 
