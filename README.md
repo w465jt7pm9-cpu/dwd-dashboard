@@ -5,9 +5,11 @@ Es ist für die Nutzung vor dem Ablegen und unterwegs auf dem Wasser gedacht. Zu
 
 ## Aktueller Release
 
-`Release-1.7` umfasst kompakte DWD-Seewetter-Zeitreihen für Nord- und Ostsee,
-die textuelle Wetterlage sowie die Gezeitenphase für die Nordsee. Die
-zugehörigen Daten bleiben über die bestehende Cache- und Offline-Logik verfügbar.
+`Release-1.8` macht das Dashboard auf mobilen Displays übersichtlicher: Die
+Startseite zeigt im Portrait eine gezielte Auswahl von sechs Karten, und auf
+den Seewetter- und Höhenwetter-Seiten sind jeweils zwei Karten pro Zeile
+sichtbar. Die vergrößerte Bodenluftdruckkarte bewahrt auch beim Zoomen ihr
+natürliches Seitenverhältnis.
 
 ## Live-Version
 
@@ -15,21 +17,35 @@ zugehörigen Daten bleiben über die bestehende Cache- und Offline-Logik verfüg
 
 ## Funktionsumfang
 
-- Wetterkarten, Seewetterberichte und Seegangsvorhersagen für Nordsee und Ostsee.
-- Seegangsübersichten mit mehreren Zeitpunkten und Seegebieten.
-- Kompakte Zeitreihen für Wind, Böen, Welle und Wetterentwicklung.
-- Textuelle Wetterlage als Kontext zur Seewetter-Zeitreihe.
-- Gezeitenphase mit Spring-, Mitt- und Nipp-Phasen in der Nordsee-Zeitreihe.
-- Navigation per Wischen, Tippen, Tastatur und Zoom.
-- Die vergrößerte Kartenansicht bewahrt beim Einpassen und Zoomen das
-  natürliche Seitenverhältnis der Bildquelle.
-- An die Bildschirmausrichtung angepasstes Startseitenraster: sechs Wetterkarten im Mobiltelefon-Portrait, alle zehn Karten im Landscape-Modus.
-- Auf der Seewetter-Seite werden im Mobiltelefon-Portrait pro Zeile nur die ersten beiden Karten gezeigt; im Landscape bleiben alle vier sichtbar.
-- Auf der Höhenwetter-Seite werden im Mobiltelefon-Portrait pro Zeile nur die ersten beiden Karten gezeigt; im Landscape bleiben alle vier sichtbar.
-- Die Nordsee-Zeitreihe nutzt im Querformat den verfügbaren Platz und hält Abstand zu Displayrändern und Aussparungen.
-- Vergrößerte Kartenansicht mit Wechsel zwischen Nachbarkarten.
-- Offline-Nutzung zuletzt geladener Karten und Texte.
-- Automatische Anpassung an den System-Dark-Mode.
+### Das Wetter im Überblick
+
+Vom Boden bis in die Höhe: Entdecke DWD-Wetterkarten, Seewetterberichte und
+Seegangsvorhersagen für Nord- und Ostsee. Mehrere Seegebiete und
+Vorhersagezeitpunkte machen Entwicklungen auf einen Blick vergleichbar.
+
+### Reinzoomen. Zusammenhänge erkennen.
+
+Öffne eine Karte groß, zoome hinein und verschiebe sie, um Details genauer
+anzusehen. Beim Blättern bleiben die Nachbarkarten griffbereit. Die Darstellung
+bewahrt dabei das natürliche Seitenverhältnis der Bildquelle.
+
+Für Nord- und Ostsee fassen kompakte Zeitreihen Wind, Böen, Welle und
+Wetterentwicklung zusammen. Die textuelle Wetterlage liefert zusätzlichen
+Kontext; in der Nordsee-Zeitreihe zeigt die Gezeitenphase, ob gerade Spring-,
+Mitt- oder Nipptide herrscht.
+
+### Für kleine Displays und draußen
+
+Das Kartenraster passt sich der Ausrichtung an: Im Mobiltelefon-Portrait zeigt
+die Startseite sechs Karten. Auf der Seewetter- und Höhenwetter-Seite stehen
+jeweils zwei Karten pro Zeile bereit. Im Landscape sind wieder alle zehn
+Startseitenkarten und alle Karten der beiden Vorhersageseiten sichtbar. Die
+Nordsee-Zeitreihe nutzt im Querformat den Platz, ohne Displayränder oder
+Aussparungen zu überdecken.
+
+Wische oder tippe dich durchs Dashboard, nutze die Tastatur oder zoome direkt
+in die Karte. Zuletzt geladene Karten und Texte bleiben bei eingeschränkter
+Verbindung verfügbar. Der Dark Mode richtet sich automatisch nach deinem Gerät.
 
 ## Daten und Aktualisierung
 
@@ -68,8 +84,9 @@ bash scripts/setup-git-hooks.sh
 ```
 
 Zusätzlich läuft die Testsuite über GitHub Actions bei jedem Push auf `main`,
-`feature/portrait-weather-grid` und `feature/us-027-lightbox-portrait` sowie
-bei Pull Requests nach `main`
+`feature/portrait-weather-grid`, `feature/us-027-lightbox-portrait`,
+`feature/us-028-seewetter-portrait-cards` und
+`feature/us-029-upperair-portrait-cards` sowie bei Pull Requests nach `main`
 (`.github/workflows/tests.yml`) als serverseitiges Sicherheitsnetz.
 
 ## Entwicklung
