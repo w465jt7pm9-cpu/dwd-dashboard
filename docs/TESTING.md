@@ -1,7 +1,7 @@
 # Tests und Qualitätssicherung
 
 > Stand 2026-10-10: Die vollständige automatisierte Testsuite sowie die
-> manuellen Prüfungen für US-025, US-026 und US-027 sind erfolgreich durchgelaufen.
+> manuellen Prüfungen für US-025 bis US-028 sind erfolgreich durchgelaufen.
 
 ## Zweck
 
@@ -176,11 +176,13 @@ python3 tests/smoke_nordsee_tide_test.py
 
 ### Seewetter-Karten im Portrait (US-028)
 
-- [ ] In jeder Seewetter-Zeile sind im Portrait nur die ersten beiden Karten
-      sichtbar.
-- [ ] Im Landscape sind wieder alle vier Karten je Zeile sichtbar.
-- [ ] Portrait-/Landscape-Wechsel aktualisiert die Darstellung ohne Reload;
+- [x] Auf iPads, iPhones und Android-Geräten sind in jeder Seewetter-Zeile im
+      Portrait nur die ersten beiden Karten sichtbar.
+- [x] Im Landscape sind wieder alle vier Karten je Zeile sichtbar.
+- [x] Portrait-/Landscape-Wechsel aktualisiert die Darstellung ohne Reload;
       andere Dashboard-Seiten bleiben unverändert.
+- [x] Manuelle Prüfungen auf iPads, iPhones und Android-Geräten in Portrait und
+      Landscape waren erfolgreich.
 
 ### Offline und Aktualisierung
 

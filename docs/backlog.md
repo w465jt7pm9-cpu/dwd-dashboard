@@ -15,10 +15,11 @@
 
 ## 🟨 DOING
 
-- US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
+- Keine aktuellen Aufgaben
 
 ## ✅ DONE
 
+- US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
 - US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
 - US-026 – Startseiten-Grid im Mobiltelefon-Portrait anpassen
 - US-001 – Menü vollständig entfernen
@@ -2097,7 +2098,7 @@ damit Kartenformen und Beschriftungen zuverlässig erkennbar bleiben.
 
 ## 🔍 US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
 
-**Status:** DOING
+**Status:** DONE
 **Priorität:** Mittel
 
 ### Beschreibung
@@ -2132,7 +2133,7 @@ damit die Karten auf dem schmalen Bildschirm größer und leichter bedienbar sin
   eine eigene Cloudflare-Pages-Preview, getrennt von der Produktionsversion.
 - [x] Ein automatisierter Regressionstest prüft die Kartenanzahl im Portrait
   und Landscape.
-- [ ] Die manuelle Prüfung umfasst unterstützte Mobilgeräte mit iOS und Android
+- [x] Die manuelle Prüfung umfasst unterstützte Mobilgeräte mit iOS und Android
   im Portrait und Landscape.
 - [x] `bash scripts/run-tests.sh` und `git diff --check` sind erfolgreich.
 
@@ -2143,7 +2144,8 @@ damit die Karten auf dem schmalen Bildschirm größer und leichter bedienbar sin
   alle vier Karten sichtbar. Der Wechsel funktioniert ohne Reload.
 - Die vollständige Testsuite, der GitHub-Actions-Lauf und das Cloudflare-Pages-
   Preview-Deployment waren erfolgreich.
-- Die manuelle Prüfung auf iOS- und Android-Geräten steht noch aus.
+- Manuelle Prüfungen auf iPads, iPhones und Android-Geräten waren im Portrait
+  und Landscape erfolgreich.
 
 ### Abhängigkeiten und Bezug
 
