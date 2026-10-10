@@ -12,11 +12,10 @@
 
 - US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 - US-017 – UI-Texte für Internationalisierung strukturieren
-- US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
 
 ## 🟨 DOING
 
-- Keine aktuellen Aufgaben
+- US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
 
 ## ✅ DONE
 
@@ -2117,21 +2116,21 @@ damit die Karten auf dem schmalen Bildschirm größer und leichter bedienbar sin
 
 ### Akzeptanzkriterien
 
-- [ ] Im Mobiltelefon-Portrait zeigt jede Seewetter-Kartenzeile mit vier
+- [x] Im Mobiltelefon-Portrait zeigt jede Seewetter-Kartenzeile mit vier
   Vorhersagekarten ausschließlich die ersten beiden Karten.
-- [ ] Im Landscape-Modus bleiben alle vier Karten jeder Seewetter-Zeile sichtbar.
-- [ ] Die im Portrait sichtbaren Karten bleiben vollständig, unverzerrt und
+- [x] Im Landscape-Modus bleiben alle vier Karten jeder Seewetter-Zeile sichtbar.
+- [x] Die im Portrait sichtbaren Karten bleiben vollständig, unverzerrt und
   ohne horizontales Scrollen bedienbar.
-- [ ] Beim Wechsel zwischen Portrait und Landscape wird die Darstellung ohne
+- [x] Beim Wechsel zwischen Portrait und Landscape wird die Darstellung ohne
   Neuladen aktualisiert.
-- [ ] Andere Dashboard-Seiten, Navigation, Lightbox, Cache und Aktualisierung
+- [x] Andere Dashboard-Seiten, Navigation, Lightbox, Cache und Aktualisierung
   bleiben unverändert.
-- [ ] Die Umsetzung erfolgt auf dem eigenen Branch
+- [x] Die Umsetzung erfolgt auf dem eigenen Branch
   `feature/us-028-seewetter-portrait-cards`, angelegt auf Basis des aktuellen
   `main`; `main` bleibt bis zur Prüfung und Freigabe unverändert.
 - [ ] Pushes auf den Feature-Branch führen die Testsuite aus und aktualisieren
   eine eigene Cloudflare-Pages-Preview, getrennt von der Produktionsversion.
-- [ ] Ein automatisierter Regressionstest prüft die Kartenanzahl im Portrait
+- [x] Ein automatisierter Regressionstest prüft die Kartenanzahl im Portrait
   und Landscape.
 - [ ] Die manuelle Prüfung umfasst unterstützte Mobilgeräte mit iOS und Android
   im Portrait und Landscape.
