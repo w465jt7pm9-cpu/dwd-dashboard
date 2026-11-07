@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const REFRESH_INTERVAL_MS = 5 * 60 * 1000
+  const NORDATLANTIK_CURRENT_SLOT_UPDATE_INTERVAL_MS = 60 * 1000
   const LONG_PRESS_DURATION_MS = 600
   const INFO_OVERLAY_DURATION_MS = 4500
   const EDGE_TAP_ZONE_PX = 26
@@ -123,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentPageIndex = 0
   let nordatlantikReportRequest = null
+  let nordatlantikReportPayload = null
   let lightboxImageList = []
   let currentLightboxImageIndex = -1
   let isLightboxOpen = false
@@ -780,6 +782,45 @@ document.addEventListener('DOMContentLoaded', () => {
     return normalizeInlineText(parsedFragment.body?.textContent || '')
   }
 
+  function parseStreckenwetterForecastStartAt (forecastPeriod) {
+    const forecastStartMatch = String(forecastPeriod || '').match(
+      /^(Mo|Di|Mi|Do|Fr|Sa|So),\s*(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2})$/i
+    )
+    if (!forecastStartMatch) {
+      return null
+    }
+
+    const weekdayIndices = {
+      So: 0,
+      Mo: 1,
+      Di: 2,
+      Mi: 3,
+      Do: 4,
+      Fr: 5,
+      Sa: 6
+    }
+    const forecastStartAt = Date.UTC(
+      Number(forecastStartMatch[4]),
+      Number(forecastStartMatch[3]) - 1,
+      Number(forecastStartMatch[2]),
+      Number(forecastStartMatch[5])
+    )
+    const forecastStartDate = new Date(forecastStartAt)
+    if (
+      forecastStartDate.getUTCDate() !== Number(forecastStartMatch[2]) ||
+      forecastStartDate.getUTCMonth() !== Number(forecastStartMatch[3]) - 1 ||
+      forecastStartDate.getUTCFullYear() !== Number(forecastStartMatch[4]) ||
+      forecastStartDate.getUTCHours() !== Number(forecastStartMatch[5]) ||
+      forecastStartDate.getUTCDay() !==
+        weekdayIndices[forecastStartMatch[1][0].toUpperCase() +
+          forecastStartMatch[1].slice(1).toLowerCase()]
+    ) {
+      return null
+    }
+
+    return forecastStartAt
+  }
+
   function parseStreckenwetterberichtFromHtml (rawHtml) {
     if (!rawHtml) {
       throw new Error('Leere DWD-Streckenwetterquelle')
@@ -823,6 +864,13 @@ document.addEventListener('DOMContentLoaded', () => {
       throw new Error('DWD-Vorhersagezeitraum hat ein unbekanntes Format')
     }
 
+    const forecastStartAt = parseStreckenwetterForecastStartAt(
+      forecastPeriodMatch[1]
+    )
+    if (forecastStartAt === null) {
+      throw new Error('DWD-Vorhersagebeginn hat ein unbekanntes oder ungültiges Format')
+    }
+
     const timeseries = parseSeaTimeseriesFromHtml(
       rawHtml,
       'Streckenwetter'
@@ -836,8 +884,69 @@ document.addEventListener('DOMContentLoaded', () => {
       issuedAt: `${issueMatch[1]}, ${issueMatch[2]} UTC`,
       weatherSituation: extractHtmlFragmentText(weatherSituationMatch[1]),
       forecastPeriod: forecastPeriodMatch[1],
+      forecastStartAt,
       ...timeseries
     }
+  }
+
+  function getCurrentStreckenwetterSlotIndex (payload, now = Date.now()) {
+    const storedForecastStartAt =
+      payload?.forecastStartAt == null
+        ? Number.NaN
+        : Number(payload.forecastStartAt)
+    const forecastStartAt = Number.isFinite(storedForecastStartAt)
+      ? storedForecastStartAt
+      : parseStreckenwetterForecastStartAt(payload?.forecastPeriod)
+    if (forecastStartAt === null || !Array.isArray(payload?.slots)) {
+      return -1
+    }
+
+    const weekdayIndices = {
+      So: 0,
+      Mo: 1,
+      Di: 2,
+      Mi: 3,
+      Do: 4,
+      Fr: 5,
+      Sa: 6
+    }
+    let previousSlotAt = forecastStartAt - 1
+    let currentSlotIndex = -1
+
+    for (const [index, slot] of payload.slots.entries()) {
+      const slotMatch = String(slot?.key || '').match(
+        /^(Mo|Di|Mi|Do|Fr|Sa|So)(\d{2})$/i
+      )
+      if (!slotMatch) {
+        continue
+      }
+
+      const hour = Number(slotMatch[2])
+      if (hour > 23) {
+        continue
+      }
+      const weekday = slotMatch[1][0].toUpperCase() +
+        slotMatch[1].slice(1).toLowerCase()
+
+      const slotDate = new Date(forecastStartAt)
+      slotDate.setUTCHours(hour, 0, 0, 0)
+      while (
+        slotDate.getTime() < forecastStartAt ||
+        slotDate.getUTCDay() !== weekdayIndices[weekday] ||
+        slotDate.getTime() <= previousSlotAt
+      ) {
+        slotDate.setUTCDate(slotDate.getUTCDate() + 1)
+      }
+
+      previousSlotAt = slotDate.getTime()
+      if (slotDate.getTime() > now) {
+        break
+      }
+
+      currentSlotIndex = index
+    }
+
+    return currentSlotIndex
   }
 
   async function fetchSeaTimeseriesPayload (config) {
@@ -1586,7 +1695,8 @@ document.addEventListener('DOMContentLoaded', () => {
       regionKey = 'ostsee',
       includeWetterlage = true,
       includeStand = true,
-      separateGustRow = false
+      separateGustRow = false,
+      currentSlotIndex = -1
     } = {}
   ) {
     const slots = Array.isArray(payload?.slots) ? payload.slots : []
@@ -1613,9 +1723,20 @@ document.addEventListener('DOMContentLoaded', () => {
       return normalizedLabel || key || '·'
     }
 
+    const getCurrentSlotAttributes = index =>
+      index === currentSlotIndex
+        ? ' class="nordatlantik-current-slot"'
+        : ''
     const tableHeaderMarkup = slots
       .map(
-        slot => `<th scope="col">${escapeHtml(getSlotDisplayLabel(slot))}</th>`
+        (slot, index) =>
+          `<th scope="col"${getCurrentSlotAttributes(
+            index
+          )}${
+            index === currentSlotIndex ? ' aria-current="time"' : ''
+          }><span>${escapeHtml(
+            getSlotDisplayLabel(slot)
+          )}</span><span class="nordatlantik-now-marker">Jetzt</span></th>`
       )
       .join('')
 
@@ -1629,10 +1750,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const rowsBySlot = new Map(area.rows.map(row => [row.slotKey, row]))
 
         const windCells = slots
-          .map(slot => {
+          .map((slot, index) => {
             const row = rowsBySlot.get(slot.key)
+            const currentSlotAttributes = getCurrentSlotAttributes(index)
             if (!row) {
-              return '<td>·</td>'
+              return `<td${currentSlotAttributes}>·</td>`
             }
 
             const directionSymbol = getWindDirectionSymbol(row.windDirection)
@@ -1644,31 +1766,37 @@ document.addEventListener('DOMContentLoaded', () => {
               ? `${windValueMarkup}${gustMarkup}`
               : windValueMarkup
 
-            return `<td><span class="ostsee-ts-wind"><span class="ostsee-ts-dir">${directionSymbol}</span>${combinedValueMarkup}</span></td>`
+            return `<td${currentSlotAttributes}><span class="ostsee-ts-wind"><span class="ostsee-ts-dir">${directionSymbol}</span>${combinedValueMarkup}</span></td>`
           })
           .join('')
 
         const gustCells = separateGustRow
           ? slots
-              .map(slot => {
+              .map((slot, index) => {
                 const row = rowsBySlot.get(slot.key)
-                return `<td>${renderGustBftValueMarkup(row?.gustBft || '') || '·'}</td>`
+                return `<td${getCurrentSlotAttributes(
+                  index
+                )}>${renderGustBftValueMarkup(row?.gustBft || '') || '·'}</td>`
               })
               .join('')
           : ''
 
         const waveCells = slots
-          .map(slot => {
+          .map((slot, index) => {
             const row = rowsBySlot.get(slot.key)
             const waveValue = row?.waveM ? `${row.waveM}m` : '·'
-            return `<td>${escapeHtml(waveValue)}</td>`
+            return `<td${getCurrentSlotAttributes(index)}>${escapeHtml(
+              waveValue
+            )}</td>`
           })
           .join('')
 
         const weatherCells = slots
-          .map(slot => {
+          .map((slot, index) => {
             const row = rowsBySlot.get(slot.key)
-            return `<td>${renderWeatherValueMarkup(row?.weather || '')}</td>`
+            return `<td${getCurrentSlotAttributes(
+              index
+            )}>${renderWeatherValueMarkup(row?.weather || '')}</td>`
           })
           .join('')
 
@@ -1758,6 +1886,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
+    nordatlantikReportPayload = payload
     if (!payload) {
       nordatlantikReportElement.innerHTML = `<p class="nordatlantik-report__status" aria-live="polite">${escapeHtml(
         status
@@ -1778,7 +1907,8 @@ document.addEventListener('DOMContentLoaded', () => {
       regionKey: 'nordatlantik',
       includeWetterlage: false,
       includeStand: false,
-      separateGustRow: true
+      separateGustRow: true,
+      currentSlotIndex: getCurrentStreckenwetterSlotIndex(payload)
     })
 
     nordatlantikReportElement.innerHTML = [
@@ -1798,6 +1928,47 @@ document.addEventListener('DOMContentLoaded', () => {
       '<p class="nordatlantik-report__scroll-hint">Zeitreihe seitlich scrollen für weitere Vorhersagezeiten</p>',
       `<section class="nordatlantik-report__timeseries" aria-label="Streckenwetter-Zeitreihe">${tableMarkup}</section>`
     ].join('')
+  }
+
+  function updateNordatlantikCurrentTimeColumn () {
+    if (!nordatlantikReportElement || !nordatlantikReportPayload) {
+      return
+    }
+
+    const table = nordatlantikReportElement.querySelector(
+      '.nordatlantik-report__timeseries .ostsee-ts-table'
+    )
+    if (!table) {
+      return
+    }
+
+    const currentSlotIndex = getCurrentStreckenwetterSlotIndex(
+      nordatlantikReportPayload
+    )
+    Array.from(
+      table.querySelectorAll('thead tr:first-child th[scope="col"]')
+    ).forEach((cell, index) => {
+      const isCurrent = index === currentSlotIndex
+      cell.classList.toggle('nordatlantik-current-slot', isCurrent)
+      if (isCurrent) {
+        cell.setAttribute('aria-current', 'time')
+      } else {
+        cell.removeAttribute('aria-current')
+      }
+    })
+
+    Array.from(table.querySelectorAll('tbody tr')).forEach(row => {
+      if (row.classList.contains('ostsee-ts-area')) {
+        return
+      }
+
+      Array.from(row.querySelectorAll('td')).forEach((cell, index) => {
+        cell.classList.toggle(
+          'nordatlantik-current-slot',
+          index === currentSlotIndex
+        )
+      })
+    })
   }
 
   function ensureNordatlantikReportContent (force = false) {
@@ -3910,6 +4081,11 @@ document.addEventListener('DOMContentLoaded', () => {
   updateOfflineUi()
   goToPage(0)
   refreshVisibleImages()
+
+  window.setInterval(
+    updateNordatlantikCurrentTimeColumn,
+    NORDATLANTIK_CURRENT_SLOT_UPDATE_INTERVAL_MS
+  )
 
   window.setInterval(() => {
     if (

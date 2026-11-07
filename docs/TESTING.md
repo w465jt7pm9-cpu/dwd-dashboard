@@ -100,6 +100,11 @@ Wind- und Böenwerten prüft, dass die beiden Werte in der Nordatlantik-Tabelle
 getrennt und beschriftet bleiben. Für schmale Viewports hat die Tabelle eine
 sichtbare Seitwärts-Scrollhilfe. Die vorhandenen Nord-/Ostsee-Zeitreihen behalten
 ihr bisheriges Rendering. Die Tests benötigen keine Live-DWD-Verbindung.
+Die Zeitmarkierung hebt den letzten bereits gültigen DWD-Zeitpunkt hervor,
+berechnet diesen in UTC aus dem Berichtsbeginn und den Tabellenzeitpunkten und
+aktualisiert die Spalte minütlich ohne neuen Netzwerkabruf. Regressionstests
+prüfen den Spaltenwechsel am Zeitstempel sowie die Kompatibilität mit älteren
+gespeicherten Berichten.
 
 ### Live-Smoke-Test als Frühwarnsystem
 

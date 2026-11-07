@@ -2310,6 +2310,10 @@ aufeinander bezogen beurteilen kann.
   separat mit Einheit beschriftet, damit hohe Werte nicht in einer Zelle
   zusammengedrängt werden; auf schmalen Displays weist eine Scrollhilfe auf die
   horizontal scrollbar angeordnete Tabelle hin.
+- [x] Der letzte bereits erreichte DWD-Vorhersagezeitpunkt ist in der Tabelle
+  durch eine dezente Spaltenhervorhebung und die Kennzeichnung „Jetzt“ erkennbar.
+  Die Hervorhebung folgt den UTC-Vorhersagezeitpunkten ohne erneutes Laden der
+  Daten; vor Beginn des Vorhersagezeitraums wird keine Spalte markiert.
 - [x] Auf breiten Displays stehen die vier Karten nebeneinander; auf schmalen
   Displays werden sie responsiv als 2×2-Raster angeordnet. Der Bericht steht
   darunter über die verfügbare Breite.

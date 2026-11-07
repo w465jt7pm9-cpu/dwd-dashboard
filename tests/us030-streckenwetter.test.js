@@ -80,6 +80,7 @@ assert.strictEqual(
   'Ein Hoch nördlich der Azoren wandert ostwärts. Ein Tief zieht zur Biskaya.'
 )
 assert.strictEqual(report.forecastPeriod, 'Sa, 07.11.2026 00')
+assert.strictEqual(report.forecastStartAt, Date.UTC(2026, 10, 7, 0))
 assert.deepStrictEqual(JSON.parse(JSON.stringify(report.slots)), [
   { key: 'Sa00', label: 'Sa 00' },
   { key: 'Sa06', label: 'Sa 06' }
@@ -112,6 +113,59 @@ assert.deepStrictEqual(JSON.parse(JSON.stringify(report.areas)), [{
   ]
 }], 'DWD route, time, wind, gust, wave, and weather fields must be retained')
 
+const currentSlotPayload = {
+  forecastStartAt: report.forecastStartAt,
+  forecastPeriod: report.forecastPeriod,
+  slots: report.slots
+}
+assert.strictEqual(
+  context.getCurrentStreckenwetterSlotIndex(
+    currentSlotPayload,
+    Date.UTC(2026, 10, 7, 5, 59)
+  ),
+  0,
+  'The last forecast time already reached remains active until the next slot'
+)
+assert.strictEqual(
+  context.getCurrentStreckenwetterSlotIndex(
+    currentSlotPayload,
+    Date.UTC(2026, 10, 7, 6)
+  ),
+  1,
+  'The active forecast column advances at its UTC forecast time'
+)
+assert.strictEqual(
+  context.getCurrentStreckenwetterSlotIndex(
+    { forecastPeriod: report.forecastPeriod, slots: report.slots },
+    Date.UTC(2026, 10, 7, 6)
+  ),
+  1,
+  'Previously cached reports without a stored timestamp still support the marker'
+)
+assert.strictEqual(
+  context.getCurrentStreckenwetterSlotIndex(
+    {
+      forecastStartAt: report.forecastStartAt,
+      slots: [
+        { key: 'Sa18', label: 'Sa 18' },
+        { key: 'So00', label: 'So 00' },
+        { key: 'So06', label: 'So 06' }
+      ]
+    },
+    Date.UTC(2026, 10, 8, 2)
+  ),
+  1,
+  'The active column advances correctly across UTC midnight'
+)
+assert.strictEqual(
+  context.getCurrentStreckenwetterSlotIndex(
+    currentSlotPayload,
+    Date.UTC(2026, 10, 6, 23, 59)
+  ),
+  -1,
+  'No forecast column is marked before the report forecast begins'
+)
+
 assert.throws(
   () => context.parseStreckenwetterberichtFromHtml(
     fixture.replace('Vorhersagen von Sa, 07.11.2026 00 UTC', 'Vorhersage ab Sa')
@@ -123,6 +177,15 @@ assert.throws(
     fixture.replace('<b>Wetterlage:</b>', '<b>Wetter:</b>')
   ),
   /DWD-Abschnitt „Wetterlage“ nicht gefunden/
+)
+assert.throws(
+  () => context.parseStreckenwetterberichtFromHtml(
+    fixture.replace(
+      'Vorhersagen von Sa, 07.11.2026 00 UTC',
+      'Vorhersagen von So, 07.11.2026 00 UTC'
+    )
+  ),
+  /Vorhersagebeginn hat ein unbekanntes oder ungültiges Format/
 )
 
 const rendererStart = source.indexOf(
@@ -166,7 +229,7 @@ const highWindPayload = {
 }
 const northAtlanticTimeseries = rendererContext.buildSeaTimeseriesOverlayMarkup(
   highWindPayload,
-  { separateGustRow: true }
+  { separateGustRow: true, currentSlotIndex: 0 }
 )
 const windRow = northAtlanticTimeseries.match(
   /<tr class="ostsee-ts-wind-row">([\s\S]*?)<\/tr>/
@@ -180,6 +243,16 @@ assert.match(windRow[1], /<wind>8-9<\/wind>/)
 assert.doesNotMatch(windRow[1], /11-12/)
 assert.match(gustRow[1], /Böen \(Bft\)/)
 assert.match(gustRow[1], /<gust>B11-12<\/gust>/)
+assert.match(northAtlanticTimeseries, /aria-current="time"/)
+assert.match(northAtlanticTimeseries, /class="nordatlantik-now-marker">Jetzt<\/span>/)
+assert.match(
+  northAtlanticTimeseries,
+  /<td class="nordatlantik-current-slot">/
+)
+assert.doesNotMatch(
+  northAtlanticTimeseries.match(/<td class="nordatlantik-current-slot"[^>]*>/)?.[0] || '',
+  /aria-current/
+)
 
 const existingTimeseries = rendererContext.buildSeaTimeseriesOverlayMarkup(
   highWindPayload
@@ -233,5 +306,8 @@ assert.match(
 )
 assert.match(css, /\.nordatlantik-report__scroll-hint\s*\{\s*display:\s*none/)
 assert.match(source, /nordatlantik-report__scroll-hint/)
+assert.match(css, /\.nordatlantik-current-slot\s*\{/)
+assert.match(css, /\.nordatlantik-current-slot\s+\.nordatlantik-now-marker\s*\{\s*display:\s*block/)
+assert.match(source, /NORDATLANTIK_CURRENT_SLOT_UPDATE_INTERVAL_MS = 60 \* 1000/)
 
 console.log('US-030 Streckenwetter parser and page regression checks passed')
