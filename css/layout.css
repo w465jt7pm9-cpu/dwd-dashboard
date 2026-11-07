@@ -202,12 +202,19 @@
 .nordatlantik-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-2);
-  padding: var(--space-2);
+  gap: 0;
+  padding: 0;
 }
 
 .nordatlantik-grid .card {
   aspect-ratio: 16 / 10;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.nordatlantik-grid .card:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .nordatlantik-grid .card img {
