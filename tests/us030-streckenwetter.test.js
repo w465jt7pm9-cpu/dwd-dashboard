@@ -301,6 +301,7 @@ assert.match(
 )
 assert.match(css, /\.nordatlantik-grid\s*\{[^}]*gap:\s*0;[^}]*padding:\s*0;/)
 assert.match(css, /\.nordatlantik-grid\s+\.card\s*\{[^}]*border-radius:\s*0;/)
+assert.match(css, /\.nordatlantik-grid\s+\.card\s+img\s*\{[^}]*object-fit:\s*cover;/)
 assert.match(
   css,
   /@media\s*\(max-width:\s*767px\)\s*and\s*\(orientation:\s*portrait\)\s*\{\s*\.page\[data-page='3'\]\s+\.nordatlantik-grid\s*\{\s*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/

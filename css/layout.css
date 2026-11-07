@@ -218,7 +218,7 @@
 }
 
 .nordatlantik-grid .card img {
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .nordatlantik-card__label {
