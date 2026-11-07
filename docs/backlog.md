@@ -2327,8 +2327,8 @@ aufeinander bezogen beurteilen kann.
   Desktop und Mobilgeräten sind erfolgreich.
 - [x] Umsetzung erfolgt auf `feature/us-030-nordatlantik-streckenwetter`;
   `main` bleibt bis zur Prüfung und Freigabe unverändert.
-- [ ] GitHub Actions führt für Pushes auf den Feature-Branch die Testsuite aus.
-- [ ] Pushes auf den Feature-Branch aktualisieren eine eigene Cloudflare-
+- [x] GitHub Actions führt für Pushes auf den Feature-Branch die Testsuite aus.
+- [x] Pushes auf den Feature-Branch aktualisieren eine eigene Cloudflare-
   Pages-Preview, getrennt von der Produktionsversion; die Preview wird vor
   dem Merge geprüft.
 - [ ] Die Änderung gelangt erst nach erfolgreicher Prüfung und Freigabe über
