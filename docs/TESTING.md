@@ -88,14 +88,18 @@ an:
 | --- | --- |
 | Gebietsname, Position und `WT` in der Gebietszeile | Gebietsüberschrift mit Position und Wassertemperatur |
 | Wochentag und UTC-Stunde | Spaltenkopf des Vorhersagezeitpunkts |
-| Windrichtung, Windstärke und Böen | Windzeile der bestehenden kompakten Zeitreihentabelle |
+| Windrichtung und Windstärke | Eigene, mit `Wind (Bft)` beschriftete Windzeile |
+| Böen | Separate, mit `Böen (Bft)` beschriftete Böenzeile; verhindert, dass Wind- und Böenwerte in einer schmalen Zelle zusammengedrängt werden |
 | Signifikante Wellenhöhe | Wellenzeile in Metern |
 | Wetterangabe | Wetterzeile mit den bestehenden Wetterzeichen |
 
 Die Feldfolge wird mit einer versionierten, anonymisierten DWD-HTML-Fixture
 abgesichert. Der Regressionstest prüft zusätzlich vollständigen Berichtskopf,
-Ausgabestand, Wetterlage und dynamischen Vorhersagebeginn; er benötigt keine
-Live-DWD-Verbindung.
+Ausgabestand, Wetterlage und dynamischen Vorhersagebeginn. Ein Fall mit hohen
+Wind- und Böenwerten prüft, dass die beiden Werte in der Nordatlantik-Tabelle
+getrennt und beschriftet bleiben. Für schmale Viewports hat die Tabelle eine
+sichtbare Seitwärts-Scrollhilfe. Die vorhandenen Nord-/Ostsee-Zeitreihen behalten
+ihr bisheriges Rendering. Die Tests benötigen keine Live-DWD-Verbindung.
 
 ### Live-Smoke-Test als Frühwarnsystem
 

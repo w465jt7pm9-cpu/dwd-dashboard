@@ -2306,7 +2306,10 @@ aufeinander bezogen beurteilen kann.
 - [x] Die Zuordnung der DWD-Berichtsfelder zu den Tabellenspalten wird vor der
   Umsetzung anhand des tatsächlichen Quellformats festgelegt und dokumentiert.
 - [x] Die Tabellen-Darstellung orientiert sich an der bestehenden
-  Seegang-Zeitreihe und ist mindestens ebenso gut lesbar.
+  Seegang-Zeitreihe und ist mindestens ebenso gut lesbar. Wind und Böen sind
+  separat mit Einheit beschriftet, damit hohe Werte nicht in einer Zelle
+  zusammengedrängt werden; auf schmalen Displays weist eine Scrollhilfe auf die
+  horizontal scrollbar angeordnete Tabelle hin.
 - [x] Auf breiten Displays stehen die vier Karten nebeneinander; auf schmalen
   Displays werden sie responsiv als 2×2-Raster angeordnet. Der Bericht steht
   darunter über die verfügbare Breite.
@@ -2322,7 +2325,8 @@ aufeinander bezogen beurteilen kann.
   konsistent mit den bestehenden DWD-Karten- und Textintegrationen.
 - [x] Fixture-basierte Regressionstests prüfen Kartenquellen, Reihenfolge,
   Beschriftung sowie Extraktion, Vollständigkeit und Tabellen-Darstellung des
-  Berichts, ohne im Standardtestlauf vom Live-DWD abhängig zu sein.
+  Berichts einschließlich hoher Wind- und Böenwerte, ohne im Standardtestlauf
+  vom Live-DWD abhängig zu sein.
 - [x] Die vollständige Testsuite und eine manuelle Prüfung der neuen Seite auf
   Desktop und Mobilgeräten sind erfolgreich.
 - [x] Umsetzung erfolgt auf `feature/us-030-nordatlantik-streckenwetter`;

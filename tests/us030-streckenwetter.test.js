@@ -125,6 +125,68 @@ assert.throws(
   /DWD-Abschnitt „Wetterlage“ nicht gefunden/
 )
 
+const rendererStart = source.indexOf(
+  '  function buildSeaTimeseriesOverlayMarkup ('
+)
+const rendererEnd = source.indexOf(
+  '\n  function getCachedNordatlantikReport ()',
+  rendererStart
+)
+assert.ok(rendererStart >= 0 && rendererEnd > rendererStart)
+const rendererContext = vm.createContext({
+  Array,
+  Map,
+  String,
+  escapeHtml: value => String(value).replace(/[&<>"']/g, ''),
+  getWindDirectionSymbol: () => '→',
+  renderBftValueMarkup: value => `<wind>${value}</wind>`,
+  renderGustBftValueMarkup: value => value ? `<gust>B${value}</gust>` : '',
+  renderWeatherValueMarkup: () => '·',
+  formatTimestamp: () => 'test',
+  getCachedWetterlageText: () => '',
+  buildWetterlageOverlayMarkup: () => ''
+})
+vm.runInContext(source.slice(rendererStart, rendererEnd), rendererContext)
+
+const highWindPayload = {
+  slots: [{ key: 'Sa00', label: 'Sa 00' }],
+  areas: [{
+    areaName: 'Testgebiet',
+    position: '48.00N 10.00W',
+    waterTemp: '16 C',
+    rows: [{
+      slotKey: 'Sa00',
+      windDirection: 'W',
+      windBft: '8-9',
+      gustBft: '11-12',
+      waveM: '4.0',
+      weather: 'RAIN'
+    }]
+  }]
+}
+const northAtlanticTimeseries = rendererContext.buildSeaTimeseriesOverlayMarkup(
+  highWindPayload,
+  { separateGustRow: true }
+)
+const windRow = northAtlanticTimeseries.match(
+  /<tr class="ostsee-ts-wind-row">([\s\S]*?)<\/tr>/
+)
+const gustRow = northAtlanticTimeseries.match(
+  /<tr class="ostsee-ts-gust-row">([\s\S]*?)<\/tr>/
+)
+assert.ok(windRow && gustRow, 'Wind and gusts need separate labeled rows')
+assert.match(windRow[1], /Wind \(Bft\)/)
+assert.match(windRow[1], /<wind>8-9<\/wind>/)
+assert.doesNotMatch(windRow[1], /11-12/)
+assert.match(gustRow[1], /Böen \(Bft\)/)
+assert.match(gustRow[1], /<gust>B11-12<\/gust>/)
+
+const existingTimeseries = rendererContext.buildSeaTimeseriesOverlayMarkup(
+  highWindPayload
+)
+assert.doesNotMatch(existingTimeseries, /ostsee-ts-gust-row/)
+assert.match(existingTimeseries, /<gust>B11-12<\/gust>/)
+
 const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8')
 const pageMatches = Array.from(
   html.matchAll(/<section class="page" data-page="(\d+)" aria-label="([^"]+)">/g),
@@ -163,5 +225,11 @@ assert.match(
   /@media\s*\(max-width:\s*767px\)\s*and\s*\(orientation:\s*portrait\)\s*\{\s*\.page\[data-page='3'\]\s+\.nordatlantik-grid\s*\{\s*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/
 )
 assert.match(css, /\.page\[data-page='3'\]\s*\{\s*min-width:\s*0/)
+assert.match(
+  css,
+  /\.nordatlantik-report__timeseries\s+\.ostsee-ts-table\s*\{\s*min-width:\s*1320px/
+)
+assert.match(css, /\.nordatlantik-report__scroll-hint\s*\{\s*display:\s*none/)
+assert.match(source, /nordatlantik-report__scroll-hint/)
 
 console.log('US-030 Streckenwetter parser and page regression checks passed')

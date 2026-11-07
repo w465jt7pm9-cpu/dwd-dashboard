@@ -258,12 +258,34 @@
   font-size: 1rem;
 }
 
+.nordatlantik-report__scroll-hint {
+  display: none;
+  margin-bottom: var(--space-2);
+  font-size: 0.78rem;
+  opacity: 0.78;
+}
+
 .nordatlantik-report__situation p {
   white-space: pre-wrap;
 }
 
 .nordatlantik-report__timeseries .ostsee-ts-wrap {
   max-width: 100%;
+}
+
+.nordatlantik-report__timeseries .ostsee-ts-table {
+  min-width: 1320px;
+}
+
+.nordatlantik-report__timeseries .ostsee-ts-table th[scope='row'] {
+  width: 96px;
+  white-space: nowrap;
+}
+
+@media (max-width: 1340px) {
+  .nordatlantik-report__scroll-hint {
+    display: block;
+  }
 }
 
 .sea-row,

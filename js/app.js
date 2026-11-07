@@ -1585,7 +1585,8 @@ document.addEventListener('DOMContentLoaded', () => {
       regionLabel = 'Ostsee',
       regionKey = 'ostsee',
       includeWetterlage = true,
-      includeStand = true
+      includeStand = true,
+      separateGustRow = false
     } = {}
   ) {
     const slots = Array.isArray(payload?.slots) ? payload.slots : []
@@ -1636,7 +1637,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const directionSymbol = getWindDirectionSymbol(row.windDirection)
             const windValueMarkup = renderBftValueMarkup(row.windBft)
-            const gustMarkup = renderGustBftValueMarkup(row.gustBft)
+            const gustMarkup = separateGustRow
+              ? ''
+              : renderGustBftValueMarkup(row.gustBft)
             const combinedValueMarkup = gustMarkup
               ? `${windValueMarkup}${gustMarkup}`
               : windValueMarkup
@@ -1644,6 +1647,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<td><span class="ostsee-ts-wind"><span class="ostsee-ts-dir">${directionSymbol}</span>${combinedValueMarkup}</span></td>`
           })
           .join('')
+
+        const gustCells = separateGustRow
+          ? slots
+              .map(slot => {
+                const row = rowsBySlot.get(slot.key)
+                return `<td>${renderGustBftValueMarkup(row?.gustBft || '') || '·'}</td>`
+              })
+              .join('')
+          : ''
 
         const waveCells = slots
           .map(slot => {
@@ -1664,6 +1676,13 @@ document.addEventListener('DOMContentLoaded', () => {
           ? `${area.position} · WT ${area.waterTemp}`
           : area.position
 
+        const forecastRows = separateGustRow
+          ? [
+              `<tr class="ostsee-ts-wind-row"><th scope="row">Wind (Bft)</th>${windCells}</tr>`,
+              `<tr class="ostsee-ts-gust-row"><th scope="row">Böen (Bft)</th>${gustCells}</tr>`
+            ]
+          : [`<tr><th scope="row">⇢</th>${windCells}</tr>`]
+
         return [
           `<tr class="ostsee-ts-area"><th colspan="${
             slots.length + 1
@@ -1672,7 +1691,7 @@ document.addEventListener('DOMContentLoaded', () => {
           )}<span class="ostsee-ts-meta">${escapeHtml(
             areaMeta
           )}</span></th></tr>`,
-          `<tr><th scope="row">⇢</th>${windCells}</tr>`,
+          ...forecastRows,
           `<tr><th scope="row">≈</th>${waveCells}</tr>`,
           `<tr><th scope="row">☀</th>${weatherCells}</tr>`
         ].join('')
@@ -1758,7 +1777,8 @@ document.addEventListener('DOMContentLoaded', () => {
       regionLabel: 'Streckenwetter',
       regionKey: 'nordatlantik',
       includeWetterlage: false,
-      includeStand: false
+      includeStand: false,
+      separateGustRow: true
     })
 
     nordatlantikReportElement.innerHTML = [
@@ -1775,6 +1795,7 @@ document.addEventListener('DOMContentLoaded', () => {
         payload.forecastPeriod
       )} UTC</h3>`,
       '</header>',
+      '<p class="nordatlantik-report__scroll-hint">Zeitreihe seitlich scrollen für weitere Vorhersagezeiten</p>',
       `<section class="nordatlantik-report__timeseries" aria-label="Streckenwetter-Zeitreihe">${tableMarkup}</section>`
     ].join('')
   }
