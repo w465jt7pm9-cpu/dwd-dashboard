@@ -1003,7 +1003,7 @@ Technisch:
 
 ## 🔄 US-015 – Datenzyklus für Bodenwetter-Analyse- und Prognosekarten korrekt abbilden
 
-**Status:** DONE  
+**Status:** DONE
 **Priorität:** Hoch
 
 👉 **Umsetzung:** siehe `docs/copilot-prompts.md` → Abschnitt „Bodenwetter-Datenzyklus“
@@ -1015,6 +1015,8 @@ Technisch:
 Als Nutzer  
 möchte ich, dass Bodenwetter-Analyse- und Prognosekarten entsprechend ihrem tatsächlichen Veröffentlichungs- und Modellzyklus behandelt werden  
 damit ich jederzeit die aktuellsten verfügbaren Daten sehe und keine unnötigen Aktualisierungen stattfinden
+
+Zusätzlich möchte ich weiterhin verfügbare DWD-Prognosekarten sehen, wenn der DWD einzelne Vorhersagehorizonte aus dem Angebot nimmt, damit die Prognosedarstellung vollständig und aktuell bleibt.
 
 ---
 
@@ -1033,9 +1035,11 @@ Die Bodenwetterkarten des Deutschen Wetterdienstes folgen einem festen meteorolo
   - werden erst **mehrere Stunden nach Modellstart verfügbar**, typischerweise:
     - ca. 07 UTC (für den 00 UTC Lauf)
     - ca. 19 UTC (für den 12 UTC Lauf)
-  - Modellläufe liefern Vorhersagen mit festen Offsets (z. B. H+24, H+48 usw.)
+  - Modellläufe liefern Vorhersagen mit festen Offsets (z. B. H+36, H+60 und H+84)
 
 👉 Ein Modelllauf ist erst nach Abschluss der Berechnung verfügbar, was einige Stunden dauern kann 【2-fe6845】
+
+**Aktuelle Anforderungsergänzung (07.11.2026):** Der DWD hat diese Änderung am 01.11.2026 aus produktionstechnischen Gründen umgesetzt und stellt `ico_tkboden_na_048.png` seitdem nicht mehr bereit. Für die Prognosekarten soll daher der bisherige Horizont `+48h` durch `+60h` und der bisherige Horizont `+60h` durch `+84h` ersetzt werden. Die ergänzenden Akzeptanzkriterien sind abgestimmt.
 
 ---
 
@@ -1087,6 +1091,14 @@ Die Bodenwetterkarten des Deutschen Wetterdienstes folgen einem festen meteorolo
 - [x] Zeitlogik ist zentral implementiert (keine Duplikate)
 - [x] Neue Kartentypen können diese Logik direkt übernehmen
 
+**Verfügbare Prognosehorizonte**
+
+- [x] Die bisherige +48h-Karte lädt künftig `ico_tkboden_na_060.png` und wird als +60h bezeichnet
+- [x] Die bisherige +60h-Karte lädt künftig `ico_tkboden_na_084.png` und wird als +84h bezeichnet
+- [x] Die beiden +36h-Karten sowie die Reihenfolge der Karten bleiben unverändert
+- [x] `ico_tkboden_na_048.png` wird nicht mehr als Kartenquelle verwendet
+- [x] Ein Regressionstest prüft, dass die erwarteten DWD-Karten für +60h (`ico_tkboden_na_060.png`) und +84h (`ico_tkboden_na_084.png`) verfügbar sind
+
 ---
 
 ### 🧠 Definition of Done
@@ -1095,6 +1107,9 @@ Die Bodenwetterkarten des Deutschen Wetterdienstes folgen einem festen meteorolo
 - keine veralteten Karten werden unnötig neu geladen
 - Aktualisierung erfolgt nur zu realen Veröffentlichungszeitpunkten
 - Zeitverhalten entspricht dem meteorologischen Workflow des DWD
+- Prognosekarten verwenden +60h (`ico_tkboden_na_060.png`) und +84h (`ico_tkboden_na_084.png`) statt der nicht mehr verfügbaren +48h- und bisherigen +60h-Karten
+- Die beiden +36h-Karten sowie die bestehende Kartenreihenfolge bleiben unverändert
+- Ein Regressionstest bestätigt die Verfügbarkeit der erwarteten +60h- und +84h-Karten und dass `ico_tkboden_na_048.png` nicht mehr als Quelle verwendet wird
 
 ---
 

@@ -1,7 +1,5 @@
 ## Gesamtarchitektur
 
-> Release-1.7 (2026-09-23): Die Dokumentation ist auf die reale Projektstruktur und die umgesetzten Features des Dashboards abgestimmt. Die Wind-gegen-Strom-Erkennung (US-006) bleibt eine geplante Idee und ist nicht Teil der aktuellen Architektur.
-
 Das DWD Dashboard ist eine leichte, browserbasierte Web-App für Desktop- und Touch-Nutzung. Sie kombiniert Wetterkarten, Seewettertexte, Seegangsvorhersagen und ergänzende Zeitreihen-Ansichten in einem single-pageartigen Carousel-Workflow. Die Architektur ist bewusst minimal-invasiv, ohne Framework, und orientiert sich an einer robusten, offline-fähigen Nutzung im maritimen Einsatzkontext.
 
 ### Ziel und Grundprinzipien

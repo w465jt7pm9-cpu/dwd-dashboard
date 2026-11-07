@@ -2,6 +2,18 @@
 
 const SOURCES = [
   {
+    name: 'Boden forecast +60h map',
+    url: 'https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/ico_tkboden_na_060.png',
+    expectedContentType: 'image/png',
+    expectedSignature: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
+  },
+  {
+    name: 'Boden forecast +84h map',
+    url: 'https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/ico_tkboden_na_084.png',
+    expectedContentType: 'image/png',
+    expectedSignature: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
+  },
+  {
     name: 'Maritime forecast feed',
     url: 'https://opendata.dwd.de/weather/maritime/forecast/german/FQEN50_EDZW_LATEST',
     encoding: 'latin1',
@@ -66,6 +78,22 @@ async function fetchSource (source) {
     }
     if (!body.trim()) {
       findings.push(`${source.name}: empty response`)
+      return
+    }
+    if (source.expectedContentType) {
+      const contentType = response.headers.get('content-type') || ''
+      if (!contentType.toLowerCase().includes(source.expectedContentType)) {
+        findings.push(
+          `${source.name}: expected ${source.expectedContentType}, got ${contentType || 'no content type'}`
+        )
+        return
+      }
+    }
+    if (
+      source.expectedSignature &&
+      !source.expectedSignature.every((byte, index) => bytes[index] === byte)
+    ) {
+      findings.push(`${source.name}: invalid PNG signature`)
       return
     }
 

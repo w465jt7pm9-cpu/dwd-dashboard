@@ -1,7 +1,5 @@
 # 📂 docs – Copilot & Arbeitsdokumentation
 
-> Release-1.6 (2026-08-20): Testsuite erfolgreich abgeschlossen; US-015, US-016, US-020, US-022 und US-023 sind umgesetzt. US-006 bleibt eine geplante Idee.
-
 ## Zweck dieses Ordners
 
 Dieser Ordner enthält unterstützende Dokumente für die **Entwicklung und Weiterentwicklung des DWD Dashboards mit GitHub Copilot**.
@@ -102,7 +100,7 @@ Aktuelle Kurz-Checkliste für Analyse, Umsetzung und Review.
 
 - schneller Copy-&-Paste in Copilot Chat
 - Fokus auf kleine, überprüfbare Änderungen
-- Release-1.6-Regeln und US-006-Abgrenzung
+- allgemeine Arbeitsregeln und US-006-Abgrenzung
 
 👉 Nutzung:
 

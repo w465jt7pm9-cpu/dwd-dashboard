@@ -1,6 +1,6 @@
 # Copilot Session Plan – DWD Dashboard
 
-> Release-1.6 (2026-08-20): Dieser Ablaufplan beschreibt den aktuellen Arbeitsprozess. US-006 (Wind-gegen-Strom-Erkennung) bleibt eine geplante Idee und ist nicht implementiert.
+> Dieser Ablaufplan beschreibt den aktuellen Arbeitsprozess. US-006 (Wind-gegen-Strom-Erkennung) bleibt eine geplante Idee und ist nicht implementiert.
 
 ## Zweck
 
@@ -90,7 +90,9 @@ konsistent sein. US-006 darf nicht als umgesetzt erscheinen.
 ## Aktuelle fachliche Leitplanken
 
 - Die App bleibt eine Vanilla-JavaScript-Anwendung ohne Framework.
-- Bildquellen, Service Worker und bestehende Cache-Strategie bleiben stabil.
+- Bildquellen, Service Worker und bestehende Cache-Strategie bleiben unverändert,
+  sofern keine fachliche Anforderung oder Änderung beim Datenanbieter eine
+  Anpassung erfordert.
 - Seewettertexte und Zeitreihen werden aus DWD-Produkten aufbereitet.
 - Die Gezeitenphase ist eine begrenzte eigene Ableitung und ersetzt keine
   amtliche Gezeitenvorausberechnung.

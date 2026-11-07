@@ -5,11 +5,12 @@ Es ist für die Nutzung vor dem Ablegen und unterwegs auf dem Wasser gedacht. Zu
 
 ## Aktueller Release
 
-`Release-1.8` macht das Dashboard auf mobilen Displays übersichtlicher: Die
-Startseite zeigt im Portrait eine gezielte Auswahl von sechs Karten, und auf
-den Seewetter- und Höhenwetter-Seiten sind jeweils zwei Karten pro Zeile
-sichtbar. Die vergrößerte Bodenluftdruckkarte bewahrt auch beim Zoomen ihr
-natürliches Seitenverhältnis.
+`Release-1.8.1` aktualisiert die Bodenwetter-Prognosekarten auf die vom DWD
+verfügbaren Horizonte +60h und +84h. Die Verbesserungen aus Release 1.8 bleiben
+enthalten: Die Startseite zeigt im Portrait eine gezielte Auswahl von sechs
+Karten, auf den Seewetter- und Höhenwetter-Seiten sind jeweils zwei Karten pro
+Zeile sichtbar, und die vergrößerte Bodenluftdruckkarte bewahrt auch beim Zoomen
+ihr natürliches Seitenverhältnis.
 
 ## Live-Version
 

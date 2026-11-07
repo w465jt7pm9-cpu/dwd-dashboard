@@ -26,6 +26,7 @@ Pakete werden nicht benötigt.
 | Testdatei                             | Prüft                                                                      |
 | ------------------------------------- | -------------------------------------------------------------------------- |
 | `boden-refresh-cycle.test.js`         | Veröffentlichungs- und Modelllauf-Zyklen für Bodenwetterkarten             |
+| `us015-forecast-maps.test.js`         | Boden-Prognosekarten: DWD-Dateien, Beschriftungen und Reihenfolge          |
 | `sea-timeseries-parsing.test.js`      | Parsing und Struktur der DWD-Seewetter-Zeitreihen                          |
 | `seewetter-highlighting.test.js`      | Strukturierung, Windwarnungen und Hervorhebungen im Seewettertext          |
 | `tide-phase.test.js`                  | Gezeitenphasen-Generator gegen BSH-Referenzdaten und Mondphasen-Zeitpunkte |
@@ -78,7 +79,9 @@ an einzelnen Quellformat-Verträgen im Testdiff eindeutig erkennbar bleiben.
 ### Live-Smoke-Test als Frühwarnsystem
 
 Der optionale Live-Test ruft die aktuell konfigurierten DWD-Quellen ab und
-prüft HTTP-Erreichbarkeit, Antwortgröße und die wichtigsten Quellformatmarker:
+prüft HTTP-Erreichbarkeit, Antwortgröße und die wichtigsten Quellformatmarker.
+Für die Boden-Prognosekarten prüft er zusätzlich den Bildtyp und die PNG-Signatur
+der erwarteten +60h- und +84h-Karten:
 
 ```bash
 node scripts/live-dwd-smoke-test.js
