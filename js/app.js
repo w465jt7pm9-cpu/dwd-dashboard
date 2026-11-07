@@ -1811,14 +1811,27 @@ document.addEventListener('DOMContentLoaded', () => {
             ]
           : [`<tr><th scope="row">⇢</th>${windCells}</tr>`]
 
+        const areaHeaderRow = separateGustRow
+          ? `<tr class="ostsee-ts-area"><th scope="row" class="ostsee-ts-area__label">${escapeHtml(
+              area.areaName
+            )}<span class="ostsee-ts-meta">${escapeHtml(
+              areaMeta
+            )}</span></th>${slots
+              .map(
+                (_, index) =>
+                  `<td${getCurrentSlotAttributes(index)}></td>`
+              )
+              .join('')}</tr>`
+          : `<tr class="ostsee-ts-area"><th colspan="${
+              slots.length + 1
+            }">${escapeHtml(
+              area.areaName
+            )}<span class="ostsee-ts-meta">${escapeHtml(
+              areaMeta
+            )}</span></th></tr>`
+
         return [
-          `<tr class="ostsee-ts-area"><th colspan="${
-            slots.length + 1
-          }">${escapeHtml(
-            area.areaName
-          )}<span class="ostsee-ts-meta">${escapeHtml(
-            areaMeta
-          )}</span></th></tr>`,
+          areaHeaderRow,
           ...forecastRows,
           `<tr><th scope="row">≈</th>${waveCells}</tr>`,
           `<tr><th scope="row">☀</th>${weatherCells}</tr>`

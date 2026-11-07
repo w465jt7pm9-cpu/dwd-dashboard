@@ -243,6 +243,11 @@ assert.match(windRow[1], /<wind>8-9<\/wind>/)
 assert.doesNotMatch(windRow[1], /11-12/)
 assert.match(gustRow[1], /Böen \(Bft\)/)
 assert.match(gustRow[1], /<gust>B11-12<\/gust>/)
+assert.match(
+  northAtlanticTimeseries,
+  /<tr class="ostsee-ts-area"><th scope="row" class="ostsee-ts-area__label">Testgebiet<span class="ostsee-ts-meta">48\.00N 10\.00W · WT 16 C<\/span><\/th><td(?: class="nordatlantik-current-slot")?><\/td><\/tr>/
+)
+assert.doesNotMatch(northAtlanticTimeseries, /colspan=/)
 assert.match(northAtlanticTimeseries, /aria-current="time"/)
 assert.match(northAtlanticTimeseries, /class="nordatlantik-now-marker">Jetzt<\/span>/)
 assert.match(
@@ -259,6 +264,7 @@ const existingTimeseries = rendererContext.buildSeaTimeseriesOverlayMarkup(
 )
 assert.doesNotMatch(existingTimeseries, /ostsee-ts-gust-row/)
 assert.match(existingTimeseries, /<gust>B11-12<\/gust>/)
+assert.match(existingTimeseries, /<tr class="ostsee-ts-area"><th colspan="2">Testgebiet/)
 
 const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8')
 const pageMatches = Array.from(
@@ -303,6 +309,15 @@ assert.match(css, /\.page\[data-page='3'\]\s*\{\s*min-width:\s*0/)
 assert.match(
   css,
   /\.nordatlantik-report__timeseries\s+\.ostsee-ts-table\s*\{\s*min-width:\s*1320px/
+)
+assert.match(css, /\.ostsee-ts-area__label\s*\{\s*background:/)
+assert.match(
+  css,
+  /\.nordatlantik-report__timeseries\s+\.ostsee-ts-table\s+tbody\s+th\[scope='row'\]\s*\{\s*position:\s*sticky;\s*left:\s*0/
+)
+assert.match(
+  css,
+  /\.nordatlantik-report__timeseries\s+\.ostsee-ts-table\s+\.ostsee-ts-area__label\s+\.ostsee-ts-meta\s*\{\s*display:\s*block/
 )
 assert.match(css, /\.nordatlantik-report__scroll-hint\s*\{\s*display:\s*none/)
 assert.match(source, /nordatlantik-report__scroll-hint/)

@@ -104,7 +104,9 @@ Die Zeitmarkierung hebt den letzten bereits gültigen DWD-Zeitpunkt hervor,
 berechnet diesen in UTC aus dem Berichtsbeginn und den Tabellenzeitpunkten und
 aktualisiert die Spalte minütlich ohne neuen Netzwerkabruf. Regressionstests
 prüfen den Spaltenwechsel am Zeitstempel sowie die Kompatibilität mit älteren
-gespeicherten Berichten.
+gespeicherten Berichten. Die linke Tabellenzelle mit Gebiet und Positionsdaten
+bleibt beim horizontalen Scrollen fixiert; die beschriftenden Messzeilen bleiben
+ebenfalls links sichtbar.
 
 ### Live-Smoke-Test als Frühwarnsystem
 

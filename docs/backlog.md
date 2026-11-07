@@ -2309,7 +2309,8 @@ aufeinander bezogen beurteilen kann.
   Seegang-Zeitreihe und ist mindestens ebenso gut lesbar. Wind und Böen sind
   separat mit Einheit beschriftet, damit hohe Werte nicht in einer Zelle
   zusammengedrängt werden; auf schmalen Displays weist eine Scrollhilfe auf die
-  horizontal scrollbar angeordnete Tabelle hin.
+  horizontal scrollbar angeordnete Tabelle hin. Gebiets-/Stationsnamen sowie
+  die Zeilenbeschriftungen bleiben beim horizontalen Scrollen links fixiert.
 - [x] Der letzte bereits erreichte DWD-Vorhersagezeitpunkt ist in der Tabelle
   durch eine dezente Spaltenhervorhebung und die Kennzeichnung „Jetzt“ erkennbar.
   Die Hervorhebung folgt den UTC-Vorhersagezeitpunkten ohne erneutes Laden der
