@@ -1960,15 +1960,17 @@ document.addEventListener('DOMContentLoaded', () => {
     )
     Array.from(
       table.querySelectorAll('thead tr:first-child th[scope="col"]')
-    ).forEach((cell, index) => {
-      const isCurrent = index === currentSlotIndex
-      cell.classList.toggle('nordatlantik-current-slot', isCurrent)
-      if (isCurrent) {
-        cell.setAttribute('aria-current', 'time')
-      } else {
-        cell.removeAttribute('aria-current')
-      }
-    })
+    )
+      .slice(1)
+      .forEach((cell, index) => {
+        const isCurrent = index === currentSlotIndex
+        cell.classList.toggle('nordatlantik-current-slot', isCurrent)
+        if (isCurrent) {
+          cell.setAttribute('aria-current', 'time')
+        } else {
+          cell.removeAttribute('aria-current')
+        }
+      })
 
     Array.from(table.querySelectorAll('tbody tr')).forEach(row => {
       if (row.classList.contains('ostsee-ts-area')) {

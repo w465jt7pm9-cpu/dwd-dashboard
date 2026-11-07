@@ -107,6 +107,9 @@ prüfen den Spaltenwechsel am Zeitstempel sowie die Kompatibilität mit älteren
 gespeicherten Berichten. Die linke Tabellenzelle mit Gebiet und Positionsdaten
 bleibt beim horizontalen Scrollen fixiert; die beschriftenden Messzeilen bleiben
 ebenfalls links sichtbar.
+Ein Regressionstest prüft zusätzlich, dass die minütliche Aktualisierung die
+leere linke Kopfzelle überspringt und den Zeitkopf mit der passenden Datenzelle
+markiert.
 
 ### Live-Smoke-Test als Frühwarnsystem
 

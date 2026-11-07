@@ -166,6 +166,79 @@ assert.strictEqual(
   'No forecast column is marked before the report forecast begins'
 )
 
+const updateCurrentColumnStart = source.indexOf(
+  '  function updateNordatlantikCurrentTimeColumn () {'
+)
+const updateCurrentColumnEnd = source.indexOf(
+  '\n\n  function ensureNordatlantikReportContent',
+  updateCurrentColumnStart
+)
+assert.ok(updateCurrentColumnStart >= 0 && updateCurrentColumnEnd > updateCurrentColumnStart)
+
+const createTestCell = () => {
+  const classes = new Set()
+  const attributes = new Map()
+  return {
+    classList: {
+      toggle (className, enabled) {
+        if (enabled) {
+          classes.add(className)
+        } else {
+          classes.delete(className)
+        }
+      },
+      contains: className => classes.has(className)
+    },
+    setAttribute: (name, value) => attributes.set(name, value),
+    removeAttribute: name => attributes.delete(name),
+    getAttribute: name => attributes.get(name)
+  }
+}
+const headerCells = Array.from({ length: 4 }, createTestCell)
+const forecastCells = Array.from({ length: 3 }, createTestCell)
+const reportTable = {
+  querySelectorAll (selector) {
+    if (selector === 'thead tr:first-child th[scope="col"]') {
+      return headerCells
+    }
+    if (selector === 'tbody tr') {
+      return [{
+        classList: { contains: () => false },
+        querySelectorAll: () => forecastCells
+      }]
+    }
+    return []
+  }
+}
+const currentColumnContext = vm.createContext({
+  Array,
+  nordatlantikReportElement: {
+    querySelector: () => reportTable
+  },
+  nordatlantikReportPayload: currentSlotPayload,
+  getCurrentStreckenwetterSlotIndex: () => 1
+})
+vm.runInContext(
+  source.slice(updateCurrentColumnStart, updateCurrentColumnEnd),
+  currentColumnContext
+)
+currentColumnContext.updateNordatlantikCurrentTimeColumn()
+assert.deepStrictEqual(
+  headerCells.map(cell => cell.classList.contains('nordatlantik-current-slot')),
+  [false, false, true, false],
+  'The timer must skip the empty corner header and highlight the matching forecast column'
+)
+assert.strictEqual(
+  headerCells[2].getAttribute('aria-current'),
+  'time',
+  'The timer must keep aria-current on the active forecast header'
+)
+assert.deepStrictEqual(
+  forecastCells.map(cell => cell.classList.contains('nordatlantik-current-slot')),
+  [false, true, false],
+  'The active body column must stay aligned with the forecast headers'
+)
+
 assert.throws(
   () => context.parseStreckenwetterberichtFromHtml(
     fixture.replace('Vorhersagen von Sa, 07.11.2026 00 UTC', 'Vorhersage ab Sa')
