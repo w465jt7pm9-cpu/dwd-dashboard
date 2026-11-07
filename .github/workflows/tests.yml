@@ -8,6 +8,7 @@ on:
       - feature/us-027-lightbox-portrait
       - feature/us-028-seewetter-portrait-cards
       - feature/us-029-upperair-portrait-cards
+      - feature/us-030-nordatlantik-streckenwetter
   pull_request:
     branches: [main]
 

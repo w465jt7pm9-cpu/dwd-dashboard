@@ -87,7 +87,8 @@ bash scripts/setup-git-hooks.sh
 Zusätzlich läuft die Testsuite über GitHub Actions bei jedem Push auf `main`,
 `feature/portrait-weather-grid`, `feature/us-027-lightbox-portrait`,
 `feature/us-028-seewetter-portrait-cards` und
-`feature/us-029-upperair-portrait-cards` sowie bei Pull Requests nach `main`
+`feature/us-029-upperair-portrait-cards`,
+`feature/us-030-nordatlantik-streckenwetter` sowie bei Pull Requests nach `main`
 (`.github/workflows/tests.yml`) als serverseitiges Sicherheitsnetz.
 
 ## Entwicklung

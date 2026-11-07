@@ -2,6 +2,40 @@
 
 const SOURCES = [
   {
+    name: 'North Atlantic sea-state +00h map',
+    url: 'https://www.dwd.de/DWD/wetter/wv_spez/seewetter/na_00.png',
+    expectedContentType: 'image/png',
+    expectedSignature: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
+  },
+  {
+    name: 'North Atlantic sea-state +36h map',
+    url: 'https://www.dwd.de/DWD/wetter/wv_spez/seewetter/na_36.png',
+    expectedContentType: 'image/png',
+    expectedSignature: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
+  },
+  {
+    name: 'North Atlantic sea-state +60h map',
+    url: 'https://www.dwd.de/DWD/wetter/wv_spez/seewetter/na_60.png',
+    expectedContentType: 'image/png',
+    expectedSignature: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
+  },
+  {
+    name: 'North Atlantic sea-state +84h map',
+    url: 'https://www.dwd.de/DWD/wetter/wv_spez/seewetter/na_84.png',
+    expectedContentType: 'image/png',
+    expectedSignature: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
+  },
+  {
+    name: 'North Atlantic route weather forecast',
+    url: 'https://www.dwd.de/DE/leistungen/streckenseewetterbericht/streckenseewetterbericht.html?nn=392762',
+    markers: [
+      'Wetterlage:',
+      'Vorhersagen von',
+      'Sig. Wellenhoehe',
+      'WT:'
+    ]
+  },
+  {
     name: 'Boden forecast +60h map',
     url: 'https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/ico_tkboden_na_060.png',
     expectedContentType: 'image/png',

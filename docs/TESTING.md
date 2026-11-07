@@ -27,6 +27,7 @@ Pakete werden nicht benötigt.
 | ------------------------------------- | -------------------------------------------------------------------------- |
 | `boden-refresh-cycle.test.js`         | Veröffentlichungs- und Modelllauf-Zyklen für Bodenwetterkarten             |
 | `us015-forecast-maps.test.js`         | Boden-Prognosekarten: DWD-Dateien, Beschriftungen und Reihenfolge          |
+| `us030-streckenwetter.test.js`        | Streckenwetter-Parsing, Quellverträge, Karten und responsive Seite         |
 | `sea-timeseries-parsing.test.js`      | Parsing und Struktur der DWD-Seewetter-Zeitreihen                          |
 | `seewetter-highlighting.test.js`      | Strukturierung, Windwarnungen und Hervorhebungen im Seewettertext          |
 | `tide-phase.test.js`                  | Gezeitenphasen-Generator gegen BSH-Referenzdaten und Mondphasen-Zeitpunkte |
@@ -76,12 +77,33 @@ Zeitreihenfelder ab. Die Nordsee-Fixture ergänzt die bestehende Ostsee-Fixture;
 die zusätzlichen Varianten sind absichtlich klein gehalten, damit Änderungen
 an einzelnen Quellformat-Verträgen im Testdiff eindeutig erkennbar bleiben.
 
+### Streckenwetterbericht Nordatlantik (US-030)
+
+Der DWD-Bericht liefert den Berichtskopf mit Ausgabestand in einer Überschrift,
+die Wetterlage vor der Prognosetabelle und den Vorhersagebeginn in deren
+`summary`. Die Zeitreihentabellen ordnen die Felder je Gebiet in dieser Folge
+an:
+
+| DWD-Quellfeld | Dashboard-Darstellung |
+| --- | --- |
+| Gebietsname, Position und `WT` in der Gebietszeile | Gebietsüberschrift mit Position und Wassertemperatur |
+| Wochentag und UTC-Stunde | Spaltenkopf des Vorhersagezeitpunkts |
+| Windrichtung, Windstärke und Böen | Windzeile der bestehenden kompakten Zeitreihentabelle |
+| Signifikante Wellenhöhe | Wellenzeile in Metern |
+| Wetterangabe | Wetterzeile mit den bestehenden Wetterzeichen |
+
+Die Feldfolge wird mit einer versionierten, anonymisierten DWD-HTML-Fixture
+abgesichert. Der Regressionstest prüft zusätzlich vollständigen Berichtskopf,
+Ausgabestand, Wetterlage und dynamischen Vorhersagebeginn; er benötigt keine
+Live-DWD-Verbindung.
+
 ### Live-Smoke-Test als Frühwarnsystem
 
 Der optionale Live-Test ruft die aktuell konfigurierten DWD-Quellen ab und
 prüft HTTP-Erreichbarkeit, Antwortgröße und die wichtigsten Quellformatmarker.
 Für die Boden-Prognosekarten prüft er zusätzlich den Bildtyp und die PNG-Signatur
-der erwarteten +60h- und +84h-Karten:
+der erwarteten +60h- und +84h-Karten sowie der vier Nordatlantik-Karten und
+des Streckenwetterberichts:
 
 ```bash
 node scripts/live-dwd-smoke-test.js
@@ -220,7 +242,8 @@ python3 tests/smoke_nordsee_tide_test.py
 GitHub Actions führt die Testsuite bei jedem Push auf `main`,
 `feature/portrait-weather-grid`, `feature/us-027-lightbox-portrait`,
 `feature/us-028-seewetter-portrait-cards` und
-`feature/us-029-upperair-portrait-cards` sowie bei Pull Requests nach `main` aus:
+`feature/us-029-upperair-portrait-cards`,
+`feature/us-030-nordatlantik-streckenwetter` sowie bei Pull Requests nach `main` aus:
 [.github/workflows/tests.yml](../.github/workflows/tests.yml).
 
 Optional können die versionierten Hooks aktiviert werden:

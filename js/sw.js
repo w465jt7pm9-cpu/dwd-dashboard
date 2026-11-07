@@ -39,6 +39,11 @@ self.addEventListener('fetch', event => {
     return
   }
 
+  if (isStreckenwetterReportRequest(request)) {
+    event.respondWith(handleStreckenwetterRequest(request))
+    return
+  }
+
   if (isTextForecastRequest(request)) {
     event.respondWith(handleTextForecastRequest(request))
     return
@@ -98,6 +103,15 @@ function isTextForecastRequest (request) {
   return !requestUrl.pathname.endsWith('/txt/')
 }
 
+function isStreckenwetterReportRequest (request) {
+  const requestUrl = new URL(request.url)
+  return (
+    requestUrl.origin === 'https://www.dwd.de' &&
+    requestUrl.pathname ===
+      '/DE/leistungen/streckenseewetterbericht/streckenseewetterbericht.html'
+  )
+}
+
 async function handleNavigationRequest (request) {
   try {
     const networkResponse = await fetch(request)
@@ -107,6 +121,10 @@ async function handleNavigationRequest (request) {
     const cachedResponse = await caches.match(request)
     return cachedResponse || caches.match('./index.html')
   }
+}
+
+async function handleStreckenwetterRequest (request) {
+  return fetch(request)
 }
 
 async function handleImageRequest (request) {

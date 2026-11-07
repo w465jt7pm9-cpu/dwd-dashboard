@@ -9,11 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const LONG_PRESS_DURATION_MS = 600
   const INFO_OVERLAY_DURATION_MS = 4500
   const EDGE_TAP_ZONE_PX = 26
-  const NORDSEE_PAGE_INDEX = 3
-  const OSTSEE_PAGE_INDEX = 4
-  const TEXT_PAGE_INDEX = 5
+  const NORDATLANTIK_PAGE_INDEX = 3
+  const NORDSEE_PAGE_INDEX = 4
+  const OSTSEE_PAGE_INDEX = 5
+  const TEXT_PAGE_INDEX = 6
   const SEEGANG_REFRESH_WINDOW_UTC_HOURS = [7, 19]
   const SEEGANG_REFRESH_WINDOW_SPAN_MINUTES = 90
+  const NORDATLANTIK_REPORT_REFRESH_TTL_MS = 5 * 60 * 1000
   const BODEN_ANALYSIS_CYCLE_UTC_HOURS = [0, 12]
   const BODEN_FORECAST_RELEASE_UTC_HOURS = {
     RUN_00: 7,
@@ -55,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const OSTSEE_TS_UPDATED_AT_CACHE_KEY = 'dwdOstseeTimeseriesUpdatedAt'
   const NORDSEE_TS_CACHE_KEY = 'dwdNordseeTimeseriesCache'
   const NORDSEE_TS_UPDATED_AT_CACHE_KEY = 'dwdNordseeTimeseriesUpdatedAt'
+  const NORDATLANTIK_REPORT_CACHE_KEY = 'dwdNordatlantikStreckenwetterCache'
   const REGIONAL_WETTERLAGE_CACHE_KEYS = {
     nordsee: {
       text: 'dwdNordseeWetterlageText',
@@ -77,6 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
     'https://www.dwd.de/DE/leistungen/seevorhersageostsee/seevorhersagenostsee.html?nn=16102'
   const DWD_NORDSEE_3DAY_URL =
     'https://www.dwd.de/DE/leistungen/seevorhersagenordsee/seevorhersagennordsee.html?nn=16102'
+  const DWD_NORDATLANTIK_REPORT_URL =
+    'https://www.dwd.de/DE/leistungen/streckenseewetterbericht/streckenseewetterbericht.html?nn=392762'
   const OSTSEE_TS_CACHE_TTL_MS = 3 * 60 * 60 * 1000
   const WETTERLAGE_STALE_AFTER_MS = 24 * 60 * 60 * 1000
   const LAST_KNOWN_IMAGE_URL_KEY_PREFIX = 'dwdImageLastKnownUrl:'
@@ -86,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'Land',
     'See / Seegang',
     'Höhenwetter',
+    'Seegang Nordatlantik',
     'Seegang Nordsee',
     'Seegang Ostsee',
     'Seewetter Texte'
@@ -106,6 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const lightboxWeatherlageElement = document.getElementById(
     'lightboxWeatherlage'
   )
+  const nordatlantikReportElement = document.getElementById(
+    'nordatlantikReport'
+  )
   const lightboxPeekPreviousElement =
     document.getElementById('lightboxPeekPrev')
   const lightboxPeekNextElement = document.getElementById('lightboxPeekNext')
@@ -113,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const lightboxNextButton = document.getElementById('lbNext')
 
   let currentPageIndex = 0
+  let nordatlantikReportRequest = null
   let lightboxImageList = []
   let currentLightboxImageIndex = -1
   let isLightboxOpen = false
@@ -759,6 +769,74 @@ document.addEventListener('DOMContentLoaded', () => {
     return {
       slots,
       areas: allAreas
+    }
+  }
+
+  function extractHtmlFragmentText (htmlFragment) {
+    const parsedFragment = new DOMParser().parseFromString(
+      htmlFragment,
+      'text/html'
+    )
+    return normalizeInlineText(parsedFragment.body?.textContent || '')
+  }
+
+  function parseStreckenwetterberichtFromHtml (rawHtml) {
+    if (!rawHtml) {
+      throw new Error('Leere DWD-Streckenwetterquelle')
+    }
+
+    const headingMatch = rawHtml.match(/<h2\b[^>]*>([\s\S]*?)<\/h2>/i)
+    if (!headingMatch) {
+      throw new Error('DWD-Berichtskopf nicht gefunden')
+    }
+
+    const headingText = extractHtmlFragmentText(headingMatch[1])
+    const issueMatch = headingText.match(
+      /\bam\s+(\d{2}\.\d{2}\.\d{4}),?\s+(\d{2}\.\d{2})\s+UTC\b/i
+    )
+    if (!issueMatch) {
+      throw new Error('DWD-Ausgabestand im Berichtskopf nicht gefunden')
+    }
+
+    const reportTitle = headingText
+      .slice(0, issueMatch.index)
+      .replace(/[,\s]+$/, '')
+    const weatherSituationMatch = rawHtml.match(
+      /<(?:b|strong)\b[^>]*>\s*Wetterlage:\s*<\/(?:b|strong)>\s*(?:<br\b[^>]*>\s*)?([\s\S]*?)(?=<table\b)/i
+    )
+    if (!weatherSituationMatch) {
+      throw new Error('DWD-Abschnitt „Wetterlage“ nicht gefunden')
+    }
+
+    const forecastSummaryMatch = rawHtml.match(
+      /<summary\b[^>]*>([\s\S]*?)<\/summary>/i
+    )
+    if (!forecastSummaryMatch) {
+      throw new Error('DWD-Vorhersagezeitraum nicht gefunden')
+    }
+
+    const forecastSummary = extractHtmlFragmentText(forecastSummaryMatch[1])
+    const forecastPeriodMatch = forecastSummary.match(
+      /^Vorhersagen\s+von\s+(.+?)\s+UTC\.?$/i
+    )
+    if (!forecastPeriodMatch) {
+      throw new Error('DWD-Vorhersagezeitraum hat ein unbekanntes Format')
+    }
+
+    const timeseries = parseSeaTimeseriesFromHtml(
+      rawHtml,
+      'Streckenwetter'
+    )
+    if (!reportTitle) {
+      throw new Error('DWD-Berichtstitel ist leer')
+    }
+
+    return {
+      reportTitle,
+      issuedAt: `${issueMatch[1]}, ${issueMatch[2]} UTC`,
+      weatherSituation: extractHtmlFragmentText(weatherSituationMatch[1]),
+      forecastPeriod: forecastPeriodMatch[1],
+      ...timeseries
     }
   }
 
@@ -1503,7 +1581,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function buildSeaTimeseriesOverlayMarkup (
     payload,
-    { regionLabel = 'Ostsee', regionKey = 'ostsee' } = {}
+    {
+      regionLabel = 'Ostsee',
+      regionKey = 'ostsee',
+      includeWetterlage = true,
+      includeStand = true
+    } = {}
   ) {
     const slots = Array.isArray(payload?.slots) ? payload.slots : []
     const areas = Array.isArray(payload?.areas) ? payload.areas : []
@@ -1597,15 +1680,19 @@ document.addEventListener('DOMContentLoaded', () => {
       .join('')
 
     const updatedLabel = formatTimestamp(payload.updatedAt)
-    const cachedWetterlageText = getCachedWetterlageText(regionKey)
+    const cachedWetterlageText = includeWetterlage
+      ? getCachedWetterlageText(regionKey)
+      : ''
     const wetterlageMarkup = cachedWetterlageText
       ? buildWetterlageOverlayMarkup(cachedWetterlageText)
       : ''
 
     return [
-      `<span class="weatherlage-stand">DWD ${escapeHtml(
-        regionLabel
-      )} Zeitreihe · Stand ${escapeHtml(updatedLabel)}</span>`,
+      includeStand
+        ? `<span class="weatherlage-stand">DWD ${escapeHtml(
+            regionLabel
+          )} Zeitreihe · Stand ${escapeHtml(updatedLabel)}</span>`
+        : '',
       wetterlageMarkup
         ? `<section class="ostsee-ts-weatherlage" aria-label="Textuelle Wetterlage">${wetterlageMarkup}</section>`
         : '',
@@ -1616,6 +1703,154 @@ document.addEventListener('DOMContentLoaded', () => {
       '</table>',
       '</div>'
     ].join('')
+  }
+
+  function getCachedNordatlantikReport () {
+    try {
+      const cachedPayload = localStorage.getItem(
+        NORDATLANTIK_REPORT_CACHE_KEY
+      )
+      if (!cachedPayload) {
+        return null
+      }
+
+      const payload = JSON.parse(cachedPayload)
+      return payload?.slots?.length && payload?.areas?.length ? payload : null
+    } catch {
+      return null
+    }
+  }
+
+  function setCachedNordatlantikReport (payload) {
+    try {
+      localStorage.setItem(
+        NORDATLANTIK_REPORT_CACHE_KEY,
+        JSON.stringify(payload)
+      )
+      return true
+    } catch (error) {
+      console.warn('Streckenwetterbericht konnte nicht offline gespeichert werden.', error)
+      return false
+    }
+  }
+
+  function renderNordatlantikReport (payload, status) {
+    if (!nordatlantikReportElement) {
+      return
+    }
+
+    if (!payload) {
+      nordatlantikReportElement.innerHTML = `<p class="nordatlantik-report__status" aria-live="polite">${escapeHtml(
+        status
+      )}</p>`
+      return
+    }
+
+    const statusLabels = {
+      current: `DWD-Ausgabestand: ${payload.issuedAt} · zuletzt abgerufen ${formatTimestamp(payload.updatedAt)}`,
+      cached: `Gespeicherter Stand · DWD-Ausgabestand: ${payload.issuedAt} · zuletzt abgerufen ${formatTimestamp(payload.updatedAt)}`,
+      offline: `Offline · zuletzt verfügbarer Stand · DWD-Ausgabestand: ${payload.issuedAt} · abgerufen ${formatTimestamp(payload.updatedAt)}`,
+      stale: `Aktualisierung nicht möglich · letzter verfügbarer Stand · DWD-Ausgabestand: ${payload.issuedAt} · abgerufen ${formatTimestamp(payload.updatedAt)}`,
+      storageWarning: `DWD-Ausgabestand: ${payload.issuedAt} · zuletzt abgerufen ${formatTimestamp(payload.updatedAt)} · Offline-Speicherung nicht verfügbar`
+    }
+    const statusLabel = statusLabels[status] || statusLabels.cached
+    const tableMarkup = buildSeaTimeseriesOverlayMarkup(payload, {
+      regionLabel: 'Streckenwetter',
+      regionKey: 'nordatlantik',
+      includeWetterlage: false,
+      includeStand: false
+    })
+
+    nordatlantikReportElement.innerHTML = [
+      '<header class="nordatlantik-report__header">',
+      `<h2>${escapeHtml(payload.reportTitle)}</h2>`,
+      `<p class="nordatlantik-report__status" aria-live="polite">${escapeHtml(
+        statusLabel
+      )}</p>`,
+      '<section class="nordatlantik-report__situation" aria-labelledby="nordatlantikWeatherlageHeading">',
+      '<h3 id="nordatlantikWeatherlageHeading">Wetterlage</h3>',
+      `<p>${escapeHtml(payload.weatherSituation)}</p>`,
+      '</section>',
+      `<h3 class="nordatlantik-report__period">Vorhersagen von ${escapeHtml(
+        payload.forecastPeriod
+      )} UTC</h3>`,
+      '</header>',
+      `<section class="nordatlantik-report__timeseries" aria-label="Streckenwetter-Zeitreihe">${tableMarkup}</section>`
+    ].join('')
+  }
+
+  function ensureNordatlantikReportContent (force = false) {
+    const cachedPayload = getCachedNordatlantikReport()
+    if (cachedPayload) {
+      renderNordatlantikReport(
+        cachedPayload,
+        navigator.onLine ? 'cached' : 'offline'
+      )
+    }
+
+    if (!navigator.onLine) {
+      if (!cachedPayload) {
+        renderNordatlantikReport(
+          null,
+          'Offline: kein gespeicherter Streckenwetterbericht verfügbar.'
+        )
+      }
+      return Promise.resolve()
+    }
+
+    if (
+      !force &&
+      cachedPayload &&
+      Date.now() - Number(cachedPayload.updatedAt) <
+        NORDATLANTIK_REPORT_REFRESH_TTL_MS
+    ) {
+      return Promise.resolve()
+    }
+
+    if (nordatlantikReportRequest) {
+      return nordatlantikReportRequest
+    }
+
+    nordatlantikReportRequest = (async () => {
+      try {
+        const response = await fetch(DWD_NORDATLANTIK_REPORT_URL, {
+          cache: 'no-store'
+        })
+        if (!response.ok) {
+          throw new Error(
+            `DWD-Streckenwetterbericht nicht erreichbar (HTTP ${response.status})`
+          )
+        }
+
+        const report = parseStreckenwetterberichtFromHtml(
+          await response.text()
+        )
+        const payload = {
+          ...report,
+          updatedAt: Date.now()
+        }
+        const wasCached = setCachedNordatlantikReport(payload)
+        renderNordatlantikReport(
+          payload,
+          wasCached ? 'current' : 'storageWarning'
+        )
+      } catch (error) {
+        console.warn('Streckenwetterbericht konnte nicht aktualisiert werden.', error)
+        const fallbackPayload = getCachedNordatlantikReport()
+        renderNordatlantikReport(
+          fallbackPayload,
+          fallbackPayload
+            ? navigator.onLine
+              ? 'stale'
+              : 'offline'
+            : 'Streckenwetterbericht derzeit nicht verfügbar. Bitte später erneut versuchen.'
+        )
+      } finally {
+        nordatlantikReportRequest = null
+      }
+    })()
+
+    return nordatlantikReportRequest
   }
 
   async function ensureSeaTimeseriesOverlayContent (config) {
@@ -2605,6 +2840,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentPageIndex === 0) {
       void preloadWetterlageInBackground()
     }
+    if (currentPageIndex === NORDATLANTIK_PAGE_INDEX) {
+      void ensureNordatlantikReportContent()
+    }
 
     refreshVisibleImages()
   }
@@ -3094,9 +3332,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function startPullRefresh (clientY) {
+    const scrollTop =
+      currentPageIndex === NORDATLANTIK_PAGE_INDEX
+        ? nordatlantikReportElement?.parentElement?.scrollTop || 0
+        : viewportElement.scrollTop
+
     // Only track pull-to-refresh if at top of viewport and on allowed pages
     if (
-      viewportElement.scrollTop === 0 &&
+      scrollTop === 0 &&
       isPullToRefreshEnabledPage(currentPageIndex)
     ) {
       pullRefreshStartY = clientY
@@ -3113,16 +3356,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const gestureDurationMs = Date.now() - pullRefreshStartTimestamp
     const PULL_REFRESH_MIN_DISTANCE_PX = 60
     const PULL_REFRESH_MAX_DURATION_MS = 800
+    const scrollTop =
+      currentPageIndex === NORDATLANTIK_PAGE_INDEX
+        ? nordatlantikReportElement?.parentElement?.scrollTop || 0
+        : viewportElement.scrollTop
 
     // Trigger refresh if pull was downward, fast, and at top
     if (
       deltaY >= PULL_REFRESH_MIN_DISTANCE_PX &&
       gestureDurationMs <= PULL_REFRESH_MAX_DURATION_MS &&
-      viewportElement.scrollTop === 0 &&
+      scrollTop === 0 &&
       isPullToRefreshEnabledPage(currentPageIndex) &&
       !isLightboxOpen
     ) {
       refreshVisibleImages(true)
+      if (currentPageIndex === NORDATLANTIK_PAGE_INDEX) {
+        void ensureNordatlantikReportContent(true)
+      }
     }
 
     pullRefreshStartY = null
@@ -3191,6 +3441,9 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('online', () => {
     updateOfflineUi()
     void preloadWetterlageInBackground()
+    if (currentPageIndex === NORDATLANTIK_PAGE_INDEX) {
+      void ensureNordatlantikReportContent(true)
+    }
     IMAGE_ELEMENTS.forEach(imageElement => {
       const cardElement = imageElement.closest('.card')
       const statusBadge = cardElement?.querySelector('.card-status')
@@ -3211,6 +3464,16 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('offline', () => {
     updateOfflineUi()
     lastImageStatesBeforeOffline.clear()
+
+    if (currentPageIndex === NORDATLANTIK_PAGE_INDEX) {
+      const cachedReport = getCachedNordatlantikReport()
+      renderNordatlantikReport(
+        cachedReport,
+        cachedReport
+          ? 'offline'
+          : 'Offline: kein gespeicherter Streckenwetterbericht verfügbar.'
+      )
+    }
 
     IMAGE_ELEMENTS.forEach(imageElement => {
       const pageElement = imageElement.closest('.page')
@@ -3634,6 +3897,9 @@ document.addEventListener('DOMContentLoaded', () => {
       getPageImages(currentPageIndex).length > 0
     ) {
       refreshVisibleImages()
+    }
+    if (!isLightboxOpen && currentPageIndex === NORDATLANTIK_PAGE_INDEX) {
+      void ensureNordatlantikReportContent()
     }
   }, REFRESH_INTERVAL_MS)
 })

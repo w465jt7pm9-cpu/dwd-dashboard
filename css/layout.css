@@ -140,6 +140,16 @@
 }
 
 @media (max-width: 767px) and (orientation: portrait) {
+  .page[data-page='3'] .nordatlantik-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.page[data-page='3'] {
+  min-width: 0;
+}
+
+@media (max-width: 767px) and (orientation: portrait) {
   .page[data-page='1'] .sea-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -180,6 +190,80 @@
   height: 100%;
   display: grid;
   grid-template-rows: 1fr 1fr;
+}
+
+.nordatlantik-page {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+}
+
+.nordatlantik-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+  padding: var(--space-2);
+}
+
+.nordatlantik-grid .card {
+  aspect-ratio: 16 / 10;
+}
+
+.nordatlantik-grid .card img {
+  object-fit: contain;
+}
+
+.nordatlantik-card__label {
+  position: absolute;
+  left: var(--space-2);
+  bottom: var(--space-2);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.nordatlantik-report {
+  padding: var(--space-3);
+}
+
+.nordatlantik-report__header {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.nordatlantik-report__header h2 {
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  line-height: 1.3;
+}
+
+.nordatlantik-report__status {
+  font-size: 0.82rem;
+  opacity: 0.82;
+}
+
+.nordatlantik-report__situation {
+  display: grid;
+  gap: var(--space-2);
+  line-height: 1.5;
+}
+
+.nordatlantik-report__situation h3,
+.nordatlantik-report__period {
+  font-size: 1rem;
+}
+
+.nordatlantik-report__situation p {
+  white-space: pre-wrap;
+}
+
+.nordatlantik-report__timeseries .ostsee-ts-wrap {
+  max-width: 100%;
 }
 
 .sea-row,

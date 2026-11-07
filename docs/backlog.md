@@ -15,7 +15,7 @@
 
 ## 🟨 DOING
 
-- Keine aktuellen Aufgaben
+- US-030 – Seegangskarten und Streckenwetterbericht Nordatlantik integrieren
 
 ## ✅ DONE
 
@@ -2244,6 +2244,101 @@ damit die Karten auf dem schmalen Bildschirm größer und leichter bedienbar sin
   Nordsee-/Ostsee-Zeitreihenseiten.
 - Keine Änderung an DWD-Datenquellen, Refresh-Zyklen oder Service Worker.
 - Keine Änderung an Kartenreihenfolge oder Vorhersageinhalten.
+
+---
+
+## 🌊 US-030 – Seegangskarten und Streckenwetterbericht Nordatlantik integrieren
+
+**Status:** DOING
+**Priorität:** Mittel
+
+### Beschreibung
+
+Als Nutzer möchte ich die Seegangsvorhersagekarten für den Nordatlantik und den
+dazugehörigen Streckenwetterbericht auf einer eigenen Dashboard-Seite gemeinsam
+sehen, damit ich Wellenentwicklung und Wetterlage für dieselbe Region zeitlich
+aufeinander bezogen beurteilen kann.
+
+### Datenquellen
+
+- DWD-Seegangskarten:
+  - `https://www.dwd.de/DWD/wetter/wv_spez/seewetter/na_00.png`
+  - `https://www.dwd.de/DWD/wetter/wv_spez/seewetter/na_36.png`
+  - `https://www.dwd.de/DWD/wetter/wv_spez/seewetter/na_60.png`
+  - `https://www.dwd.de/DWD/wetter/wv_spez/seewetter/na_84.png`
+- DWD-Streckenwetterbericht:
+  `https://www.dwd.de/DE/leistungen/streckenseewetterbericht/streckenseewetterbericht.html?nn=392762`
+
+### Zielbild
+
+- Eine eigene Seite ergänzt das Dashboard um Seegangskarten und Streckenwetter
+  für den Nordatlantik.
+- Die vier Karten stehen in zeitlicher Reihenfolge von links nach rechts in
+  der oberen Zeile.
+- Der Streckenwetterbericht erscheint in einem eigenen, darunterliegenden
+  Bereich.
+- Die Berichtsdarstellung orientiert sich an der kompakten und gut lesbaren
+  Darstellung der bestehenden Seegang-Zeitreihe.
+
+### Akzeptanzkriterien
+
+- [x] Eine eigene Nordatlantik-Seite ist in die bestehende Carousel-Navigation
+  integriert; sie folgt direkt auf „Höhenwetter“ und liegt direkt vor
+  „Seegang Nordsee“.
+- [x] Die obere Kartenzeile enthält genau die vier DWD-Karten in dieser
+  Reihenfolge: `na_00.png`, `na_36.png`, `na_60.png`, `na_84.png`.
+- [x] Die Vorhersagehorizonte sind verständlich beschriftet und der zeitliche
+  Bezug ist von links nach rechts eindeutig.
+- [x] Der Streckenwetterbericht wird aus der angegebenen DWD-Quelle geladen und
+  unterhalb der Karten angezeigt.
+- [x] Oberhalb der Zeitreihentabelle stehen der vollständige DWD-Berichtskopf
+  („Wettervorhersagen für die Strecke Engl. Kanal - Kanarische Inseln“,
+  herausgegeben vom Deutschen Wetterdienst, Seewetterdienst Hamburg), der
+  dynamisch aus der Quelle gelesene Ausgabestand sowie der vollständige
+  Abschnitt „Wetterlage“.
+- [x] Direkt oberhalb der Zeitreihentabelle wird der aus der Quelle gelesene
+  Beginn des Vorhersagezeitraums im Format
+  `Vorhersagen von {Wochentag, Datum, Uhrzeit} UTC` angezeigt; Datums- und
+  Zeitwerte sind nicht fest im Code hinterlegt.
+- [x] Die fachlichen Vorhersagewerte aus dem Bericht werden als kompakte
+  Zeitreihentabelle dargestellt. Gebiete, Zeiträume und Wetterangaben werden
+  vollständig und ohne eigenständige Ableitungen übernommen.
+- [x] Die Zuordnung der DWD-Berichtsfelder zu den Tabellenspalten wird vor der
+  Umsetzung anhand des tatsächlichen Quellformats festgelegt und dokumentiert.
+- [x] Die Tabellen-Darstellung orientiert sich an der bestehenden
+  Seegang-Zeitreihe und ist mindestens ebenso gut lesbar.
+- [x] Auf breiten Displays stehen die vier Karten nebeneinander; auf schmalen
+  Displays werden sie responsiv als 2×2-Raster angeordnet. Der Bericht steht
+  darunter über die verfügbare Breite.
+- [x] Die Seite bleibt auf Desktop, Tablet und Mobilgeräten ohne horizontalen
+  Seitenüberlauf bedienbar.
+- [ ] Karten unterstützen bestehende Lightbox-, Zoom- und Pan-Interaktionen;
+  Navigation und bestehende Dashboard-Seiten bleiben unbeeinflusst.
+- [ ] Die zuletzt erfolgreich geladenen Karten und der letzte Bericht bleiben
+  entsprechend der bestehenden Cache-Strategie offline verfügbar; bei
+  Cache-/Offline-Nutzung bleibt der Ausgabestand sichtbar und der Inhalt als
+  zuletzt verfügbar gekennzeichnet.
+- [ ] Automatische Aktualisierung und manuelle Aktualisierung verhalten sich
+  konsistent mit den bestehenden DWD-Karten- und Textintegrationen.
+- [x] Fixture-basierte Regressionstests prüfen Kartenquellen, Reihenfolge,
+  Beschriftung sowie Extraktion, Vollständigkeit und Tabellen-Darstellung des
+  Berichts, ohne im Standardtestlauf vom Live-DWD abhängig zu sein.
+- [x] Die vollständige Testsuite und eine manuelle Prüfung der neuen Seite auf
+  Desktop und Mobilgeräten sind erfolgreich.
+- [x] Umsetzung erfolgt auf `feature/us-030-nordatlantik-streckenwetter`;
+  `main` bleibt bis zur Prüfung und Freigabe unverändert.
+- [ ] GitHub Actions führt für Pushes auf den Feature-Branch die Testsuite aus.
+- [ ] Pushes auf den Feature-Branch aktualisieren eine eigene Cloudflare-
+  Pages-Preview, getrennt von der Produktionsversion; die Preview wird vor
+  dem Merge geprüft.
+- [ ] Die Änderung gelangt erst nach erfolgreicher Prüfung und Freigabe über
+  einen Pull Request nach `main`.
+
+### Abgrenzung
+
+- Keine Änderung an bestehenden Nordsee-/Ostsee-Seegangskarten oder deren
+  Zeitreihen.
+- Keine Änderung an anderen DWD-Seiten, Datenquellen oder Vorhersageinhalten.
 
 ---
 
