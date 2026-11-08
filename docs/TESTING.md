@@ -113,7 +113,12 @@ markiert. Auf der Nordatlantik-Seite scrollt die Zeitreihe innerhalb der
 verfügbaren Höhe in beide Richtungen; Karten und Berichtskopf mit Wetterlage
 bleiben dabei sichtbar, und die Zeitspaltenüberschriften bleiben beim vertikalen
 Tabellenscrollen am oberen Rand stehen. Touch- und Randklicks in der Tabelle
-lösen keine Carousel-Navigation aus.
+lösen keine Carousel-Navigation aus. Kartenvorhersagehorizonte werden anhand
+ihrer nominalen Stundenwerte ab dem dynamischen Berichtsbeginn den passenden
+Zeitspalten zugeordnet. Karten- und Spaltenmarker verwenden Text und dezente
+Akzentfarben; die zugeordneten Spalten sind über ihre gesamte Höhe dezent
+hervorgehoben. Ein Hinweis kennzeichnet die Zuordnung als nominal und verweist
+für die tatsächliche Gültigkeitszeit auf die Kartenfußzeile.
 
 ### Live-Smoke-Test als Frühwarnsystem
 

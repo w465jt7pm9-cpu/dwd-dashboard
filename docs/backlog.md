@@ -2305,6 +2305,20 @@ aufeinander bezogen beurteilen kann.
   Beginn des Vorhersagezeitraums im Format
   `Vorhersagen von {Wochentag, Datum, Uhrzeit} UTC` angezeigt; Datums- und
   Zeitwerte sind nicht fest im Code hinterlegt.
+- [x] Die Kartenhorizonte `+00h`, `+36h`, `+60h` und `+84h` werden anhand ihres
+  nominalen Horizonts ab dem dynamischen Beginn des Streckenwetterberichts den
+  entsprechenden Tabellenzeitpunkten zugeordnet. Nur vorhandene Spalten werden
+  markiert.
+- [x] Die Karten-Spalten-Zuordnung bleibt auch ohne Farbwahrnehmung eindeutig:
+  Ein wiederkehrender Textmarker (z. B. `+36h`) erscheint sowohl an der Karte
+  als auch im zugehörigen Spaltenkopf; Farbe ist nur ein zusätzliches Signal.
+  Die Ergänzung wirkt dezent und verändert das bestehende Layout nicht
+  wesentlich. Ein kurzer Hinweis stellt klar, dass die Zuordnung nominal ist
+  und für die Gültigkeitszeit die Kartenfußzeile maßgeblich bleibt.
+- [x] Die einer Karte zugeordnete Tabellenspalte wird zusätzlich über ihre
+  gesamte Höhe dezent mit einer farblich passenden Fläche und klaren vertikalen
+  Kanten hervorgehoben. Die wiederkehrenden Textmarker bleiben erhalten; die
+  aktuelle „Jetzt“-Kennzeichnung bleibt erkennbar.
 - [x] Die fachlichen Vorhersagewerte aus dem Bericht werden als kompakte
   Zeitreihentabelle dargestellt. Gebiete, Zeiträume und Wetterangaben werden
   vollständig und ohne eigenständige Ableitungen übernommen.

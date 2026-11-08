@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const REFRESH_INTERVAL_MS = 5 * 60 * 1000
   const NORDATLANTIK_CURRENT_SLOT_UPDATE_INTERVAL_MS = 60 * 1000
+  const NORDATLANTIK_MAP_FORECAST_HOURS = [0, 36, 60, 84]
+  const HOUR_IN_MS = 60 * 60 * 1000
   const LONG_PRESS_DURATION_MS = 600
   const INFO_OVERLAY_DURATION_MS = 4500
   const EDGE_TAP_ZONE_PX = 26
@@ -889,16 +891,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function getCurrentStreckenwetterSlotIndex (payload, now = Date.now()) {
+  function getStreckenwetterForecastStartAt (payload) {
     const storedForecastStartAt =
       payload?.forecastStartAt == null
         ? Number.NaN
         : Number(payload.forecastStartAt)
-    const forecastStartAt = Number.isFinite(storedForecastStartAt)
+    return Number.isFinite(storedForecastStartAt)
       ? storedForecastStartAt
       : parseStreckenwetterForecastStartAt(payload?.forecastPeriod)
+  }
+
+  function getStreckenwetterSlotTimestamps (payload) {
+    const forecastStartAt = getStreckenwetterForecastStartAt(payload)
     if (forecastStartAt === null || !Array.isArray(payload?.slots)) {
-      return -1
+      return []
     }
 
     const weekdayIndices = {
@@ -911,19 +917,18 @@ document.addEventListener('DOMContentLoaded', () => {
       Sa: 6
     }
     let previousSlotAt = forecastStartAt - 1
-    let currentSlotIndex = -1
 
-    for (const [index, slot] of payload.slots.entries()) {
+    return payload.slots.map(slot => {
       const slotMatch = String(slot?.key || '').match(
         /^(Mo|Di|Mi|Do|Fr|Sa|So)(\d{2})$/i
       )
       if (!slotMatch) {
-        continue
+        return null
       }
 
       const hour = Number(slotMatch[2])
       if (hour > 23) {
-        continue
+        return null
       }
       const weekday = slotMatch[1][0].toUpperCase() +
         slotMatch[1].slice(1).toLowerCase()
@@ -939,14 +944,38 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       previousSlotAt = slotDate.getTime()
-      if (slotDate.getTime() > now) {
+      return previousSlotAt
+    })
+  }
+
+  function getCurrentStreckenwetterSlotIndex (payload, now = Date.now()) {
+    let currentSlotIndex = -1
+    for (const [index, slotAt] of getStreckenwetterSlotTimestamps(payload).entries()) {
+      if (slotAt === null) {
+        continue
+      }
+      if (slotAt > now) {
         break
       }
-
       currentSlotIndex = index
     }
-
     return currentSlotIndex
+  }
+
+  function getNordatlantikMapSlotMatches (payload) {
+    const forecastStartAt = getStreckenwetterForecastStartAt(payload)
+    if (forecastStartAt === null) {
+      return []
+    }
+
+    const slotTimestamps = getStreckenwetterSlotTimestamps(payload)
+    return NORDATLANTIK_MAP_FORECAST_HOURS.flatMap(horizon => {
+      const nominalForecastAt = forecastStartAt + horizon * HOUR_IN_MS
+      const slotIndex = slotTimestamps.findIndex(
+        slotAt => slotAt === nominalForecastAt
+      )
+      return slotIndex < 0 ? [] : [{ horizon, slotIndex }]
+    })
   }
 
   async function fetchSeaTimeseriesPayload (config) {
@@ -1696,7 +1725,8 @@ document.addEventListener('DOMContentLoaded', () => {
       includeWetterlage = true,
       includeStand = true,
       separateGustRow = false,
-      currentSlotIndex = -1
+      currentSlotIndex = -1,
+      mapSlotMatches = []
     } = {}
   ) {
     const slots = Array.isArray(payload?.slots) ? payload.slots : []
@@ -1723,20 +1753,42 @@ document.addEventListener('DOMContentLoaded', () => {
       return normalizedLabel || key || '·'
     }
 
-    const getCurrentSlotAttributes = index =>
-      index === currentSlotIndex
-        ? ' class="nordatlantik-current-slot"'
+    const mapHorizonBySlot = new Map(
+      mapSlotMatches.map(({ horizon, slotIndex }) => [slotIndex, horizon])
+    )
+    const getSlotAttributes = index => {
+      const classes = []
+      const horizon = mapHorizonBySlot.get(index)
+      if (index === currentSlotIndex) {
+        classes.push('nordatlantik-current-slot')
+      }
+      if (Number.isInteger(horizon)) {
+        classes.push('nordatlantik-map-aligned-slot')
+      }
+
+      const classAttribute = classes.length
+        ? ` class="${classes.join(' ')}"`
         : ''
+      const mapHorizonAttribute = Number.isInteger(horizon)
+        ? ` data-map-horizon="${horizon}"`
+        : ''
+      return `${classAttribute}${mapHorizonAttribute}`
+    }
     const tableHeaderMarkup = slots
       .map(
-        (slot, index) =>
-          `<th scope="col"${getCurrentSlotAttributes(
-            index
-          )}${
+        (slot, index) => {
+          const horizon = mapHorizonBySlot.get(index)
+          const mapHorizonMarkup = Number.isInteger(horizon)
+            ? `<span class="nordatlantik-map-horizon" data-horizon="${horizon}" title="Nominaler Kartenhorizont; die Kartenfußzeile nennt die Gültigkeitszeit">+${String(
+                horizon
+              ).padStart(2, '0')}h</span>`
+            : ''
+          return `<th scope="col"${getSlotAttributes(index)}${
             index === currentSlotIndex ? ' aria-current="time"' : ''
           }><span>${escapeHtml(
             getSlotDisplayLabel(slot)
-          )}</span><span class="nordatlantik-now-marker">Jetzt</span></th>`
+          )}</span>${mapHorizonMarkup}<span class="nordatlantik-now-marker">Jetzt</span></th>`
+        }
       )
       .join('')
 
@@ -1752,9 +1804,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const windCells = slots
           .map((slot, index) => {
             const row = rowsBySlot.get(slot.key)
-            const currentSlotAttributes = getCurrentSlotAttributes(index)
+            const slotAttributes = getSlotAttributes(index)
             if (!row) {
-              return `<td${currentSlotAttributes}>·</td>`
+              return `<td${slotAttributes}>·</td>`
             }
 
             const directionSymbol = getWindDirectionSymbol(row.windDirection)
@@ -1766,7 +1818,7 @@ document.addEventListener('DOMContentLoaded', () => {
               ? `${windValueMarkup}${gustMarkup}`
               : windValueMarkup
 
-            return `<td${currentSlotAttributes}><span class="ostsee-ts-wind"><span class="ostsee-ts-dir">${directionSymbol}</span>${combinedValueMarkup}</span></td>`
+            return `<td${slotAttributes}><span class="ostsee-ts-wind"><span class="ostsee-ts-dir">${directionSymbol}</span>${combinedValueMarkup}</span></td>`
           })
           .join('')
 
@@ -1774,9 +1826,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ? slots
               .map((slot, index) => {
                 const row = rowsBySlot.get(slot.key)
-                return `<td${getCurrentSlotAttributes(
-                  index
-                )}>${renderGustBftValueMarkup(row?.gustBft || '') || '·'}</td>`
+                return `<td${getSlotAttributes(index)}>${renderGustBftValueMarkup(row?.gustBft || '') || '·'}</td>`
               })
               .join('')
           : ''
@@ -1785,7 +1835,7 @@ document.addEventListener('DOMContentLoaded', () => {
           .map((slot, index) => {
             const row = rowsBySlot.get(slot.key)
             const waveValue = row?.waveM ? `${row.waveM}m` : '·'
-            return `<td${getCurrentSlotAttributes(index)}>${escapeHtml(
+            return `<td${getSlotAttributes(index)}>${escapeHtml(
               waveValue
             )}</td>`
           })
@@ -1794,9 +1844,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const weatherCells = slots
           .map((slot, index) => {
             const row = rowsBySlot.get(slot.key)
-            return `<td${getCurrentSlotAttributes(
-              index
-            )}>${renderWeatherValueMarkup(row?.weather || '')}</td>`
+            return `<td${getSlotAttributes(index)}>${renderWeatherValueMarkup(row?.weather || '')}</td>`
           })
           .join('')
 
@@ -1819,7 +1867,7 @@ document.addEventListener('DOMContentLoaded', () => {
             )}</span></th>${slots
               .map(
                 (_, index) =>
-                  `<td${getCurrentSlotAttributes(index)}></td>`
+                  `<td${getSlotAttributes(index)}></td>`
               )
               .join('')}</tr>`
           : `<tr class="ostsee-ts-area"><th colspan="${
@@ -1921,7 +1969,8 @@ document.addEventListener('DOMContentLoaded', () => {
       includeWetterlage: false,
       includeStand: false,
       separateGustRow: true,
-      currentSlotIndex: getCurrentStreckenwetterSlotIndex(payload)
+      currentSlotIndex: getCurrentStreckenwetterSlotIndex(payload),
+      mapSlotMatches: getNordatlantikMapSlotMatches(payload)
     })
 
     nordatlantikReportElement.innerHTML = [
@@ -1937,6 +1986,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `<h3 class="nordatlantik-report__period">Vorhersagen von ${escapeHtml(
         payload.forecastPeriod
       )} UTC</h3>`,
+      '<p class="nordatlantik-report__map-alignment-note">Kartenmarken zeigen nominale Horizonte; maßgeblich für die Gültigkeitszeit ist die Kartenfußzeile.</p>',
       '</header>',
       '<p class="nordatlantik-report__scroll-hint">Zeitreihe seitlich scrollen für weitere Vorhersagezeiten</p>',
       `<section class="nordatlantik-report__timeseries" aria-label="Streckenwetter-Zeitreihe">${tableMarkup}</section>`

@@ -229,11 +229,55 @@
   bottom: var(--space-2);
   padding: 2px 8px;
   border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-left-width: 3px;
   background: rgba(0, 0, 0, 0.72);
   color: #fff;
   font-size: 0.78rem;
   font-weight: 700;
   pointer-events: none;
+}
+
+.nordatlantik-map-horizon {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-left-width: 3px;
+  border-radius: var(--radius-pill);
+  background: rgba(4, 10, 20, 0.9);
+  color: rgba(255, 255, 255, 0.98);
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1.2;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.nordatlantik-map-alignment-note {
+  font-size: 0.7rem;
+  line-height: 1.25;
+  opacity: 0.72;
+}
+
+.nordatlantik-card__label[data-horizon='0'],
+.nordatlantik-map-horizon[data-horizon='0'] {
+  border-left-color: #80d8f2;
+}
+
+.nordatlantik-card__label[data-horizon='36'],
+.nordatlantik-map-horizon[data-horizon='36'] {
+  border-left-color: #ffd166;
+}
+
+.nordatlantik-card__label[data-horizon='60'],
+.nordatlantik-map-horizon[data-horizon='60'] {
+  border-left-color: #c5a0ff;
+}
+
+.nordatlantik-card__label[data-horizon='84'],
+.nordatlantik-map-horizon[data-horizon='84'] {
+  border-left-color: #8be0b1;
 }
 
 .nordatlantik-report {
@@ -337,12 +381,41 @@
     inset -1px 0 rgba(132, 196, 255, 0.72);
 }
 
+.nordatlantik-report__timeseries .nordatlantik-map-aligned-slot {
+  background-color: rgba(var(--nordatlantik-map-accent), 0.08);
+  box-shadow: inset 2px 0 rgba(var(--nordatlantik-map-accent), 0.78),
+    inset -2px 0 rgba(var(--nordatlantik-map-accent), 0.78);
+}
+
+.nordatlantik-map-aligned-slot[data-map-horizon='0'] {
+  --nordatlantik-map-accent: 128, 216, 242;
+}
+
+.nordatlantik-map-aligned-slot[data-map-horizon='36'] {
+  --nordatlantik-map-accent: 255, 209, 102;
+}
+
+.nordatlantik-map-aligned-slot[data-map-horizon='60'] {
+  --nordatlantik-map-accent: 197, 160, 255;
+}
+
+.nordatlantik-map-aligned-slot[data-map-horizon='84'] {
+  --nordatlantik-map-accent: 139, 224, 177;
+}
+
 .nordatlantik-report__timeseries th.nordatlantik-current-slot {
   background: linear-gradient(
     180deg,
     rgba(38, 113, 177, 0.96),
     rgba(15, 54, 94, 0.98)
   );
+}
+
+.nordatlantik-report__timeseries
+  .nordatlantik-current-slot.nordatlantik-map-aligned-slot {
+  background-color: rgba(32, 113, 196, 0.2);
+  box-shadow: inset 2px 0 rgba(var(--nordatlantik-map-accent), 0.9),
+    inset -2px 0 rgba(var(--nordatlantik-map-accent), 0.9);
 }
 
 .nordatlantik-now-marker {

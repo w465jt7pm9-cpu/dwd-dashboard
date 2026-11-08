@@ -58,6 +58,8 @@ assert.ok(helpersMatch, 'Could not extract DWD report parser helpers from app.js
 const context = vm.createContext({
   Array,
   Map,
+  NORDATLANTIK_MAP_FORECAST_HOURS: [0, 36, 60, 84],
+  HOUR_IN_MS: 60 * 60 * 1000,
   RegExp,
   String,
   DOMParser: FakeDOMParser
@@ -164,6 +166,35 @@ assert.strictEqual(
   ),
   -1,
   'No forecast column is marked before the report forecast begins'
+)
+
+const mapSlotPayload = {
+  forecastStartAt: Date.UTC(2026, 10, 7, 0),
+  slots: [
+    'Sa00', 'Sa06', 'Sa12', 'Sa18',
+    'So00', 'So06', 'So12', 'So18',
+    'Mo00', 'Mo06', 'Mo12', 'Mo18',
+    'Di00', 'Di06', 'Di12'
+  ].map(key => ({ key }))
+}
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(
+    context.getNordatlantikMapSlotMatches(mapSlotPayload)
+  )),
+  [
+    { horizon: 0, slotIndex: 0 },
+    { horizon: 36, slotIndex: 6 },
+    { horizon: 60, slotIndex: 10 },
+    { horizon: 84, slotIndex: 14 }
+  ],
+  'Nominal map horizons must align with report slots from the report start'
+)
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(
+    context.getNordatlantikMapSlotMatches(currentSlotPayload)
+  )),
+  [{ horizon: 0, slotIndex: 0 }],
+  'A nominal map horizon without a corresponding report slot must not be assigned'
 )
 
 const updateCurrentColumnStart = source.indexOf(
@@ -302,7 +333,11 @@ const highWindPayload = {
 }
 const northAtlanticTimeseries = rendererContext.buildSeaTimeseriesOverlayMarkup(
   highWindPayload,
-  { separateGustRow: true, currentSlotIndex: 0 }
+  {
+    separateGustRow: true,
+    currentSlotIndex: 0,
+    mapSlotMatches: [{ horizon: 0, slotIndex: 0 }]
+  }
 )
 const windRow = northAtlanticTimeseries.match(
   /<tr class="ostsee-ts-wind-row">([\s\S]*?)<\/tr>/
@@ -318,17 +353,25 @@ assert.match(gustRow[1], /Böen \(Bft\)/)
 assert.match(gustRow[1], /<gust>B11-12<\/gust>/)
 assert.match(
   northAtlanticTimeseries,
-  /<tr class="ostsee-ts-area"><th scope="row" class="ostsee-ts-area__label">Testgebiet<span class="ostsee-ts-meta">48\.00N 10\.00W · WT 16 C<\/span><\/th><td(?: class="nordatlantik-current-slot")?><\/td><\/tr>/
+  /<tr class="ostsee-ts-area"><th scope="row" class="ostsee-ts-area__label">Testgebiet<span class="ostsee-ts-meta">48\.00N 10\.00W · WT 16 C<\/span><\/th><td class="nordatlantik-current-slot nordatlantik-map-aligned-slot" data-map-horizon="0"><\/td><\/tr>/
 )
 assert.doesNotMatch(northAtlanticTimeseries, /colspan=/)
 assert.match(northAtlanticTimeseries, /aria-current="time"/)
 assert.match(northAtlanticTimeseries, /class="nordatlantik-now-marker">Jetzt<\/span>/)
 assert.match(
   northAtlanticTimeseries,
-  /<td class="nordatlantik-current-slot">/
+  /<span class="nordatlantik-map-horizon" data-horizon="0" title="Nominaler Kartenhorizont; die Kartenfußzeile nennt die Gültigkeitszeit">\+00h<\/span>/
+)
+assert.match(
+  northAtlanticTimeseries,
+  /<th scope="col" class="nordatlantik-current-slot nordatlantik-map-aligned-slot" data-map-horizon="0" aria-current="time">/
+)
+assert.match(
+  northAtlanticTimeseries,
+  /<td class="nordatlantik-current-slot nordatlantik-map-aligned-slot" data-map-horizon="0">/
 )
 assert.doesNotMatch(
-  northAtlanticTimeseries.match(/<td class="nordatlantik-current-slot"[^>]*>/)?.[0] || '',
+  northAtlanticTimeseries.match(/<td class="nordatlantik-current-slot nordatlantik-map-aligned-slot"[^>]*>/)?.[0] || '',
   /aria-current/
 )
 
@@ -338,6 +381,8 @@ const existingTimeseries = rendererContext.buildSeaTimeseriesOverlayMarkup(
 assert.doesNotMatch(existingTimeseries, /ostsee-ts-gust-row/)
 assert.match(existingTimeseries, /<gust>B11-12<\/gust>/)
 assert.match(existingTimeseries, /<tr class="ostsee-ts-area"><th colspan="2">Testgebiet/)
+assert.doesNotMatch(existingTimeseries, /nordatlantik-map-horizon/)
+assert.doesNotMatch(existingTimeseries, /nordatlantik-map-aligned-slot/)
 
 const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8')
 const pageMatches = Array.from(
@@ -360,10 +405,17 @@ assert.deepStrictEqual(
 )
 assert.deepStrictEqual(
   Array.from(
-    northAtlanticPage[1].matchAll(/<figcaption class="nordatlantik-card__label">([^<]+)<\/figcaption>/g),
-    ([, label]) => label
+    northAtlanticPage[1].matchAll(
+      /<figcaption\s+class="nordatlantik-card__label"\s+data-horizon="(\d+)"\s*>\s*\+(\d+)h\s*<\/figcaption>/g
+    ),
+    ([, horizon, label]) => ({ horizon: Number(horizon), label: `+${label}h` })
   ),
-  ['+00h', '+36h', '+60h', '+84h']
+  [
+    { horizon: 0, label: '+00h' },
+    { horizon: 36, label: '+36h' },
+    { horizon: 60, label: '+60h' },
+    { horizon: 84, label: '+84h' }
+  ]
 )
 assert.match(northAtlanticPage[1], /id="nordatlantikReport"/)
 
@@ -379,6 +431,21 @@ assert.match(
 assert.match(css, /\.nordatlantik-grid\s*\{[^}]*gap:\s*0;[^}]*padding:\s*0;/)
 assert.match(css, /\.nordatlantik-grid\s+\.card\s*\{[^}]*border-radius:\s*0;/)
 assert.match(css, /\.nordatlantik-grid\s+\.card\s+img\s*\{[^}]*object-fit:\s*cover;/)
+assert.match(css, /\.nordatlantik-map-horizon\s*\{[^}]*display:\s*inline-block/)
+assert.match(css, /\.nordatlantik-map-alignment-note\s*\{[^}]*font-size:/)
+assert.match(css, /\.nordatlantik-map-aligned-slot\s*\{[^}]*background-color:\s*rgba\(var\(--nordatlantik-map-accent\),\s*0\.08\);[^}]*box-shadow:/)
+assert.match(
+  css,
+  /\.nordatlantik-current-slot\.nordatlantik-map-aligned-slot\s*\{[^}]*box-shadow:\s*inset 2px 0 rgba\(var\(--nordatlantik-map-accent\),\s*0\.9\)/
+)
+for (const horizon of [0, 36, 60, 84]) {
+  assert.match(
+    css,
+    new RegExp(
+      `\\.nordatlantik-card__label\\[data-horizon='${horizon}'\\][\\s\\S]*?\\.nordatlantik-map-horizon\\[data-horizon='${horizon}'\\]`
+    )
+  )
+}
 assert.match(
   css,
   /\.nordatlantik-page\s*\{[^}]*display:\s*grid;[^}]*grid-template-rows:\s*auto\s+minmax\(0,\s*1fr\);[^}]*overflow:\s*hidden;/
