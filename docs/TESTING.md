@@ -117,8 +117,8 @@ lösen keine Carousel-Navigation aus. Kartenvorhersagehorizonte werden anhand
 ihrer nominalen Stundenwerte ab dem dynamischen Berichtsbeginn den passenden
 Zeitspalten zugeordnet. Karten- und Spaltenmarker verwenden Text und dezente
 Akzentfarben; die zugeordneten Spalten sind über ihre gesamte Höhe dezent
-hervorgehoben. Ein Hinweis kennzeichnet die Zuordnung als nominal und verweist
-für die tatsächliche Gültigkeitszeit auf die Kartenfußzeile.
+hervorgehoben. Zusätzliche Erläuterungs- und Scrollhinweise beanspruchen keinen
+vertikalen Platz im Bericht.
 
 ### Live-Smoke-Test als Frühwarnsystem
 

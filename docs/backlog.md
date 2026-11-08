@@ -2313,8 +2313,8 @@ aufeinander bezogen beurteilen kann.
   Ein wiederkehrender Textmarker (z. B. `+36h`) erscheint sowohl an der Karte
   als auch im zugehörigen Spaltenkopf; Farbe ist nur ein zusätzliches Signal.
   Die Ergänzung wirkt dezent und verändert das bestehende Layout nicht
-  wesentlich. Ein kurzer Hinweis stellt klar, dass die Zuordnung nominal ist
-  und für die Gültigkeitszeit die Kartenfußzeile maßgeblich bleibt.
+  wesentlich. Die Erläuterung zur nominalen Zuordnung erfolgt nicht über
+  zusätzlichen Fließtext im Bericht, um vertikalen Platz zu sparen.
 - [x] Die einer Karte zugeordnete Tabellenspalte wird zusätzlich über ihre
   gesamte Höhe dezent mit einer farblich passenden Fläche und klaren vertikalen
   Kanten hervorgehoben. Die wiederkehrenden Textmarker bleiben erhalten; die
@@ -2327,9 +2327,8 @@ aufeinander bezogen beurteilen kann.
 - [x] Die Tabellen-Darstellung orientiert sich an der bestehenden
   Seegang-Zeitreihe und ist mindestens ebenso gut lesbar. Wind und Böen sind
   separat mit Einheit beschriftet, damit hohe Werte nicht in einer Zelle
-  zusammengedrängt werden; auf schmalen Displays weist eine Scrollhilfe auf die
-  horizontal scrollbar angeordnete Tabelle hin. Die Tabelle scrollt innerhalb
-  der verfügbaren Seitenhöhe vertikal und horizontal; dabei bleiben die
+  zusammengedrängt werden. Die Tabelle scrollt innerhalb der verfügbaren
+  Seitenhöhe vertikal und horizontal; dabei bleiben die
   Seegangskarten, der Berichtskopf und die Wetterlage sichtbar. Touch-Scrollen
   innerhalb der Tabelle löst keine Carousel-Navigation aus.
 - [x] Beim vertikalen Scrollen der Tabelle bleiben die Zeitspaltenüberschriften
@@ -2344,13 +2343,13 @@ aufeinander bezogen beurteilen kann.
   darunter über die verfügbare Breite.
 - [x] Die Seite bleibt auf Desktop, Tablet und Mobilgeräten ohne horizontalen
   Seitenüberlauf bedienbar.
-- [ ] Karten unterstützen bestehende Lightbox-, Zoom- und Pan-Interaktionen;
+- [x] Karten unterstützen bestehende Lightbox-, Zoom- und Pan-Interaktionen;
   Navigation und bestehende Dashboard-Seiten bleiben unbeeinflusst.
-- [ ] Die zuletzt erfolgreich geladenen Karten und der letzte Bericht bleiben
+- [x] Die zuletzt erfolgreich geladenen Karten und der letzte Bericht bleiben
   entsprechend der bestehenden Cache-Strategie offline verfügbar; bei
   Cache-/Offline-Nutzung bleibt der Ausgabestand sichtbar und der Inhalt als
   zuletzt verfügbar gekennzeichnet.
-- [ ] Automatische Aktualisierung und manuelle Aktualisierung verhalten sich
+- [x] Automatische Aktualisierung und manuelle Aktualisierung verhalten sich
   konsistent mit den bestehenden DWD-Karten- und Textintegrationen.
 - [x] Fixture-basierte Regressionstests prüfen Kartenquellen, Reihenfolge,
   Beschriftung sowie Extraktion, Vollständigkeit und Tabellen-Darstellung des

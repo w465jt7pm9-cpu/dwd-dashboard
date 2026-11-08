@@ -254,12 +254,6 @@
   white-space: nowrap;
 }
 
-.nordatlantik-map-alignment-note {
-  font-size: 0.7rem;
-  line-height: 1.25;
-  opacity: 0.72;
-}
-
 .nordatlantik-card__label[data-horizon='0'],
 .nordatlantik-map-horizon[data-horizon='0'] {
   border-left-color: #80d8f2;
@@ -282,7 +276,7 @@
 
 .nordatlantik-report {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   min-height: 0;
   overflow: hidden;
   padding: var(--space-3);
@@ -313,13 +307,6 @@
 .nordatlantik-report__situation h3,
 .nordatlantik-report__period {
   font-size: 1rem;
-}
-
-.nordatlantik-report__scroll-hint {
-  display: none;
-  margin-bottom: var(--space-2);
-  font-size: 0.78rem;
-  opacity: 0.78;
 }
 
 .nordatlantik-report__situation p {
@@ -432,12 +419,6 @@
   display: block;
 }
 
-@media (max-width: 1340px) {
-  .nordatlantik-report__scroll-hint {
-    display: block;
-  }
-}
-
 @media (max-height: 600px) and (orientation: landscape) {
   .nordatlantik-grid .card {
     height: clamp(72px, 22vh, 132px);
@@ -473,10 +454,6 @@
     font-size: 0.78rem;
   }
 
-  .nordatlantik-report__scroll-hint {
-    font-size: 0.68rem;
-    margin-bottom: 2px;
-  }
 }
 
 .sea-row,

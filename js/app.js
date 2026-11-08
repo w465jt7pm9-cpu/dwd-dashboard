@@ -1986,9 +1986,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `<h3 class="nordatlantik-report__period">Vorhersagen von ${escapeHtml(
         payload.forecastPeriod
       )} UTC</h3>`,
-      '<p class="nordatlantik-report__map-alignment-note">Kartenmarken zeigen nominale Horizonte; maßgeblich für die Gültigkeitszeit ist die Kartenfußzeile.</p>',
       '</header>',
-      '<p class="nordatlantik-report__scroll-hint">Zeitreihe seitlich scrollen für weitere Vorhersagezeiten</p>',
       `<section class="nordatlantik-report__timeseries" aria-label="Streckenwetter-Zeitreihe">${tableMarkup}</section>`
     ].join('')
   }

@@ -432,7 +432,9 @@ assert.match(css, /\.nordatlantik-grid\s*\{[^}]*gap:\s*0;[^}]*padding:\s*0;/)
 assert.match(css, /\.nordatlantik-grid\s+\.card\s*\{[^}]*border-radius:\s*0;/)
 assert.match(css, /\.nordatlantik-grid\s+\.card\s+img\s*\{[^}]*object-fit:\s*cover;/)
 assert.match(css, /\.nordatlantik-map-horizon\s*\{[^}]*display:\s*inline-block/)
-assert.match(css, /\.nordatlantik-map-alignment-note\s*\{[^}]*font-size:/)
+assert.doesNotMatch(source, /Kartenmarken zeigen/)
+assert.doesNotMatch(source, /Zeitreihe seitlich scrollen/)
+assert.doesNotMatch(css, /nordatlantik-map-alignment-note|nordatlantik-report__scroll-hint/)
 assert.match(css, /\.nordatlantik-map-aligned-slot\s*\{[^}]*background-color:\s*rgba\(var\(--nordatlantik-map-accent\),\s*0\.08\);[^}]*box-shadow:/)
 assert.match(
   css,
@@ -454,7 +456,7 @@ assert.match(css, /\.nordatlantik-page\s*\{[^}]*touch-action:\s*auto;/)
 assert.match(css, /\.viewport\s*\{[^}]*touch-action:\s*auto;/)
 assert.match(
   css,
-  /\.nordatlantik-report\s*\{[^}]*display:\s*grid;[^}]*grid-template-rows:\s*auto\s+auto\s+minmax\(0,\s*1fr\);[^}]*min-height:\s*0;/
+  /\.nordatlantik-report\s*\{[^}]*display:\s*grid;[^}]*grid-template-rows:\s*auto\s+minmax\(0,\s*1fr\);[^}]*min-height:\s*0;/
 )
 assert.match(
   css,
@@ -525,8 +527,10 @@ assert.match(
   css,
   /\.nordatlantik-report__timeseries\s+\.ostsee-ts-table\s+\.ostsee-ts-area__label\s+\.ostsee-ts-meta\s*\{\s*display:\s*block/
 )
-assert.match(css, /\.nordatlantik-report__scroll-hint\s*\{\s*display:\s*none/)
-assert.match(source, /nordatlantik-report__scroll-hint/)
+assert.match(
+  css,
+  /\.nordatlantik-report\s*\{\s*display:\s*grid;\s*grid-template-rows:\s*auto\s+minmax\(0,\s*1fr\)/
+)
 assert.match(css, /\.nordatlantik-current-slot\s*\{/)
 assert.match(css, /\.nordatlantik-current-slot\s+\.nordatlantik-now-marker\s*\{\s*display:\s*block/)
 assert.match(source, /NORDATLANTIK_CURRENT_SLOT_UPDATE_INTERVAL_MS = 60 \* 1000/)
