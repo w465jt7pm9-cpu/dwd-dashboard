@@ -109,7 +109,11 @@ bleibt beim horizontalen Scrollen fixiert; die beschriftenden Messzeilen bleiben
 ebenfalls links sichtbar.
 Ein Regressionstest prüft zusätzlich, dass die minütliche Aktualisierung die
 leere linke Kopfzelle überspringt und den Zeitkopf mit der passenden Datenzelle
-markiert.
+markiert. Auf der Nordatlantik-Seite scrollt die Zeitreihe innerhalb der
+verfügbaren Höhe in beide Richtungen; Karten und Berichtskopf mit Wetterlage
+bleiben dabei sichtbar, und die Zeitspaltenüberschriften bleiben beim vertikalen
+Tabellenscrollen am oberen Rand stehen. Touch- und Randklicks in der Tabelle
+lösen keine Carousel-Navigation aus.
 
 ### Live-Smoke-Test als Frühwarnsystem
 

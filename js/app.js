@@ -3538,6 +3538,15 @@ document.addEventListener('DOMContentLoaded', () => {
     return false
   }
 
+  function isNordatlantikTimeseriesInteraction (target) {
+    return (
+      currentPageIndex === NORDATLANTIK_PAGE_INDEX &&
+      target?.closest?.(
+        '.nordatlantik-report__timeseries .ostsee-ts-wrap'
+      ) != null
+    )
+  }
+
   function startPullRefresh (clientY) {
     const scrollTop =
       currentPageIndex === NORDATLANTIK_PAGE_INDEX
@@ -3985,6 +3994,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return
       }
 
+      if (isNordatlantikTimeseriesInteraction(event.target)) {
+        pageSwipeStartX = null
+        pageSwipeStartY = null
+        pullRefreshStartY = null
+        return
+      }
+
       const changedTouch = event.changedTouches[0]
       startPageSwipe(changedTouch.clientX, changedTouch.clientY)
       startPullRefresh(changedTouch.clientY)
@@ -3999,6 +4015,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return
       }
 
+      if (isNordatlantikTimeseriesInteraction(event.target)) {
+        pageSwipeStartX = null
+        pageSwipeStartY = null
+        pullRefreshStartY = null
+        return
+      }
+
       const changedTouch = event.changedTouches[0]
       finishPageSwipe(changedTouch.clientX, changedTouch.clientY)
       finishPullRefresh(changedTouch.clientY)
@@ -4010,6 +4033,10 @@ document.addEventListener('DOMContentLoaded', () => {
     'pointerup',
     event => {
       if (isLightboxOpen) {
+        return
+      }
+
+      if (isNordatlantikTimeseriesInteraction(event.target)) {
         return
       }
 
@@ -4030,6 +4057,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (event.target.closest('img[data-base][data-path]')) {
+      return
+    }
+
+    if (isNordatlantikTimeseriesInteraction(event.target)) {
       return
     }
 

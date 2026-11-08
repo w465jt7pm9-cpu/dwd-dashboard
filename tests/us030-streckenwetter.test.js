@@ -368,6 +368,10 @@ assert.deepStrictEqual(
 assert.match(northAtlanticPage[1], /id="nordatlantikReport"/)
 
 const css = fs.readFileSync(path.join(__dirname, '../css/layout.css'), 'utf8')
+const componentsCss = fs.readFileSync(
+  path.join(__dirname, '../css/components.css'),
+  'utf8'
+)
 assert.match(
   css,
   /\.nordatlantik-grid\s*\{\s*display:\s*grid;\s*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/
@@ -375,6 +379,67 @@ assert.match(
 assert.match(css, /\.nordatlantik-grid\s*\{[^}]*gap:\s*0;[^}]*padding:\s*0;/)
 assert.match(css, /\.nordatlantik-grid\s+\.card\s*\{[^}]*border-radius:\s*0;/)
 assert.match(css, /\.nordatlantik-grid\s+\.card\s+img\s*\{[^}]*object-fit:\s*cover;/)
+assert.match(
+  css,
+  /\.nordatlantik-page\s*\{[^}]*display:\s*grid;[^}]*grid-template-rows:\s*auto\s+minmax\(0,\s*1fr\);[^}]*overflow:\s*hidden;/
+)
+assert.match(css, /\.nordatlantik-page\s*\{[^}]*touch-action:\s*auto;/)
+assert.match(css, /\.viewport\s*\{[^}]*touch-action:\s*auto;/)
+assert.match(
+  css,
+  /\.nordatlantik-report\s*\{[^}]*display:\s*grid;[^}]*grid-template-rows:\s*auto\s+auto\s+minmax\(0,\s*1fr\);[^}]*min-height:\s*0;/
+)
+assert.match(
+  css,
+  /\.nordatlantik-report__timeseries\s+\.ostsee-ts-wrap\s*\{[^}]*height:\s*100%;[^}]*overflow:\s*auto;/
+)
+assert.match(
+  css,
+  /@media\s*\(max-height:\s*600px\)\s*and\s*\(orientation:\s*landscape\)\s*\{[\s\S]*?\.nordatlantik-report__situation\s*\{[^}]*font-size:\s*0\.75rem;/
+)
+assert.match(
+  componentsCss,
+  /\.ostsee-ts-table\s+thead\s*\{\s*position:\s*sticky;\s*top:\s*0;/
+)
+const timeseriesInteractionStart = source.indexOf(
+  '  function isNordatlantikTimeseriesInteraction ('
+)
+const timeseriesInteractionEnd = source.indexOf(
+  '\n\n  function startPullRefresh',
+  timeseriesInteractionStart
+)
+assert.ok(
+  timeseriesInteractionStart >= 0 &&
+    timeseriesInteractionEnd > timeseriesInteractionStart
+)
+const interactionContext = vm.createContext({
+  currentPageIndex: 3,
+  NORDATLANTIK_PAGE_INDEX: 3
+})
+vm.runInContext(
+  source.slice(timeseriesInteractionStart, timeseriesInteractionEnd),
+  interactionContext
+)
+assert.strictEqual(
+  interactionContext.isNordatlantikTimeseriesInteraction({
+    closest: selector => selector === '.nordatlantik-report__timeseries .ostsee-ts-wrap'
+  }),
+  true,
+  'Touch and edge navigation gestures must not intercept table scrolling'
+)
+interactionContext.currentPageIndex = 2
+assert.strictEqual(
+  interactionContext.isNordatlantikTimeseriesInteraction({
+    closest: () => true
+  }),
+  false,
+  'Table gesture exclusions must be limited to the North Atlantic page'
+)
+assert.ok(
+  (source.match(/isNordatlantikTimeseriesInteraction\(event\.target\)/g) || [])
+    .length >= 4,
+  'Touch, pointer, and click navigation handlers must ignore table interactions'
+)
 assert.match(
   css,
   /@media\s*\(max-width:\s*767px\)\s*and\s*\(orientation:\s*portrait\)\s*\{\s*\.page\[data-page='3'\]\s+\.nordatlantik-grid\s*\{\s*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/

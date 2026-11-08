@@ -81,7 +81,7 @@
   flex: 1;
   width: 100vw;
   overflow: hidden;
-  touch-action: pan-y;
+  touch-action: auto;
 }
 
 .carousel {
@@ -194,9 +194,11 @@
 
 .nordatlantik-page {
   height: 100%;
-  overflow-y: auto;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
   overscroll-behavior-y: contain;
-  touch-action: pan-y;
+  touch-action: auto;
 }
 
 .nordatlantik-grid {
@@ -235,6 +237,10 @@
 }
 
 .nordatlantik-report {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
   padding: var(--space-3);
 }
 
@@ -277,7 +283,17 @@
 }
 
 .nordatlantik-report__timeseries .ostsee-ts-wrap {
+  width: 100%;
+  height: 100%;
   max-width: 100%;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.nordatlantik-report__timeseries {
+  min-height: 0;
+  overflow: hidden;
 }
 
 .nordatlantik-report__timeseries .ostsee-ts-table {
@@ -346,6 +362,47 @@
 @media (max-width: 1340px) {
   .nordatlantik-report__scroll-hint {
     display: block;
+  }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+  .nordatlantik-grid .card {
+    height: clamp(72px, 22vh, 132px);
+    aspect-ratio: auto;
+  }
+
+  .nordatlantik-report {
+    padding: var(--space-2);
+  }
+
+  .nordatlantik-report__header {
+    gap: var(--space-1);
+    margin-bottom: var(--space-1);
+  }
+
+  .nordatlantik-report__header h2 {
+    font-size: 0.85rem;
+    line-height: 1.15;
+  }
+
+  .nordatlantik-report__status {
+    font-size: 0.7rem;
+  }
+
+  .nordatlantik-report__situation {
+    gap: 2px;
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .nordatlantik-report__situation h3,
+  .nordatlantik-report__period {
+    font-size: 0.78rem;
+  }
+
+  .nordatlantik-report__scroll-hint {
+    font-size: 0.68rem;
+    margin-bottom: 2px;
   }
 }
 

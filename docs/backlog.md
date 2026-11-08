@@ -2274,11 +2274,14 @@ aufeinander bezogen beurteilen kann.
 - Eine eigene Seite ergänzt das Dashboard um Seegangskarten und Streckenwetter
   für den Nordatlantik.
 - Die vier Karten stehen in zeitlicher Reihenfolge von links nach rechts in
-  der oberen Zeile.
+  der oberen Zeile, grenzen ohne Zwischenraum aneinander und füllen die
+  jeweiligen Kacheln wie auf den übrigen Seegangseiten.
 - Der Streckenwetterbericht erscheint in einem eigenen, darunterliegenden
   Bereich.
 - Die Berichtsdarstellung orientiert sich an der kompakten und gut lesbaren
-  Darstellung der bestehenden Seegang-Zeitreihe.
+  Darstellung der bestehenden Seegang-Zeitreihe. Die Zeitreihe ist innerhalb
+  der Seite eigenständig vertikal und horizontal scrollbar; beim Scrollen
+  bleiben Karten, Berichtskopf und Wetterlage sichtbar.
 
 ### Akzeptanzkriterien
 
@@ -2289,6 +2292,8 @@ aufeinander bezogen beurteilen kann.
   Reihenfolge: `na_00.png`, `na_36.png`, `na_60.png`, `na_84.png`.
 - [x] Die Vorhersagehorizonte sind verständlich beschriftet und der zeitliche
   Bezug ist von links nach rechts eindeutig.
+- [x] Die vier Karten liegen ohne Zwischenräume aneinander und füllen ihre
+  Kachelflächen bildfüllend wie die Seegangskarten der übrigen Seiten.
 - [x] Der Streckenwetterbericht wird aus der angegebenen DWD-Quelle geladen und
   unterhalb der Karten angezeigt.
 - [x] Oberhalb der Zeitreihentabelle stehen der vollständige DWD-Berichtskopf
@@ -2309,7 +2314,12 @@ aufeinander bezogen beurteilen kann.
   Seegang-Zeitreihe und ist mindestens ebenso gut lesbar. Wind und Böen sind
   separat mit Einheit beschriftet, damit hohe Werte nicht in einer Zelle
   zusammengedrängt werden; auf schmalen Displays weist eine Scrollhilfe auf die
-  horizontal scrollbar angeordnete Tabelle hin. Gebiets-/Stationsnamen sowie
+  horizontal scrollbar angeordnete Tabelle hin. Die Tabelle scrollt innerhalb
+  der verfügbaren Seitenhöhe vertikal und horizontal; dabei bleiben die
+  Seegangskarten, der Berichtskopf und die Wetterlage sichtbar. Touch-Scrollen
+  innerhalb der Tabelle löst keine Carousel-Navigation aus.
+- [x] Beim vertikalen Scrollen der Tabelle bleiben die Zeitspaltenüberschriften
+  am oberen Rand des Tabellenbereichs sichtbar. Gebiets-/Stationsnamen sowie
   die Zeilenbeschriftungen bleiben beim horizontalen Scrollen links fixiert.
 - [x] Der letzte bereits erreichte DWD-Vorhersagezeitpunkt ist in der Tabelle
   durch eine dezente Spaltenhervorhebung und die Kennzeichnung „Jetzt“ erkennbar.
