@@ -438,6 +438,7 @@
   .nordatlantik-report__header {
     gap: var(--space-1);
     margin-bottom: var(--space-1);
+    padding-inline: max(72px, var(--safe-left)) max(72px, var(--safe-right));
   }
 
   .nordatlantik-report__header h2 {
@@ -455,7 +456,7 @@
     line-height: 1.2;
   }
 
-  .nordatlantik-report__situation h3,
+  .nordatlantik-report__situation summary,
   .nordatlantik-report__period {
     font-size: 0.78rem;
   }
