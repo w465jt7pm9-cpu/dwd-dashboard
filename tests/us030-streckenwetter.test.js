@@ -419,10 +419,74 @@ assert.deepStrictEqual(
 )
 assert.match(northAtlanticPage[1], /id="nordatlantikReport"/)
 
+const renderReportStart = source.indexOf('  function renderNordatlantikReport (')
+const renderReportEnd = source.indexOf(
+  '\n\n  function updateNordatlantikCurrentTimeColumn',
+  renderReportStart
+)
+assert.ok(
+  renderReportStart >= 0 && renderReportEnd > renderReportStart,
+  'Could not extract the Nordatlantik report renderer'
+)
+
+function createReportRenderContext (isCompactViewport) {
+  const reportElement = {
+    innerHTML: '',
+    situationOpen: null,
+    querySelector () {
+      return this.situationOpen === null ? null : { open: this.situationOpen }
+    }
+  }
+  const renderContext = vm.createContext({
+    nordatlantikReportElement: reportElement,
+    window: {
+      matchMedia: () => ({ matches: isCompactViewport })
+    },
+    escapeHtml: value => String(value),
+    formatTimestamp: () => '07.11.2026 09:00',
+    buildSeaTimeseriesOverlayMarkup: () => '<table></table>',
+    getCurrentStreckenwetterSlotIndex: () => 0,
+    getNordatlantikMapSlotMatches: () => []
+  })
+  vm.runInContext(
+    source.slice(renderReportStart, renderReportEnd),
+    renderContext
+  )
+  return { renderContext, reportElement }
+}
+
+const mobileReport = createReportRenderContext(true)
+mobileReport.renderContext.renderNordatlantikReport(report, 'current')
+assert.match(
+  mobileReport.reportElement.innerHTML,
+  /<details class="nordatlantik-report__situation"[^>]*><summary[^>]*>Wetterlage<\/summary>/
+)
+mobileReport.reportElement.situationOpen = true
+mobileReport.renderContext.renderNordatlantikReport(report, 'current')
+assert.match(
+  mobileReport.reportElement.innerHTML,
+  /<details class="nordatlantik-report__situation"[^>]* open>/
+)
+
+const desktopReport = createReportRenderContext(false)
+desktopReport.renderContext.renderNordatlantikReport(report, 'current')
+assert.match(
+  desktopReport.reportElement.innerHTML,
+  /<details class="nordatlantik-report__situation"[^>]* open>/
+)
+
 const css = fs.readFileSync(path.join(__dirname, '../css/layout.css'), 'utf8')
 const componentsCss = fs.readFileSync(
   path.join(__dirname, '../css/components.css'),
   'utf8'
+)
+assert.match(
+  source,
+  /existingSituation\s*\?\s*existingSituation\.open\s*:\s*!window\.matchMedia\('\(max-width: 767px\)'\)\.matches/
+)
+assert.match(
+  css,
+  /\.nordatlantik-report__situation\s+summary\s*\{\s*cursor:\s*pointer;/
 )
 assert.match(
   css,
@@ -452,7 +516,10 @@ assert.match(
   css,
   /\.nordatlantik-page\s*\{[^}]*display:\s*grid;[^}]*grid-template-rows:\s*auto\s+minmax\(0,\s*1fr\);[^}]*overflow:\s*hidden;/
 )
-assert.match(css, /\.nordatlantik-page\s*\{[^}]*touch-action:\s*auto;/)
+assert.match(
+  css,
+  /\.nordatlantik-page\s*\{[^}]*touch-action:\s*auto;[^}]*padding-top:\s*var\(--safe-top\);/
+)
 assert.match(css, /\.viewport\s*\{[^}]*touch-action:\s*auto;/)
 assert.match(
   css,

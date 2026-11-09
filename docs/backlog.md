@@ -2328,8 +2328,9 @@ aufeinander bezogen beurteilen kann.
   Seegang-Zeitreihe und ist mindestens ebenso gut lesbar. Wind und Böen sind
   separat mit Einheit beschriftet, damit hohe Werte nicht in einer Zelle
   zusammengedrängt werden. Die Tabelle scrollt innerhalb der verfügbaren
-  Seitenhöhe vertikal und horizontal; dabei bleiben die
-  Seegangskarten, der Berichtskopf und die Wetterlage sichtbar. Touch-Scrollen
+  Seitenhöhe vertikal und horizontal; dabei bleiben die Seegangskarten und der
+  Berichtskopf sichtbar. Auf kleinen Displays ist die variable Wetterlage
+  zunächst eingeklappt und kann zum Lesen geöffnet werden. Touch-Scrollen
   innerhalb der Tabelle löst keine Carousel-Navigation aus.
 - [x] Beim vertikalen Scrollen der Tabelle bleiben die Zeitspaltenüberschriften
   am oberen Rand des Tabellenbereichs sichtbar. Gebiets-/Stationsnamen sowie
@@ -2342,7 +2343,9 @@ aufeinander bezogen beurteilen kann.
   Displays werden sie responsiv als 2×2-Raster angeordnet. Der Bericht steht
   darunter über die verfügbare Breite.
 - [x] Die Seite bleibt auf Desktop, Tablet und Mobilgeräten ohne horizontalen
-  Seitenüberlauf bedienbar.
+  Seitenüberlauf bedienbar. Auf der Nordatlantik-Seite schützt der obere
+  Safe-Area-Abstand Inhalte auf iPhones mit Dynamic Island vor Überdeckung,
+  ohne die übrigen Dashboard-Seiten zu verschieben.
 - [x] Karten unterstützen bestehende Lightbox-, Zoom- und Pan-Interaktionen;
   Navigation und bestehende Dashboard-Seiten bleiben unbeeinflusst.
 - [x] Die zuletzt erfolgreich geladenen Karten und der letzte Bericht bleiben

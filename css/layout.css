@@ -199,6 +199,7 @@
   overflow: hidden;
   overscroll-behavior-y: contain;
   touch-action: auto;
+  padding-top: var(--safe-top);
 }
 
 .nordatlantik-grid {
@@ -304,9 +305,13 @@
   line-height: 1.5;
 }
 
-.nordatlantik-report__situation h3,
+.nordatlantik-report__situation summary,
 .nordatlantik-report__period {
   font-size: 1rem;
+}
+
+.nordatlantik-report__situation summary {
+  cursor: pointer;
 }
 
 .nordatlantik-report__situation p {

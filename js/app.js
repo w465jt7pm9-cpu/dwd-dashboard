@@ -1947,6 +1947,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
+    const existingSituation = nordatlantikReportElement.querySelector(
+      '.nordatlantik-report__situation'
+    )
+    const isWeatherSituationOpen = existingSituation
+      ? existingSituation.open
+      : !window.matchMedia('(max-width: 767px)').matches
+
     nordatlantikReportPayload = payload
     if (!payload) {
       nordatlantikReportElement.innerHTML = `<p class="nordatlantik-report__status" aria-live="polite">${escapeHtml(
@@ -1979,10 +1986,10 @@ document.addEventListener('DOMContentLoaded', () => {
       `<p class="nordatlantik-report__status" aria-live="polite">${escapeHtml(
         statusLabel
       )}</p>`,
-      '<section class="nordatlantik-report__situation" aria-labelledby="nordatlantikWeatherlageHeading">',
-      '<h3 id="nordatlantikWeatherlageHeading">Wetterlage</h3>',
+      `<details class="nordatlantik-report__situation" aria-labelledby="nordatlantikWeatherlageHeading"${isWeatherSituationOpen ? ' open' : ''}>`,
+      '<summary id="nordatlantikWeatherlageHeading">Wetterlage</summary>',
       `<p>${escapeHtml(payload.weatherSituation)}</p>`,
-      '</section>',
+      '</details>',
       `<h3 class="nordatlantik-report__period">Vorhersagen von ${escapeHtml(
         payload.forecastPeriod
       )} UTC</h3>`,
