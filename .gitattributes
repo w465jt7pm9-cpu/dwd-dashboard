@@ -1,0 +1,4 @@
+* text=auto eol=lf
+
+# BSH-Referenzdaten im Originalformat (CRLF) belassen
+tests/gezeiten-bsh-helgoland-*.txt -text

@@ -1,27 +1,38 @@
 ## UI-Struktur
 
-> Teststatus (2026-10-10): Die manuelle UI-Prüfung für US-027 auf iPhones, iPads und Android-Geräten war erfolgreich.
+> Stand: Release-1.8.1. US-030 (Seegang Nordatlantik mit Streckenwetterbericht)
+> ist in Umsetzung und bereits in der Oberfläche enthalten. Die Story-Historie
+> steht im [Backlog](backlog.md).
 
-> Release 1.0: Fokus auf ruhige, bildschirmfüllende Wetterkarten ohne sichtbares Menü, mit natürlicher Navigation und automatischem Dark Mode.
-> Update US-009: Die Lightbox zeigt subtile Peek-Nachbarn und nutzt zyklische, weiche Bildnavigation mit elastischem Pan- und Snap-Back-Verhalten.
-> Update US-010: Zoom- und Pan-Interaktion sind elastisch und kehren weich in den Ausgangszustand zurück.
-> Update US-011: Der Carousel enthält eine zusätzliche Seite für Seegang Nordsee mit zweizeiligem Kartenlayout.
-> Update US-012: Der Carousel enthält eine zusätzliche Seite für Seegang Ostsee mit identischem Interaktions- und Layoutprinzip.
-> Update US-013: Der Seegang-Refresh folgt einem globalen Datenzyklus für alle WX_SEE-Seiten (~07/~19 UTC).
-> Update US-014: Offline-Zugriff nutzt den letzten erfolgreichen Bildstand pro Karte, auch nach Resize- oder Orientation-Änderungen.
-> Update US-020/US-021: In der gezoomten Ostsee-Lightbox wird pro Karte ein kompaktes Inhaltsfenster eingeblendet; es zeigt eine kompakte Zeitreihen-Ansicht mit Wind, Böen, Welle und Wetter und lässt sich bei Bedarf zusammenklappen.
-> Update US-022: Für die Nordsee-Lightbox wird eine analoge, kompakte Zeitreihen-Ansicht ergänzt.
-> Update US-023: Die Nordsee-Zeitreihe enthält zusätzlich eine Gezeitenphase mit farbigen Segmenten und Kurzbezeichnern (Sp/Mt/Np) auf schmalen Displays.
-> Update US-025: Das Nordsee-Zeitreihenfenster berücksichtigt Safe-Area-Insets und nutzt im kompakten Landscape-Modus den verfügbaren vertikalen Raum, ohne die iPad-Darstellung zu verändern.
-> Update US-026: Die Startseite zeigt im Mobiltelefon-Portrait sechs Karten; die beiden sichtbaren Europa-+36h-Karten stehen rechts neben der Bodenanalyse untereinander. Im Landscape bleiben alle zehn Karten sichtbar.
-> Update US-027: Die Lightbox passt Karten anhand ihrer intrinsischen Abmessungen in den Viewport ein und bewahrt das natürliche Bildseitenverhältnis auch beim Zoomen.
-> Update US-028: Auf der Seewetter-Seite sind im Mobiltelefon-Portrait je Zeile nur die ersten beiden Karten sichtbar; im Landscape bleiben alle vier Karten erhalten.
-> Update US-029: Auf der Höhenwetter-Seite sind im Mobiltelefon-Portrait je Zeile nur die ersten beiden Karten sichtbar; im Landscape bleiben alle vier Karten erhalten.
+Die Oberfläche zeigt ruhige, bildschirmfüllende Wetterkarten ohne sichtbares
+Menü mit natürlicher Navigation und automatischem Dark Mode.
 
-Die responsive Startseitenregel ist auf Viewports bis 767 px im Portrait
-begrenzt. Sie blendet auf der ersten Seite vier Karten aus und ordnet die
-verbleibenden drei unteren Wetterkarten in drei gleich breite Spalten an.
-Andere Carousel-Seiten und ihre Raster bleiben unverändert.
+- Carousel mit sieben Seiten: Landkarte, Seewetter, Höhenwetter, Seegang
+  Nordatlantik, Seegang Nordsee, Seegang Ostsee und Seewetter Texte.
+- Navigation per Swipe, Pfeiltasten und Edge-Tap; Aktualisierung über den
+  automatischen Datenzyklus (Seegangskarten gemeinsam ~07/~19 UTC) und
+  Pull-to-Refresh.
+- Lightbox: Karten werden anhand ihrer intrinsischen Abmessungen in den
+  Viewport eingepasst und behalten ihr Seitenverhältnis auch beim Zoomen;
+  elastisches Pan- und Zoom-Verhalten mit Snap-Back, subtile Peek-Nachbarn und
+  zyklische Bildnavigation.
+- Gezoomte Bodenanalyse: Wetterlage-Overlay mit scrollbarem DWD-Text und
+  Stand-Hinweis.
+- Seegang-Lightboxen Nordsee und Ostsee: gemeinsames Inhaltsfenster mit
+  getrennten Zeitreihen (Wind, Böen, Welle, Wetter), initial eingeklappt und
+  unabhängig scrollbar; Safe-Area-Insets werden berücksichtigt. Die
+  Gezeitenphase (Sp/Mt/Np auf schmalen Displays) erscheint nur in der
+  Nordsee-Zeitreihe.
+- Seite Seegang Nordatlantik: vier Seegangskarten (+00/+36/+60/+84h) und ein
+  Panel mit dem Streckenwetterbericht Englischer Kanal bis Kanarische Inseln.
+- Offline: Der letzte erfolgreiche Bildstand je Karte bleibt sichtbar, auch
+  nach Resize- oder Orientation-Änderungen; ein Offline-Banner zeigt den
+  Zustand an.
+- Mobiltelefon-Portrait (Viewports bis 767 px): Die Startseite zeigt sechs
+  Karten – die beiden sichtbaren Europa-+36h-Karten stehen rechts neben der
+  Bodenanalyse, die drei unteren Wetterkarten in drei gleich breiten Spalten.
+  Auf der Seewetter- und Höhenwetter-Seite sind je Zeile nur die ersten beiden
+  Karten sichtbar. Im Landscape bleiben alle Karten erhalten.
 
 ```mermaid
 flowchart TD
@@ -29,9 +40,12 @@ flowchart TD
   Pages --> Land[Landkarte]
   Pages --> See[Seewetter]
   Pages --> Hoehenwetter[Höhenwetter]
+  Pages --> Nordatlantik[Seegang Nordatlantik]
   Pages --> Nordsee[Seegang Nordsee]
   Pages --> Ostsee[Seegang Ostsee]
   Pages --> Texte[Seewetter Texte]
+  Nordatlantik --> NaKarten[Seegangskarten +00/+36/+60/+84h]
+  Nordatlantik --> NaBericht[Streckenwetterbericht-Panel]
   Pages --> Cards[Overlay Karten]
   Cards --> Lightbox[Lightbox]
   Lightbox --> Image[Hauptbild - Seitenverhältnis bleibt erhalten]
@@ -39,6 +53,7 @@ flowchart TD
   Lightbox --> Arrows[Pfeile dynamisch]
   Lightbox --> Elastic[Elastic Pan + Soft Clamp]
   Lightbox --> Overlay[Hintergrund / Overlay]
+  Lightbox --> Wetterlage[Wetterlage-Overlay Bodenanalyse]
   Lightbox --> SeaWindow[Inhaltsfenster Seegang]
   SeaWindow --> SafeArea[Responsive Safe Area]
   SeaWindow --> NordseeWindow[Nordsee-Zeitreihe]

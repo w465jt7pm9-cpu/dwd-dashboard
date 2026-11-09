@@ -19,7 +19,9 @@ bash scripts/run-tests.sh
 
 Sie führt alle JavaScript-Tests in `tests/*.test.js` und anschließend den
 Python-Smoke-Test aus. Voraussetzungen sind Node.js und Python 3; zusätzliche
-Pakete werden nicht benötigt.
+Pakete werden nicht benötigt. Der Python-Interpreter wird in der Reihenfolge
+`python3` → `py` → `python` ermittelt, damit die Suite auch unter Windows
+ohne `python3`-Alias läuft.
 
 ### Testbereiche
 

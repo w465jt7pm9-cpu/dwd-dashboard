@@ -69,7 +69,7 @@ High-Level-Systemübersicht (Mermaid) für Komponenten und Datenfluss.
 ✅ Zweck:
 
 - visuelle Struktur des Carousels und der Kern-Interaktionen
-- Bezug zu den aktuellen UX- und Zeitreihen-Updates
+- kompakte Ist-Zustandsbeschreibung der Oberfläche (Story-Historie steht im Backlog)
 
 👉 Nutzung:
 
