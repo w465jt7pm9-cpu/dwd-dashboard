@@ -1,6 +1,8 @@
 # 📊 DWD Dashboard – Mini Backlog
 
-> Release-1.8 (2026-10-10): US-026 bis US-029 sind umgesetzt und auf Mobilgeräten manuell geprüft; die vollständige Testsuite ist erfolgreich durchgelaufen.
+> Release-1.9 (2026-11-09): US-030 ergänzt die Nordatlantik-Seegangskarten und
+> den Streckenwetterbericht; Akzeptanzkriterien und vollständige Testsuite
+> sind abgeschlossen.
 
 ---
 
@@ -12,10 +14,6 @@
 
 - US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 - US-017 – UI-Texte für Internationalisierung strukturieren
-
-## 🟨 DOING
-
-- US-030 – Seegangskarten und Streckenwetterbericht Nordatlantik integrieren
 
 ## ✅ DONE
 
@@ -46,6 +44,7 @@
 - US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
 - US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
 - US-029 – Höhenwetter-Karten im Mobiltelefon-Portrait reduzieren
+- US-030 – Seegangskarten und Streckenwetterbericht Nordatlantik integrieren
 
 ---
 
@@ -2249,7 +2248,7 @@ damit die Karten auf dem schmalen Bildschirm größer und leichter bedienbar sin
 
 ## 🌊 US-030 – Seegangskarten und Streckenwetterbericht Nordatlantik integrieren
 
-**Status:** DOING
+**Status:** DONE
 **Priorität:** Mittel
 
 ### Beschreibung
@@ -2368,7 +2367,7 @@ aufeinander bezogen beurteilen kann.
 - [x] Pushes auf den Feature-Branch aktualisieren eine eigene Cloudflare-
   Pages-Preview, getrennt von der Produktionsversion; die Preview wird vor
   dem Merge geprüft.
-- [ ] Die Änderung gelangt erst nach erfolgreicher Prüfung und Freigabe über
+- [x] Die Änderung gelangt erst nach erfolgreicher Prüfung und Freigabe über
   einen Pull Request nach `main`.
 
 ### Abgrenzung

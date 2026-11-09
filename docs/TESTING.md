@@ -1,7 +1,8 @@
 # Tests und Qualitätssicherung
 
-> Release-1.8 (2026-10-10): Die vollständige automatisierte Testsuite sowie die
-> manuellen Prüfungen für US-025 bis US-029 sind erfolgreich durchgelaufen.
+> Release-1.9 (2026-11-09): Die vollständige automatisierte Testsuite besteht;
+> US-030 wurde einschließlich mobiler Landscape- und Safe-Area-Anpassungen
+> geprüft.
 
 ## Zweck
 

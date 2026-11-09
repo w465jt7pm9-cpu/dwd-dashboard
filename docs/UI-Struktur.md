@@ -1,8 +1,7 @@
 ## UI-Struktur
 
-> Stand: Release-1.8.1. US-030 (Seegang Nordatlantik mit Streckenwetterbericht)
-> ist in Umsetzung und bereits in der Oberfläche enthalten. Die Story-Historie
-> steht im [Backlog](backlog.md).
+> Stand: Release-1.9. US-030 (Seegang Nordatlantik mit Streckenwetterbericht)
+> ist abgeschlossen. Die Story-Historie steht im [Backlog](backlog.md).
 
 Die Oberfläche zeigt ruhige, bildschirmfüllende Wetterkarten ohne sichtbares
 Menü mit natürlicher Navigation und automatischem Dark Mode.
@@ -25,6 +24,9 @@ Menü mit natürlicher Navigation und automatischem Dark Mode.
   Nordsee-Zeitreihe.
 - Seite Seegang Nordatlantik: vier Seegangskarten (+00/+36/+60/+84h) und ein
   Panel mit dem Streckenwetterbericht Englischer Kanal bis Kanarische Inseln.
+  Die Zeitreihe ordnet die Berichtswerte den UTC-Zeitpunkten zu, markiert
+  Kartenhorizonte und den aktuellen Zeitpunkt; die variable Wetterlage ist
+  einklappbar und wird bei kleinen Displays initial kompakt dargestellt.
 - Offline: Der letzte erfolgreiche Bildstand je Karte bleibt sichtbar, auch
   nach Resize- oder Orientation-Änderungen; ein Offline-Banner zeigt den
   Zustand an.

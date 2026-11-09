@@ -5,12 +5,13 @@ Es ist für die Nutzung vor dem Ablegen und unterwegs auf dem Wasser gedacht. Zu
 
 ## Aktueller Release
 
-`Release-1.8.1` aktualisiert die Bodenwetter-Prognosekarten auf die vom DWD
-verfügbaren Horizonte +60h und +84h. Die Verbesserungen aus Release 1.8 bleiben
-enthalten: Die Startseite zeigt im Portrait eine gezielte Auswahl von sechs
-Karten, auf den Seewetter- und Höhenwetter-Seiten sind jeweils zwei Karten pro
-Zeile sichtbar, und die vergrößerte Bodenluftdruckkarte bewahrt auch beim Zoomen
-ihr natürliches Seitenverhältnis.
+`Release-1.9` ergänzt eine eigene Nordatlantik-Seite mit vier Seegangskarten
+(+00h, +36h, +60h, +84h) und dem DWD-Streckenwetterbericht für die Strecke
+Englischer Kanal bis Kanarische Inseln. Eine kompakte Zeitreihe ordnet die
+Berichtswerte den Vorhersagezeitpunkten zu, hebt Kartenhorizonte und den
+aktuellen Zeitpunkt hervor und bleibt offline mit dem zuletzt geladenen
+Bericht verfügbar. Die Wetterlage lässt sich auf kleinen Displays einklappen;
+Safe-Area-Abstände und Carousel-Bedienung sind für Mobilgeräte berücksichtigt.
 
 ## Live-Version
 
