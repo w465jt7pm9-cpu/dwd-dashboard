@@ -2343,9 +2343,10 @@ aufeinander bezogen beurteilen kann.
   Displays werden sie responsiv als 2×2-Raster angeordnet. Der Bericht steht
   darunter über die verfügbare Breite.
 - [x] Die Seite bleibt auf Desktop, Tablet und Mobilgeräten ohne horizontalen
-  Seitenüberlauf bedienbar. Auf der Nordatlantik-Seite schützt der obere
-  Safe-Area-Abstand Inhalte auf iPhones mit Dynamic Island vor Überdeckung,
-  ohne die übrigen Dashboard-Seiten zu verschieben.
+  Seitenüberlauf bedienbar. Auf der Nordatlantik-Seite schützen Safe-Area-
+  Abstände Inhalte auf iPhones mit Dynamic Island in Hoch- und Querformat vor
+  Überdeckung, ohne die übrigen Dashboard-Seiten zu verschieben. Interaktionen
+  mit der Wetterlage lösen keine Carousel-Navigation aus.
 - [x] Karten unterstützen bestehende Lightbox-, Zoom- und Pan-Interaktionen;
   Navigation und bestehende Dashboard-Seiten bleiben unbeeinflusst.
 - [x] Die zuletzt erfolgreich geladenen Karten und der letzte Bericht bleiben

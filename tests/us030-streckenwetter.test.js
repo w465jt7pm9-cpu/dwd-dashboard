@@ -520,6 +520,10 @@ assert.match(
   css,
   /\.nordatlantik-page\s*\{[^}]*touch-action:\s*auto;[^}]*padding-top:\s*var\(--safe-top\);/
 )
+assert.match(
+  css,
+  /\.nordatlantik-page\s*\{[^}]*padding-inline:\s*var\(--safe-left\)\s+var\(--safe-right\);/
+)
 assert.match(css, /\.viewport\s*\{[^}]*touch-action:\s*auto;/)
 assert.match(
   css,
@@ -538,7 +542,7 @@ assert.match(
   /\.ostsee-ts-table\s+thead\s*\{\s*position:\s*sticky;\s*top:\s*0;/
 )
 const timeseriesInteractionStart = source.indexOf(
-  '  function isNordatlantikTimeseriesInteraction ('
+  '  function isNordatlantikReportInteraction ('
 )
 const timeseriesInteractionEnd = source.indexOf(
   '\n\n  function startPullRefresh',
@@ -557,24 +561,43 @@ vm.runInContext(
   interactionContext
 )
 assert.strictEqual(
-  interactionContext.isNordatlantikTimeseriesInteraction({
-    closest: selector => selector === '.nordatlantik-report__timeseries .ostsee-ts-wrap'
+  interactionContext.isNordatlantikReportInteraction({
+    closest: selector =>
+      selector ===
+        '.nordatlantik-report__situation, .nordatlantik-report__timeseries .ostsee-ts-wrap'
+        ? {}
+        : null
   }),
   true,
-  'Touch and edge navigation gestures must not intercept table scrolling'
+  'The weather situation must be excluded from page-navigation gestures'
+)
+assert.strictEqual(
+  interactionContext.isNordatlantikReportInteraction({
+    closest: () => null
+  }),
+  false,
+  'Unrelated areas on the North Atlantic page must keep page navigation'
 )
 interactionContext.currentPageIndex = 2
 assert.strictEqual(
-  interactionContext.isNordatlantikTimeseriesInteraction({
+  interactionContext.isNordatlantikReportInteraction({
     closest: () => true
   }),
   false,
-  'Table gesture exclusions must be limited to the North Atlantic page'
+  'Report gesture exclusions must be limited to the North Atlantic page'
 )
 assert.ok(
-  (source.match(/isNordatlantikTimeseriesInteraction\(event\.target\)/g) || [])
+  (source.match(/isNordatlantikReportInteraction\(event\.target\)/g) || [])
     .length >= 4,
-  'Touch, pointer, and click navigation handlers must ignore table interactions'
+  'Touch, pointer, and click navigation handlers must ignore report interactions'
+)
+assert.match(
+  source,
+  /viewportElement\.addEventListener\('click', event => \{[\s\S]*?event\.target\.closest\('a, button, summary, details'\)/
+)
+assert.match(
+  source,
+  /document\.addEventListener\('keydown', event => \{[\s\S]*?event\.target\.closest\('summary, details'\)/
 )
 assert.match(
   css,

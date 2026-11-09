@@ -200,6 +200,7 @@
   overscroll-behavior-y: contain;
   touch-action: auto;
   padding-top: var(--safe-top);
+  padding-inline: var(--safe-left) var(--safe-right);
 }
 
 .nordatlantik-grid {

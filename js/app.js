@@ -3593,11 +3593,11 @@ document.addEventListener('DOMContentLoaded', () => {
     return false
   }
 
-  function isNordatlantikTimeseriesInteraction (target) {
+  function isNordatlantikReportInteraction (target) {
     return (
       currentPageIndex === NORDATLANTIK_PAGE_INDEX &&
       target?.closest?.(
-        '.nordatlantik-report__timeseries .ostsee-ts-wrap'
+        '.nordatlantik-report__situation, .nordatlantik-report__timeseries .ostsee-ts-wrap'
       ) != null
     )
   }
@@ -4049,7 +4049,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return
       }
 
-      if (isNordatlantikTimeseriesInteraction(event.target)) {
+      if (isNordatlantikReportInteraction(event.target)) {
         pageSwipeStartX = null
         pageSwipeStartY = null
         pullRefreshStartY = null
@@ -4070,7 +4070,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return
       }
 
-      if (isNordatlantikTimeseriesInteraction(event.target)) {
+      if (isNordatlantikReportInteraction(event.target)) {
         pageSwipeStartX = null
         pageSwipeStartY = null
         pullRefreshStartY = null
@@ -4091,7 +4091,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return
       }
 
-      if (isNordatlantikTimeseriesInteraction(event.target)) {
+      if (isNordatlantikReportInteraction(event.target)) {
         return
       }
 
@@ -4107,7 +4107,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    if (event.target.closest('a, button')) {
+    if (event.target.closest('a, button, summary, details')) {
       return
     }
 
@@ -4115,7 +4115,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    if (isNordatlantikTimeseriesInteraction(event.target)) {
+    if (isNordatlantikReportInteraction(event.target)) {
       return
     }
 
@@ -4149,6 +4149,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return
       }
 
+      return
+    }
+
+    if (event.target.closest('summary, details')) {
       return
     }
 
