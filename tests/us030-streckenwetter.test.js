@@ -535,7 +535,11 @@ assert.match(
 )
 assert.match(
   css,
-  /@media\s*\(max-height:\s*600px\)\s*and\s*\(orientation:\s*landscape\)\s*\{[\s\S]*?\.nordatlantik-report__header\s*\{[^}]*padding-inline:\s*max\(72px,\s*var\(--safe-left\)\)\s+max\(72px,\s*var\(--safe-right\)\);[\s\S]*?\.nordatlantik-report__situation\s*\{[^}]*font-size:\s*0\.75rem;/
+  /@media\s*\(max-height:\s*600px\)\s*and\s*\(orientation:\s*landscape\)\s*\{[\s\S]*?\.nordatlantik-report__header\s*\{[^}]*gap:\s*var\(--space-1\);[^}]*\}[\s\S]*?\.nordatlantik-report__situation\s*\{[^}]*font-size:\s*0\.75rem;/
+)
+assert.doesNotMatch(
+  css,
+  /\.nordatlantik-report__header\s*\{[^}]*padding-inline:\s*max\(72px/
 )
 assert.match(
   css,

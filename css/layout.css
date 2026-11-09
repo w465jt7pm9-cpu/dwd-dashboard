@@ -438,7 +438,6 @@
   .nordatlantik-report__header {
     gap: var(--space-1);
     margin-bottom: var(--space-1);
-    padding-inline: max(72px, var(--safe-left)) max(72px, var(--safe-right));
   }
 
   .nordatlantik-report__header h2 {

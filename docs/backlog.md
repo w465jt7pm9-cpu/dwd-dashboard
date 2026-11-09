@@ -2345,9 +2345,9 @@ aufeinander bezogen beurteilen kann.
 - [x] Die Seite bleibt auf Desktop, Tablet und Mobilgeräten ohne horizontalen
   Seitenüberlauf bedienbar. Auf der Nordatlantik-Seite schützen Safe-Area-
   Abstände Inhalte auf iPhones mit Dynamic Island in Hoch- und Querformat vor
-  Überdeckung; im Querformat erhält der Berichtskopf zusätzlich einen
-  Mindestabstand zum Displayrand. Interaktionen mit der Wetterlage lösen keine
-  Carousel-Navigation aus.
+  Überdeckung; der Berichtskopf verwendet die seitenweiten Abstände ohne
+  zusätzliche horizontale Einrückung. Interaktionen mit der Wetterlage lösen
+  keine Carousel-Navigation aus.
 - [x] Karten unterstützen bestehende Lightbox-, Zoom- und Pan-Interaktionen;
   Navigation und bestehende Dashboard-Seiten bleiben unbeeinflusst.
 - [x] Die zuletzt erfolgreich geladenen Karten und der letzte Bericht bleiben
