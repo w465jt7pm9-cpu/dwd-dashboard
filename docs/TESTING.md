@@ -40,6 +40,7 @@ ohne `python3`-Alias läuft.
 | `us027-lightbox-aspect-ratio.test.js` | Proportionale Lightbox-Darstellung und einheitliche Zoom-Skalierung        |
 | `us028-seewetter-portrait-cards.test.js` | Kartenanzahl und Spaltenlayout der Seewetter-Seite im Portrait |
 | `us029-upperair-portrait-cards.test.js` | Kartenanzahl und Spaltenlayout der Höhenwetter-Seite im Portrait |
+| `us032-service-worker.test.js`        | Service-Worker-Scope, App-Shell-Precache, Karten-Cache, DWD-Datenrouten und Offline-Badge bei SW-Cache-Karten |
 | `smoke_nordsee_tide_test.py`          | Smoke-Prüfung des Nordsee-Gezeiten-Markups                                 |
 | `dwd-source-format-contracts.test.js` | DWD-Quellformat-Verträge und Regressionen bei geänderten Markern           |
 
@@ -248,6 +249,11 @@ python3 tests/smoke_nordsee_tide_test.py
 
 ### Offline und Aktualisierung
 
+- [ ] Nach einem Online-Aufruf kontrolliert der Service Worker die Seite
+      (Scope `/`); der frühere Scope `/js/` ist nicht mehr registriert (US-032).
+- [ ] Nach einem Online-Aufruf startet das Dashboard offline neu; zuvor
+      geladene Karten erscheinen mit Offline-Badge, nie geladene Karten mit
+      Fehler-Badge (US-032).
 - [ ] Gecachte Karten bleiben offline sichtbar.
 - [ ] Der gecachte Seewettertext bleibt offline verfügbar.
 - [ ] Offline- und Veraltet-Hinweise sind verständlich.
@@ -269,7 +275,8 @@ GitHub Actions führt die Testsuite bei jedem Push auf `main`,
 `feature/portrait-weather-grid`, `feature/us-027-lightbox-portrait`,
 `feature/us-028-seewetter-portrait-cards` und
 `feature/us-029-upperair-portrait-cards`,
-`feature/us-030-nordatlantik-streckenwetter` sowie bei Pull Requests nach `main` aus:
+`feature/us-030-nordatlantik-streckenwetter`,
+`feature/us-032-service-worker-offline` sowie bei Pull Requests nach `main` aus:
 [.github/workflows/tests.yml](../.github/workflows/tests.yml).
 
 Optional können die versionierten Hooks aktiviert werden:

@@ -15,6 +15,10 @@
 - US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 - US-017 – UI-Texte für Internationalisierung strukturieren
 
+## 🟨 DOING
+
+- US-032 – Service-Worker-Offline-Start und Karten-Cache reparieren
+
 ## ✅ DONE
 
 - US-001 – Menü vollständig entfernen
@@ -2375,6 +2379,70 @@ aufeinander bezogen beurteilen kann.
 - Keine Änderung an bestehenden Nordsee-/Ostsee-Seegangskarten oder deren
   Zeitreihen.
 - Keine Änderung an anderen DWD-Seiten, Datenquellen oder Vorhersageinhalten.
+
+---
+
+## 🛠️ US-032 – Service-Worker-Offline-Start und Karten-Cache reparieren
+
+**Status:** DOING
+**Priorität:** Hoch
+
+### Beschreibung
+
+Als Nutzer möchte ich das Dashboard nach einem Online-Besuch auch ohne
+Netzwerkverbindung neu starten und die zuletzt geladenen Wetterkarten weiter
+verwenden können, damit die bestehende Offline-Funktion zuverlässig nutzbar
+ist.
+
+### Zielbild
+
+- Der Service Worker kontrolliert die Dashboard-Seiten im vorgesehenen
+  Deployment-Pfad.
+- App-Shell-Ressourcen werden unter ihren tatsächlichen URLs gecacht; falsche
+  Pfade oder erfolgreiche HTML-Fallback-Antworten gelten nicht als gültige
+  Assets.
+- Die zuletzt erfolgreich geladenen DWD-Karten werden lokal gespeichert und
+  nach einem Offline-Kaltstart angezeigt.
+- Das Verhalten bestehender Seiten bleibt erhalten; die geplanten regionalen
+  Seegangsseiten (US-031) bauen für ihre Offline-Verfügbarkeit auf diesem
+  allgemeinen Fix auf.
+
+### Akzeptanzkriterien
+
+- [x] Nach einem Online-Aufruf ist der Service Worker aktiv und kontrolliert
+  die Dashboard-Seite mit dem erwarteten Gültigkeitsbereich.
+- [x] Die vollständige App-Shell wird unter den korrekten URLs gespeichert;
+  Installations- oder Precache-Fehler werden nicht durch HTML-Fallbacks als
+  Erfolg maskiert.
+- [x] Nach einem Online-Aufruf und erfolgreichem Laden der Wetterkarten kann
+  das Dashboard offline neu geladen und navigiert werden.
+- [x] Zuletzt erfolgreich geladene Karten sind nach Offline-Kaltstart sichtbar
+  und als Offline-/letzter Stand gekennzeichnet; fehlende Karten werden nicht
+  als erfolgreich geladen ausgegeben.
+- [x] Ein Regressionstest prüft Service-Worker-Gültigkeitsbereich,
+  App-Shell-Ressourcen und Karten-Cache-Verhalten ohne Live-DWD-Abhängigkeit.
+- [x] Bestehende Navigation, Aktualisierung, Cache-Versionierung und
+  Online-Verhalten bleiben funktionsfähig.
+- [x] DWD-Text- und Berichtsabrufe werden nach Aktivierung des Service Workers
+  nicht aus einem veralteten Service-Worker-Cache bedient; ihre
+  Offline-Verfügbarkeit bleibt Aufgabe der bestehenden lokalen App-Caches.
+- [ ] Die Offline-Prüfung umfasst Desktop sowie unterstützte iOS- und
+  Android-Browser.
+- [x] Umsetzung erfolgt auf `feature/us-032-service-worker-offline` ab `main`;
+  `main` bleibt bis zur Prüfung und Freigabe unverändert.
+- [ ] GitHub Actions führt für Pushes auf den Feature-Branch die Testsuite aus.
+- [ ] Pushes auf den Feature-Branch aktualisieren eine eigene Cloudflare-
+  Pages-Preview, getrennt von der Produktionsversion; die Preview wird vor
+  dem Merge geprüft.
+- [ ] Die Änderung gelangt erst nach erfolgreicher Prüfung und Freigabe über
+  einen Pull Request nach `main`.
+
+### Abgrenzung
+
+- Keine Änderung an Kartenquellen, Seitenreihenfolge oder sichtbarer
+  Seitengestaltung.
+- Keine Hintergrundaktualisierung nicht sichtbarer Seiten; diese ist Teil von
+  US-031.
 
 ---
 

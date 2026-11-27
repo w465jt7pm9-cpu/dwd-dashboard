@@ -87,12 +87,28 @@ Bereich, ohne das bestehende iPad-Layout zu verändern.
 
 #### 4. Service Worker und Caching
 
-Die Offline-Funktionalität wird über [js/sw.js](../js/sw.js) gesteuert. Der Service Worker:
+Die Offline-Funktionalität wird über [sw.js](../sw.js) im Wurzelverzeichnis
+gesteuert; nur dort erhält der Service Worker den Gültigkeitsbereich `/` und
+kontrolliert das Dashboard. Der Service Worker:
 
-- precacht die App-Shell für eine robuste Start- und Reload-Erfahrung
-- cached Bild- und statische Ressourcen
-- stellt gecachte Inhalte bei fehlender Netzwerkverbindung bereit
-- behandelt Seewettertexte und andere externe Inhalte selektiv
+- precacht die App-Shell unter ihren tatsächlichen URLs (`/` statt
+  `/index.html`, da das Hosting `/index.html` auf `/` umleitet) und bricht die
+  Installation ab, wenn eine Ressource umgeleitet oder als HTML-Fallback statt
+  mit dem erwarteten Inhaltstyp geliefert wird
+- lädt DWD-Karten per CORS zuerst aus dem Netz und speichert je Karte nur die
+  letzte erfolgreiche Bildantwort (Cache-Schlüssel ohne `t`-Parameter) in
+  einem eigenen, versionsunabhängigen Karten-Cache
+- liefert offline die gespeicherte Karte und meldet der App per Nachricht,
+  dass ein letzter Stand angezeigt wird; die Karte erhält dann das Offline-Badge
+- lässt DWD-Text- und Berichtsabrufe unverändert ans Netz durch; deren
+  Offline-Stand verwaltet die App selbst in `localStorage`
+- löscht bei einer neuen Cache-Version alle älteren App-Shell-Caches, behält
+  aber den Karten-Cache; die App entfernt zusätzlich die frühere Registrierung
+  mit Scope `/js/`
+
+Übernimmt der Service Worker eine bereits geladene Seite erstmals, ruft die App
+die schon angezeigten Karten einmal über den Service Worker ab, damit sie ohne
+erneuten Seitenaufruf offline verfügbar sind.
 
 Das Ziel ist eine zuverlässige Nutzung auch in schwankenden Netzwerkbedingungen.
 
