@@ -67,6 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const NORDATLANTIK_REPORT_CACHE_KEY = 'dwdNordatlantikStreckenwetterCache'
   const REGIONAL_SEA_REPORT_CACHE_KEY_PREFIX = 'dwdRegionalSeaReport:'
   const REGIONAL_SEA_REPORT_REFRESH_TTL_MS = 5 * 60 * 1000
+  const REGIONAL_SEA_MAP_PREFETCH_WINDOW_KEY =
+    'dwdRegionalSeaMapPrefetchWindow'
   const REGIONAL_WETTERLAGE_CACHE_KEYS = {
     nordsee: {
       text: 'dwdNordseeWetterlageText',
@@ -171,6 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const PAGE_STATE_BY_IMAGE = new Map()
   const serviceWorkerCachedImageUrls = new Set()
   const handledImageLoadUrls = new WeakMap()
+  let regionalSeaMapPrefetchRequest = null
+  let lastRegionalSeaMapPrefetchWindow = null
 
   const viewportElement = document.getElementById('viewport')
   const carouselElement = document.getElementById('carousel')
@@ -335,6 +339,26 @@ document.addEventListener('DOMContentLoaded', () => {
   function setLastSeegangWindowRefresh (windowId) {
     try {
       localStorage.setItem(SEEGANG_LAST_WINDOW_REFRESH_KEY, windowId)
+    } catch {
+      // localStorage is optional here.
+    }
+  }
+
+  function getLastRegionalSeaMapPrefetchWindow () {
+    try {
+      return (
+        localStorage.getItem(REGIONAL_SEA_MAP_PREFETCH_WINDOW_KEY) ||
+        lastRegionalSeaMapPrefetchWindow
+      )
+    } catch {
+      return lastRegionalSeaMapPrefetchWindow
+    }
+  }
+
+  function setLastRegionalSeaMapPrefetchWindow (windowId) {
+    lastRegionalSeaMapPrefetchWindow = windowId
+    try {
+      localStorage.setItem(REGIONAL_SEA_MAP_PREFETCH_WINDOW_KEY, windowId)
     } catch {
       // localStorage is optional here.
     }
@@ -3108,6 +3132,100 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  async function preloadRegionalSeaMapsInBackground () {
+    if (!navigator.onLine) {
+      return
+    }
+
+    const windowId = getActiveSeegangRefreshWindowId()
+    if (!windowId || getLastRegionalSeaMapPrefetchWindow() === windowId) {
+      return
+    }
+    if (regionalSeaMapPrefetchRequest) {
+      return regionalSeaMapPrefetchRequest
+    }
+
+    const mapImages = REGIONAL_SEA_REPORT_CONFIGS.flatMap(config =>
+      getPageImages(config.pageIndex)
+    )
+    const expectedMapCount = REGIONAL_SEA_REPORT_CONFIGS.reduce(
+      (count, config) => count + config.mapForecastHours.length,
+      0
+    )
+    if (mapImages.length !== expectedMapCount) {
+      console.warn(
+        `Regionale Seegangskarten unvollständig: ${mapImages.length} statt ${expectedMapCount} gefunden.`
+      )
+      return
+    }
+
+    const request = (async () => {
+      const results = await Promise.allSettled(
+        mapImages.map(async imageElement => {
+          const baseUrl = IMAGE_BASE_URLS[imageElement.dataset.base]
+          const imagePath = imageElement.dataset.path
+          if (!baseUrl || !imagePath) {
+            throw new Error('Regionale Seegangskarte ohne gültige Quelle.')
+          }
+
+          const imageUrl = new URL(`${baseUrl}/${imagePath}`).href
+          const response = await fetch(imageUrl, {
+            cache: 'no-cache',
+            mode: 'cors',
+            credentials: 'omit'
+          })
+          const contentType = response.headers.get('content-type') || ''
+          if (!response.ok || !/^image\//i.test(contentType)) {
+            throw new Error(
+              `Regionale Seegangskarte nicht verfügbar: ${imageUrl} (HTTP ${response.status})`
+            )
+          }
+          await response.blob()
+        })
+      )
+      const failures = results.filter(result => result.status === 'rejected')
+      if (failures.length) {
+        console.warn(
+          `${failures.length} von ${expectedMapCount} regionalen Seegangskarten konnten nicht vorab geladen werden.`,
+          failures.map(result => result.reason)
+        )
+        return
+      }
+
+      if (navigator.onLine && getActiveSeegangRefreshWindowId() === windowId) {
+        setLastRegionalSeaMapPrefetchWindow(windowId)
+      }
+    })()
+    regionalSeaMapPrefetchRequest = request
+    try {
+      await request
+    } finally {
+      regionalSeaMapPrefetchRequest = null
+    }
+  }
+
+  async function preloadRegionalSeaDataInBackground (forceReports = false) {
+    if (!navigator.onLine) {
+      return
+    }
+
+    try {
+      await Promise.all([
+        Promise.all(
+          REGIONAL_SEA_REPORT_CONFIGS.map(config =>
+            ensureRegionalSeaReportContent(config, forceReports)
+          )
+        ),
+        preloadRegionalSeaMapsInBackground()
+      ])
+    } catch (error) {
+      console.warn(
+        'Regionale Seegangsdaten konnten nicht vorab geladen werden.',
+        error
+      )
+    }
+  }
+
   async function ensureWetterlageOverlayContent () {
     const cachedText = getCachedWetterlageText()
     const cachedUpdatedAt = getCachedWetterlageUpdatedAt()
@@ -4108,6 +4226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ) {
       refreshVisibleImages(true)
       void refreshCurrentPageSeaReport(true)
+      void preloadRegionalSeaDataInBackground(true)
     }
 
     pullRefreshStartY = null
@@ -4169,6 +4288,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('online', () => {
     updateOfflineUi()
     void preloadWetterlageInBackground()
+    void preloadRegionalSeaDataInBackground(true)
     void refreshCurrentPageSeaReport(true)
     IMAGE_ELEMENTS.forEach(imageElement => {
       const cardElement = imageElement.closest('.card')
@@ -4668,6 +4788,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateOfflineUi()
   goToPage(0)
+  void preloadRegionalSeaDataInBackground(true)
   refreshVisibleImages()
 
   window.setInterval(

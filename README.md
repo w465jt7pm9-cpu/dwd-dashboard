@@ -1,7 +1,10 @@
 # DWD Wetter Dashboard
 
-Das DWD Wetter Dashboard ist eine touch-freundliche Übersicht für Wetterkarten, Seewetterberichte und Seegangsvorhersagen des Deutschen Wetterdienstes.
-Es ist für die Nutzung vor dem Ablegen und unterwegs auf dem Wasser gedacht. Zuletzt geladene Inhalte bleiben auch bei eingeschränkter Verbindung verfügbar.
+Das DWD Wetter Dashboard ist eine touch-freundliche Übersicht für Wetterkarten,
+Seewetterberichte und Seegangsvorhersagen des Deutschen Wetterdienstes. Es ist
+für die Nutzung vor dem Ablegen und unterwegs auf dem Wasser gedacht. Zuletzt
+erfolgreich geladene Wetterkarten und lokal gespeicherte Berichte stehen auch
+bei eingeschränkter Verbindung zur Verfügung.
 
 ## Aktueller Release
 

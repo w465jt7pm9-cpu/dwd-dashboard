@@ -102,6 +102,10 @@ kontrolliert das Dashboard. Der Service Worker:
   dass ein letzter Stand angezeigt wird; die Karte erhält dann das Offline-Badge
 - lässt DWD-Text- und Berichtsabrufe unverändert ans Netz durch; deren
   Offline-Stand verwaltet die App selbst in `localStorage`
+- lädt die vier regionalen Seegangberichte beim App-Start, bei Netzrückkehr
+  und Pull-to-Refresh vor; die 16 Karten werden nur im aktiven UTC-
+  Seegang-Zeitfenster mit `cache: no-cache` revalidiert und vor Abschluss des
+  Vorab-Ladens im Karten-Cache gespeichert
 - löscht bei einer neuen Cache-Version alle älteren App-Shell-Caches, behält
   aber den Karten-Cache; die App entfernt zusätzlich die frühere Registrierung
   mit Scope `/js/`

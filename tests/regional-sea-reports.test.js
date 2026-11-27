@@ -255,4 +255,188 @@ assert.strictEqual(
   false
 )
 
-console.log('Regional sea report parsing and page contracts passed')
+function extractPrefetchFunction (name) {
+  const match = source.match(
+    new RegExp(`  (?:async )?function ${name} \\([\\s\\S]*?\\n  \\}`)
+  )
+  assert.ok(match, `Missing ${name}`)
+  return match[0]
+}
+
+const prefetchFunctions = [
+  'getLastRegionalSeaMapPrefetchWindow',
+  'setLastRegionalSeaMapPrefetchWindow',
+  'preloadRegionalSeaMapsInBackground',
+  'preloadRegionalSeaDataInBackground'
+]
+  .map(extractPrefetchFunction)
+  .join('\n')
+
+function createRegionalPrefetchHarness ({
+  activeWindow = '2026-11-27-07',
+  online = true,
+  failingPaths = new Set()
+} = {}) {
+  const configs = regionalConfigs.map((config, index) => ({
+    ...config,
+    pageIndex: index + 7,
+    mapForecastHours: [0, 24, 48, 72]
+  }))
+  const imagesByPage = new Map(
+    configs.map(config => [
+      config.pageIndex,
+      config.mapForecastHours.map(hour => ({
+        dataset: {
+          base: 'WX_SEE',
+          path: `${config.key}-${hour}.png`
+        }
+      }))
+    ])
+  )
+  const storage = new Map()
+  const reportCalls = []
+  const mapCalls = []
+  const warnings = []
+  const context = vm.createContext({
+    URL,
+    IMAGE_BASE_URLS: {
+      WX_SEE: 'https://www.dwd.de/DWD/wetter/wv_spez/seewetter'
+    },
+    REGIONAL_SEA_MAP_PREFETCH_WINDOW_KEY:
+      'dwdRegionalSeaMapPrefetchWindow',
+    REGIONAL_SEA_REPORT_CONFIGS: configs,
+    regionalSeaMapPrefetchRequest: null,
+    lastRegionalSeaMapPrefetchWindow: null,
+    navigator: { onLine: online },
+    localStorage: {
+      getItem: key => storage.get(key) || null,
+      setItem: (key, value) => storage.set(key, value)
+    },
+    getActiveSeegangRefreshWindowId: () => activeWindow,
+    getPageImages: pageIndex => imagesByPage.get(pageIndex) || [],
+    ensureRegionalSeaReportContent: async (config, force) => {
+      reportCalls.push({ key: config.key, force })
+    },
+    fetch: async (url, options) => {
+      mapCalls.push({ url, options })
+      if (failingPaths.has(url)) {
+        throw new Error(`Network failure for ${url}`)
+      }
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: () => 'image/png' },
+        blob: async () => ({})
+      }
+    },
+    console: {
+      warn: (...args) =>
+        warnings.push(args.map(value => value?.message || value))
+    }
+  })
+  vm.runInContext(prefetchFunctions, context)
+  return { context, mapCalls, reportCalls, storage, warnings }
+}
+
+async function testRegionalDataPrefetchPolicy () {
+  const harness = createRegionalPrefetchHarness()
+  await harness.context.preloadRegionalSeaDataInBackground(true)
+
+  assert.deepStrictEqual(
+    harness.reportCalls.map(({ key, force }) => [key, force]),
+    regionalConfigs.map(({ key }) => [key, true]),
+    JSON.stringify(harness.warnings)
+  )
+  assert.strictEqual(
+    harness.mapCalls.length,
+    16,
+    JSON.stringify(harness.warnings)
+  )
+  assert.ok(
+    harness.mapCalls.every(
+      ({ url, options }) =>
+        !url.includes('?') &&
+        options.cache === 'no-cache' &&
+        options.credentials === 'omit' &&
+        options.mode === 'cors'
+    )
+  )
+  assert.strictEqual(
+    harness.storage.get('dwdRegionalSeaMapPrefetchWindow'),
+    '2026-11-27-07'
+  )
+
+  await harness.context.preloadRegionalSeaMapsInBackground()
+  assert.strictEqual(harness.mapCalls.length, 16)
+
+  const outsideWindow = createRegionalPrefetchHarness({ activeWindow: null })
+  await outsideWindow.context.preloadRegionalSeaDataInBackground()
+  assert.strictEqual(outsideWindow.reportCalls.length, 4)
+  assert.strictEqual(outsideWindow.mapCalls.length, 0)
+
+  const offline = createRegionalPrefetchHarness({ online: false })
+  await offline.context.preloadRegionalSeaDataInBackground(true)
+  assert.strictEqual(offline.reportCalls.length, 0)
+  assert.strictEqual(offline.mapCalls.length, 0)
+
+  const failingPath =
+    'https://www.dwd.de/DWD/wetter/wv_spez/seewetter/nordsee-0.png'
+  const partialFailure = createRegionalPrefetchHarness({
+    failingPaths: new Set([failingPath])
+  })
+  await partialFailure.context.preloadRegionalSeaMapsInBackground()
+  assert.strictEqual(partialFailure.mapCalls.length, 16)
+  assert.strictEqual(
+    partialFailure.storage.has('dwdRegionalSeaMapPrefetchWindow'),
+    false
+  )
+  assert.strictEqual(partialFailure.warnings.length, 1)
+}
+
+function testRegionalPrefetchTriggers () {
+  const pullRefreshStart = source.indexOf('  function finishPullRefresh (')
+  const pullRefreshEnd = source.indexOf(
+    '\n\n  IMAGE_ELEMENTS.forEach',
+    pullRefreshStart
+  )
+  assert.ok(pullRefreshStart >= 0 && pullRefreshEnd > pullRefreshStart)
+  assert.ok(
+    source
+      .slice(pullRefreshStart, pullRefreshEnd)
+      .includes('void preloadRegionalSeaDataInBackground(true)')
+  )
+
+  const onlineStart = source.indexOf("window.addEventListener('online'")
+  const offlineStart = source.indexOf(
+    "\n\n  window.addEventListener('offline'",
+    onlineStart
+  )
+  assert.ok(onlineStart >= 0 && offlineStart > onlineStart)
+  assert.ok(
+    source
+      .slice(onlineStart, offlineStart)
+      .includes('void preloadRegionalSeaDataInBackground(true)')
+  )
+  assert.match(
+    source,
+    /goToPage\(0\)\s+void preloadRegionalSeaDataInBackground\(true\)/
+  )
+  assert.strictEqual(
+    (source.match(/void preloadRegionalSeaDataInBackground\(true\)/g) || [])
+      .length,
+    3
+  )
+}
+
+Promise.resolve()
+  .then(testRegionalDataPrefetchPolicy)
+  .then(testRegionalPrefetchTriggers)
+  .then(() =>
+    console.log(
+      'Regional sea report parsing, page contracts and background prefetch passed'
+    )
+  )
+  .catch(error => {
+    console.error(error)
+    process.exitCode = 1
+  })

@@ -1,7 +1,8 @@
 ## UI-Struktur
 
-> US-030 (Nordatlantik) und US-031 (regionale Seegangsvorhersagen) sind
-> abgeschlossen. Die Story-Historie steht im [Backlog](backlog.md).
+> US-030 (Nordatlantik) ist abgeschlossen. US-031 (regionale
+> Seegangsvorhersagen) wird umgesetzt; die Offline-Abnahme ist noch offen.
+> Die Story-Historie steht im [Backlog](backlog.md).
 
 Die Oberfläche zeigt ruhige, bildschirmfüllende Wetterkarten ohne sichtbares
 Menü mit natürlicher Navigation und automatischem Dark Mode.
@@ -32,9 +33,15 @@ Menü mit natürlicher Navigation und automatischem Dark Mode.
   (+00/+24/+48/+72h) sowie die zugehörige DWD-Zeitreihe mit Wetterlage,
   Ausgabestand und dynamischem Vorhersagebeginn. Die bisherigen Kartenbereiche
   und ihre Lightbox-Zeitreihen bleiben unverändert.
+- Regionale Berichte werden beim App-Start, bei Netzrückkehr und Pull-to-Refresh
+  vorab geladen. Die 16 zugehörigen Karten werden nur im Seegang-Zeitfenster
+  (07/19 UTC ± 90 Minuten) mit stabilen URLs und `cache: no-cache` zur
+  HTTP-Revalidierung abgerufen und im Service-Worker-Karten-Cache gespeichert.
 - Offline: Der letzte erfolgreiche Bildstand je Karte bleibt sichtbar, auch
   nach Resize- oder Orientation-Änderungen; ein Offline-Banner zeigt den
-  Zustand an.
+  Zustand an. Berichte stehen offline nur zur Verfügung, wenn ein erfolgreicher
+  Abruf lokal gespeichert wurde; andernfalls zeigt die Seite den fehlenden
+  Stand an.
 - Mobiltelefon-Portrait (Viewports bis 767 px): Die Startseite zeigt sechs
   Karten – die beiden sichtbaren Europa-+36h-Karten stehen rechts neben der
   Bodenanalyse, die drei unteren Wetterkarten in drei gleich breiten Spalten.

@@ -148,15 +148,13 @@ async function handleMapImageRequest (event) {
   const { request } = event
   const cacheKey = getMapImageCacheKey(request.url)
 
+  let networkResponse
   try {
-    const networkResponse = await fetch(request.url, {
+    networkResponse = await fetch(request.url, {
       mode: 'cors',
-      credentials: 'omit'
+      credentials: 'omit',
+      cache: request.cache
     })
-    if (networkResponse.ok && isImageResponse(networkResponse)) {
-      event.waitUntil(cacheMapImage(cacheKey, networkResponse.clone()))
-    }
-    return networkResponse
   } catch {
     const cache = await caches.open(MAP_IMAGE_CACHE)
     const cachedResponse = await cache.match(cacheKey)
@@ -168,6 +166,16 @@ async function handleMapImageRequest (event) {
     // Without CORS or a cached copy, fall back to the browser's own request.
     return fetch(request)
   }
+
+  if (networkResponse.ok && isImageResponse(networkResponse)) {
+    const cachePromise = cacheMapImage(cacheKey, networkResponse.clone())
+    if (request.cache === 'no-cache') {
+      await cachePromise
+    } else {
+      event.waitUntil(cachePromise)
+    }
+  }
+  return networkResponse
 }
 
 function isImageResponse (response) {

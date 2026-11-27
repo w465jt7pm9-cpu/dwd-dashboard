@@ -31,7 +31,7 @@ ohne `python3`-Alias läuft.
 | `boden-refresh-cycle.test.js`         | Veröffentlichungs- und Modelllauf-Zyklen für Bodenwetterkarten             |
 | `us015-forecast-maps.test.js`         | Boden-Prognosekarten: DWD-Dateien, Beschriftungen und Reihenfolge          |
 | `us030-streckenwetter.test.js`        | Streckenwetter-Parsing, Quellverträge, Karten und responsive Seite         |
-| `regional-sea-reports.test.js`        | Regionale DWD-Berichte, Kartenhorizonte und Seiten                         |
+| `regional-sea-reports.test.js`        | Regionale DWD-Berichte, Kartenhorizonte, Seiten und Hintergrundvorladung   |
 | `sea-timeseries-parsing.test.js`      | Parsing und Struktur der DWD-Seewetter-Zeitreihen                          |
 | `seewetter-highlighting.test.js`      | Strukturierung, Windwarnungen und Hervorhebungen im Seewettertext          |
 | `tide-phase.test.js`                  | Gezeitenphasen-Generator gegen BSH-Referenzdaten und Mondphasen-Zeitpunkte |
@@ -139,7 +139,10 @@ Der Regressionstest prüft die vier neuen Seiten mit den Kartenhorizonten
 Ausgabestände und Forecast-Starts. Zusätzlich bleiben die bisherigen
 Kartenbereiche erhalten. Der Service-Worker-Test (US-032) stellt sicher, dass
 die vier regionalen Berichtsabrufe nicht aus dem Service-Worker-Cache bedient
-werden. Die Tests laufen ohne Live-DWD-Verbindung.
+werden und `cache: no-cache` für Karten bis zum Netzabruf durchgereicht wird.
+Der Regionaltest prüft außerdem alle vier Berichtsvorladungen, die 16 stabilen
+Karten-URLs, die Zeitfensterbegrenzung und Fehler ohne erfolgreiches
+Fenster-Merkmal. Die Tests laufen ohne Live-DWD-Verbindung.
 
 ### Live-Smoke-Test als Frühwarnsystem
 
