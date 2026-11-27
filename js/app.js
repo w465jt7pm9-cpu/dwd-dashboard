@@ -89,6 +89,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const WETTERLAGE_STALE_AFTER_MS = 24 * 60 * 60 * 1000
   const LAST_KNOWN_IMAGE_URL_KEY_PREFIX = 'dwdImageLastKnownUrl:'
   const THEME_STORAGE_KEY = 'dwdTheme'
+  const SERVICE_WORKER_IMAGE_FALLBACK_MESSAGE = 'dwd-image-cache-fallback'
+  const LEGACY_SERVICE_WORKER_SCOPE_PATH = './js/'
 
   const PAGE_NAMES = [
     'Land',
@@ -103,6 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('img[data-base][data-path]')
   )
   const PAGE_STATE_BY_IMAGE = new Map()
+  const serviceWorkerCachedImageUrls = new Set()
+  const handledImageLoadUrls = new WeakMap()
 
   const viewportElement = document.getElementById('viewport')
   const carouselElement = document.getElementById('carousel')
@@ -439,6 +443,81 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem(storageKey, imageUrl)
     } catch {
       // localStorage is optional here.
+    }
+  }
+
+  // The SW may report a cache fallback before or after the image load event.
+  // `complete` turns true before the load event runs, so only images whose
+  // load event was already handled are marked here; others are marked on load.
+  function markServiceWorkerCachedImage (imageUrl) {
+    if (!imageUrl) {
+      return
+    }
+
+    const loadedImages = IMAGE_ELEMENTS.filter(
+      imageElement =>
+        imageElement.src === imageUrl &&
+        handledImageLoadUrls.get(imageElement) === imageUrl
+    )
+
+    if (!loadedImages.length) {
+      serviceWorkerCachedImageUrls.add(imageUrl)
+      return
+    }
+
+    loadedImages.forEach(imageElement => setCardState(imageElement, 'offline'))
+  }
+
+  function handleImageLoaded (imageElement) {
+    imageElement.classList.add('image-loaded')
+    const loadedImageUrl = imageElement.currentSrc || imageElement.src || null
+    setLastKnownImageUrl(imageElement, loadedImageUrl)
+    handledImageLoadUrls.set(imageElement, loadedImageUrl)
+    const servedFromServiceWorkerCache =
+      serviceWorkerCachedImageUrls.delete(loadedImageUrl)
+    setCardState(
+      imageElement,
+      navigator.onLine && !servedFromServiceWorkerCache ? 'ok' : 'offline'
+    )
+  }
+
+  function cacheLoadedImagesThroughServiceWorker () {
+    if (!navigator.onLine) {
+      return
+    }
+
+    IMAGE_ELEMENTS.filter(
+      imageElement =>
+        imageElement.src &&
+        imageElement.complete &&
+        imageElement.naturalWidth > 0
+    ).forEach(imageElement => {
+      fetch(imageElement.src, { mode: 'cors', credentials: 'omit' }).catch(
+        () => {
+          // Caching is best effort; the next refresh stores the map anyway.
+        }
+      )
+    })
+  }
+
+  async function unregisterLegacyServiceWorker () {
+    if (typeof navigator.serviceWorker.getRegistrations !== 'function') {
+      return
+    }
+
+    try {
+      const legacyScope = new URL(
+        LEGACY_SERVICE_WORKER_SCOPE_PATH,
+        window.location.href
+      ).href
+      const registrations = await navigator.serviceWorker.getRegistrations()
+      await Promise.all(
+        registrations
+          .filter(registration => registration.scope === legacyScope)
+          .map(registration => registration.unregister())
+      )
+    } catch {
+      // Cleanup of the former /js/ registration is best effort.
     }
   }
 
@@ -3653,14 +3732,7 @@ document.addEventListener('DOMContentLoaded', () => {
   IMAGE_ELEMENTS.forEach(imageElement => {
     setCardState(imageElement, 'loading')
 
-    imageElement.addEventListener('load', () => {
-      imageElement.classList.add('image-loaded')
-      setLastKnownImageUrl(
-        imageElement,
-        imageElement.currentSrc || imageElement.src || null
-      )
-      setCardState(imageElement, navigator.onLine ? 'ok' : 'offline')
-    })
+    imageElement.addEventListener('load', () => handleImageLoaded(imageElement))
 
     imageElement.addEventListener('error', () => {
       if (navigator.onLine) {
@@ -4168,10 +4240,26 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   if ('serviceWorker' in navigator) {
+    const hadServiceWorkerController = Boolean(navigator.serviceWorker.controller)
+
+    navigator.serviceWorker.addEventListener('message', event => {
+      if (event.data?.type === SERVICE_WORKER_IMAGE_FALLBACK_MESSAGE) {
+        markServiceWorkerCachedImage(event.data.url)
+      }
+    })
+
+    // Maps loaded before the first SW takeover bypassed its cache.
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadServiceWorkerController) {
+        cacheLoadedImagesThroughServiceWorker()
+      }
+    })
+
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./js/sw.js').catch(() => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {
         // Service worker support is optional for the app to work.
       })
+      void unregisterLegacyServiceWorker()
     })
   }
 
