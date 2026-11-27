@@ -1,10 +1,11 @@
 # 📊 DWD Dashboard – Mini Backlog
 
+> Release-1.10 (2026-11-27): US-031 ergänzt vier regionale Integrationsseiten
+> für Nordsee, Ostsee und das westliche sowie östliche Mittelmeer und lädt
+> deren Berichte und Karten im Hintergrund vor; Akzeptanzkriterien,
+> Offline-Abnahme und vollständige Testsuite sind abgeschlossen.
 > Release-1.9.1 (2026-11-27): US-032 repariert Offline-Start und Karten-Cache
-> des Service Workers; Akzeptanzkriterien und vollständige Testsuite sind
-> abgeschlossen.
-> US-031 ergänzt vier regionale Integrationsseiten für Nordsee, Ostsee und das
-> westliche sowie östliche Mittelmeer; die Offline-Abnahme ist noch offen.
+> des Service Workers.
 
 ---
 
@@ -20,7 +21,6 @@
 ## 🟨 DOING
 
 - US-029 – Höhenwetter-Karten im Mobiltelefon-Portrait reduzieren
-- US-031 – Regionale Seegangskarten und Zeitreihen integrieren
 
 ## ✅ DONE
 
@@ -51,6 +51,7 @@
 - US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
 - US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
 - US-030 – Seegangskarten und Streckenwetterbericht Nordatlantik integrieren
+- US-031 – Regionale Seegangskarten und Zeitreihen integrieren
 - US-032 – Service-Worker-Offline-Start und Karten-Cache reparieren
 
 ---
@@ -2387,7 +2388,7 @@ aufeinander bezogen beurteilen kann.
 
 ## 🌊 US-031 – Regionale Seegangskarten und Zeitreihen integrieren
 
-**Status:** DOING
+**Status:** DONE
 **Priorität:** Mittel
 
 ### Beschreibung
@@ -2450,30 +2451,31 @@ vergleichbar bleiben.
   lokale Berichtscache einen nachvollziehbaren Datenstand anzeigt.
 - [x] Fixture- und Seitentests prüfen Kartenquellen, Reihenfolge, Parsing,
   Zeitzuordnung und Netzwerk-Routen ohne Live-DWD-Abhängigkeit.
-- [ ] Eine erfolgreiche Online-Aktualisierung lädt und speichert die Berichte
+- [x] Eine erfolgreiche Online-Aktualisierung lädt und speichert die Berichte
   aller vier Regionen sowie alle 16 zugehörigen Karten (+00h, +24h, +48h,
   +72h), ohne dass jede Seite zuvor einzeln geöffnet werden muss.
-- [ ] Die Hintergrundaktualisierung aller Regionen erfolgt beim App-Start, bei
+- [x] Die Hintergrundaktualisierung aller Regionen erfolgt beim App-Start, bei
   Rückkehr ins Netz und bei Pull-to-Refresh. Karten werden zusätzlich nur im
   Seegang-Zeitfenster und mit bedingten Abrufen aktualisiert; das reguläre
   5-Minuten-Intervall lädt nicht alle Regionen vollständig neu.
-- [ ] Nach erfolgreicher Aktualisierung sind die vier integrierten Seiten
+- [x] Nach erfolgreicher Aktualisierung sind die vier integrierten Seiten
   einschließlich ihrer zuletzt geladenen Karten und Berichte auch nach einem
   Neustart ohne Netzwerk verfügbar; der gespeicherte DWD-Ausgabestand und der
   Offline-Status bleiben erkennbar.
-- [ ] Schlägt die Aktualisierung einzelner Datenquellen fehl, bleiben zuvor
+- [x] Schlägt die Aktualisierung einzelner Datenquellen fehl, bleiben zuvor
   gespeicherte Daten nutzbar; nicht verfügbare oder nicht gespeicherte Inhalte
   werden eindeutig gekennzeichnet und nicht als aktuell ausgegeben.
-- [ ] Der Offline-Kaltstart und die Verfügbarkeit aller vier Seiten werden
-  nach einer Online-Aktualisierung auf Desktop und unterstützten Mobilgeräten
-  geprüft.
-- [ ] Umsetzung erfolgt auf `us-031-regionale-seegangberichte`; `main` bleibt
+- [x] Der Offline-Kaltstart und die Verfügbarkeit aller vier Seiten werden
+  nach einer Online-Aktualisierung auf Desktop und einem physischen iOS-Gerät
+  geprüft; eine Android-Prüfung ist für US-031 nach Abstimmung nicht
+  erforderlich.
+- [x] Umsetzung erfolgt auf `us-031-regionale-seegangberichte`; `main` bleibt
   bis zur Prüfung und Freigabe unverändert.
-- [ ] GitHub Actions führt für Pushes auf den Feature-Branch die Testsuite aus.
-- [ ] Pushes auf den Feature-Branch aktualisieren eine eigene Cloudflare-
+- [x] GitHub Actions führt für Pushes auf den Feature-Branch die Testsuite aus.
+- [x] Pushes auf den Feature-Branch aktualisieren eine eigene Cloudflare-
   Pages-Preview, getrennt von der Produktionsversion; die Preview wird vor
   dem Merge geprüft.
-- [ ] Die Änderung gelangt erst nach erfolgreicher Prüfung und Freigabe über
+- [x] Die Änderung gelangt erst nach erfolgreicher Prüfung und Freigabe über
   einen Pull Request nach `main`.
 
 ### Abgrenzung

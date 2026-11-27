@@ -1,8 +1,9 @@
 # Tests und Qualitätssicherung
 
-> Release-1.9.1 (2026-11-27): Die vollständige automatisierte Testsuite besteht;
-> der Offline-Kaltstart aus US-032 wurde auf Desktop sowie iOS und Android
-> geprüft.
+> Release-1.10 (2026-11-27): Die vollständige automatisierte Testsuite besteht;
+> der Offline-Kaltstart der vier regionalen Seiten aus US-031 wurde auf
+> Desktop und einem physischen iOS-Gerät geprüft. Der Offline-Kaltstart aus
+> US-032 (Release-1.9.1) wurde auf Desktop sowie iOS und Android geprüft.
 
 ## Zweck
 
@@ -143,6 +144,13 @@ werden und `cache: no-cache` für Karten bis zum Netzabruf durchgereicht wird.
 Der Regionaltest prüft außerdem alle vier Berichtsvorladungen, die 16 stabilen
 Karten-URLs, die Zeitfensterbegrenzung und Fehler ohne erfolgreiches
 Fenster-Merkmal. Die Tests laufen ohne Live-DWD-Verbindung.
+
+Manuell wurde die Cloudflare-Preview geprüft: Nach einer simulierten
+Aktualisierung im UTC-19-Zeitfenster lagen alle vier Berichte lokal und alle
+16 Regionalkarten im Karten-Cache. Ein Offline-Kaltstart zeigte auf Desktop
+(mobiler Viewport) und auf einem physischen iOS-Gerät alle vier Seiten mit
+Karten, Zeitreihe, gespeichertem Ausgabestand und Offline-Status. Eine
+Android-Prüfung war für US-031 nicht erforderlich.
 
 ### Live-Smoke-Test als Frühwarnsystem
 

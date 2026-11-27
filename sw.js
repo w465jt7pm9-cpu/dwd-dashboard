@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dwd-dashboard-release-1.9.1'
+const CACHE_VERSION = 'dwd-dashboard-release-1.10'
 // Maps survive app releases; each map keeps only its latest copy.
 const MAP_IMAGE_CACHE = 'dwd-dashboard-map-images'
 const IMAGE_CACHE_FALLBACK_MESSAGE = 'dwd-image-cache-fallback'

@@ -8,6 +8,15 @@ bei eingeschränkter Verbindung zur Verfügung.
 
 ## Aktueller Release
 
+`Release-1.10` ergänzt vier regionale Seiten für Nordsee, Ostsee sowie das
+westliche und östliche Mittelmeer. Jede Seite zeigt die DWD-Seegangskarten
++00h, +24h, +48h und +72h zusammen mit der regionalen Zeitreihenvorhersage;
+Kartenhorizonte und der aktuelle Zeitpunkt sind in der Zeitreihe
+hervorgehoben. Berichte aller vier Regionen werden beim App-Start, bei
+Rückkehr ins Netz und per Pull-to-Refresh im Hintergrund aktualisiert, die
+Karten zusätzlich nur im Seegang-Zeitfenster. Nach einer erfolgreichen
+Aktualisierung stehen beide auch offline zur Verfügung.
+
 `Release-1.9.1` repariert die Offline-Funktion: Das Dashboard startet nach
 einem Online-Besuch auch ohne Netzwerkverbindung, und die zuletzt geladenen
 Wetterkarten bleiben sichtbar und sind als letzter Stand gekennzeichnet. Die
