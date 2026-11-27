@@ -198,7 +198,7 @@ assert.deepStrictEqual(
 )
 
 const updateCurrentColumnStart = source.indexOf(
-  '  function updateNordatlantikCurrentTimeColumn () {'
+  '  function updateSeaReportCurrentTimeColumn ('
 )
 const updateCurrentColumnEnd = source.indexOf(
   '\n\n  function ensureNordatlantikReportContent',
@@ -486,15 +486,15 @@ assert.match(
 )
 assert.match(
   css,
-  /\.nordatlantik-report__situation\s+summary\s*\{\s*cursor:\s*pointer;/
+  /\.nordatlantik-report__situation\s+summary,\s*\.sea-region-report__situation\s+summary\s*\{\s*cursor:\s*pointer;/
 )
 assert.match(
   css,
-  /\.nordatlantik-grid\s*\{\s*display:\s*grid;\s*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/
+  /\.nordatlantik-grid,\s*\.sea-region-grid\s*\{\s*display:\s*grid;\s*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/
 )
-assert.match(css, /\.nordatlantik-grid\s*\{[^}]*gap:\s*0;[^}]*padding:\s*0;/)
-assert.match(css, /\.nordatlantik-grid\s+\.card\s*\{[^}]*border-radius:\s*0;/)
-assert.match(css, /\.nordatlantik-grid\s+\.card\s+img\s*\{[^}]*object-fit:\s*cover;/)
+assert.match(css, /\.nordatlantik-grid,\s*\.sea-region-grid\s*\{[^}]*gap:\s*0;[^}]*padding:\s*0;/)
+assert.match(css, /\.nordatlantik-grid \.card,\s*\.sea-region-grid \.card\s*\{[^}]*border-radius:\s*0;/)
+assert.match(css, /\.nordatlantik-grid \.card img,\s*\.sea-region-grid \.card img\s*\{[^}]*object-fit:\s*cover;/)
 assert.match(css, /\.nordatlantik-map-horizon\s*\{[^}]*display:\s*inline-block/)
 assert.doesNotMatch(source, /Kartenmarken zeigen/)
 assert.doesNotMatch(source, /Zeitreihe seitlich scrollen/)
@@ -514,28 +514,28 @@ for (const horizon of [0, 36, 60, 84]) {
 }
 assert.match(
   css,
-  /\.nordatlantik-page\s*\{[^}]*display:\s*grid;[^}]*grid-template-rows:\s*auto\s+minmax\(0,\s*1fr\);[^}]*overflow:\s*hidden;/
+  /\.nordatlantik-page,\s*\.sea-region-page\s*\{[^}]*display:\s*grid;[^}]*grid-template-rows:\s*auto\s+minmax\(0,\s*1fr\);[^}]*overflow:\s*hidden;/
 )
 assert.match(
   css,
-  /\.nordatlantik-page\s*\{[^}]*touch-action:\s*auto;[^}]*padding-top:\s*var\(--safe-top\);/
+  /\.nordatlantik-page,\s*\.sea-region-page\s*\{[^}]*touch-action:\s*auto;[^}]*padding-top:\s*var\(--safe-top\);/
 )
 assert.match(
   css,
-  /\.nordatlantik-page\s*\{[^}]*padding-inline:\s*var\(--safe-left\)\s+var\(--safe-right\);/
+  /\.nordatlantik-page,\s*\.sea-region-page\s*\{[^}]*padding-inline:\s*var\(--safe-left\)\s+var\(--safe-right\);/
 )
 assert.match(css, /\.viewport\s*\{[^}]*touch-action:\s*auto;/)
 assert.match(
   css,
-  /\.nordatlantik-report\s*\{[^}]*display:\s*grid;[^}]*grid-template-rows:\s*auto\s+minmax\(0,\s*1fr\);[^}]*min-height:\s*0;/
+  /\.nordatlantik-report,\s*\.sea-region-report\s*\{[^}]*display:\s*grid;[^}]*grid-template-rows:\s*auto\s+minmax\(0,\s*1fr\);[^}]*min-height:\s*0;/
 )
 assert.match(
   css,
-  /\.nordatlantik-report__timeseries\s+\.ostsee-ts-wrap\s*\{[^}]*height:\s*100%;[^}]*overflow:\s*auto;/
+  /\.nordatlantik-report__timeseries \.ostsee-ts-wrap,\s*\.sea-region-report__timeseries \.ostsee-ts-wrap\s*\{[^}]*height:\s*100%;[^}]*overflow:\s*auto;/
 )
 assert.match(
   css,
-  /@media\s*\(max-height:\s*600px\)\s*and\s*\(orientation:\s*landscape\)\s*\{[\s\S]*?\.nordatlantik-report__header\s*\{[^}]*gap:\s*var\(--space-1\);[^}]*\}[\s\S]*?\.nordatlantik-report__situation\s*\{[^}]*font-size:\s*0\.75rem;/
+  /@media\s*\(max-height:\s*600px\)\s*and\s*\(orientation:\s*landscape\)\s*\{[\s\S]*?\.nordatlantik-report__header,\s*\.sea-region-report__header\s*\{[^}]*gap:\s*var\(--space-1\);[^}]*\}[\s\S]*?\.nordatlantik-report__situation,\s*\.sea-region-report__situation\s*\{[^}]*font-size:\s*0\.75rem;/
 )
 assert.doesNotMatch(
   css,
@@ -543,7 +543,7 @@ assert.doesNotMatch(
 )
 assert.match(
   css,
-  /@media\s*\(max-height:\s*600px\)\s*and\s*\(orientation:\s*landscape\)\s*\{[\s\S]*?\.nordatlantik-report__situation summary,\s*\.nordatlantik-report__period\s*\{[^}]*font-size:\s*0\.78rem;/
+  /@media\s*\(max-height:\s*600px\)\s*and\s*\(orientation:\s*landscape\)\s*\{[\s\S]*?\.nordatlantik-report__situation summary,\s*\.nordatlantik-report__period,\s*\.sea-region-report__situation summary,\s*\.sea-region-report__period\s*\{[^}]*font-size:\s*0\.78rem;/
 )
 assert.match(
   componentsCss,
@@ -595,7 +595,7 @@ assert.strictEqual(
   'Report gesture exclusions must be limited to the North Atlantic page'
 )
 assert.ok(
-  (source.match(/isNordatlantikReportInteraction\(event\.target\)/g) || [])
+  (source.match(/isSeaReportInteraction\(event\.target\)/g) || [])
     .length >= 4,
   'Touch, pointer, and click navigation handlers must ignore report interactions'
 )
@@ -609,25 +609,28 @@ assert.match(
 )
 assert.match(
   css,
-  /@media\s*\(max-width:\s*767px\)\s*and\s*\(orientation:\s*portrait\)\s*\{\s*\.page\[data-page='3'\]\s+\.nordatlantik-grid\s*\{\s*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/
+  /@media\s*\(max-width:\s*767px\)\s*and\s*\(orientation:\s*portrait\)\s*\{\s*\.page\[data-page='3'\] \.nordatlantik-grid,\s*\.sea-region-page \.sea-region-grid\s*\{\s*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/
 )
-assert.match(css, /\.page\[data-page='3'\]\s*\{\s*min-width:\s*0/)
+assert.match(css, /\.page\[data-page='3'\],\s*\.sea-region-page\s*\{\s*min-width:\s*0/)
 assert.match(
   css,
-  /\.nordatlantik-report__timeseries\s+\.ostsee-ts-table\s*\{\s*min-width:\s*1320px/
-)
-assert.match(css, /\.ostsee-ts-area__label\s*\{\s*background:/)
-assert.match(
-  css,
-  /\.nordatlantik-report__timeseries\s+\.ostsee-ts-table\s+tbody\s+th\[scope='row'\]\s*\{\s*position:\s*sticky;\s*left:\s*0/
+  /\.nordatlantik-report__timeseries \.ostsee-ts-table,\s*\.sea-region-report__timeseries \.ostsee-ts-table\s*\{\s*min-width:\s*1320px/
 )
 assert.match(
   css,
-  /\.nordatlantik-report__timeseries\s+\.ostsee-ts-table\s+\.ostsee-ts-area__label\s+\.ostsee-ts-meta\s*\{\s*display:\s*block/
+  /\.nordatlantik-report__timeseries \.ostsee-ts-table \.ostsee-ts-area__label,\s*\.sea-region-report__timeseries \.ostsee-ts-table \.ostsee-ts-area__label\s*\{\s*background:/
 )
 assert.match(
   css,
-  /\.nordatlantik-report\s*\{\s*display:\s*grid;\s*grid-template-rows:\s*auto\s+minmax\(0,\s*1fr\)/
+  /\.nordatlantik-report__timeseries \.ostsee-ts-table thead th:first-child,\s*\.nordatlantik-report__timeseries \.ostsee-ts-table tbody th\[scope='row'\],\s*\.sea-region-report__timeseries \.ostsee-ts-table thead th:first-child,\s*\.sea-region-report__timeseries \.ostsee-ts-table tbody th\[scope='row'\]\s*\{\s*position:\s*sticky;\s*left:\s*0/
+)
+assert.match(
+  css,
+  /\.nordatlantik-report__timeseries\s+\.ostsee-ts-table\s+\.ostsee-ts-area__label\s+\.ostsee-ts-meta,\s*\.sea-region-report__timeseries[\s\S]*?\.ostsee-ts-meta\s*\{\s*display:\s*block/
+)
+assert.match(
+  css,
+  /\.nordatlantik-report,\s*\.sea-region-report\s*\{\s*display:\s*grid;\s*grid-template-rows:\s*auto\s+minmax\(0,\s*1fr\)/
 )
 assert.match(css, /\.nordatlantik-current-slot\s*\{/)
 assert.match(css, /\.nordatlantik-current-slot\s+\.nordatlantik-now-marker\s*\{\s*display:\s*block/)

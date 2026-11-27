@@ -16,6 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const NORDSEE_PAGE_INDEX = 4
   const OSTSEE_PAGE_INDEX = 5
   const TEXT_PAGE_INDEX = 6
+  const NORDSEE_REPORT_PAGE_INDEX = 7
+  const OSTSEE_REPORT_PAGE_INDEX = 8
+  const WESTMED_REPORT_PAGE_INDEX = 9
+  const EASTMED_REPORT_PAGE_INDEX = 10
   const SEEGANG_REFRESH_WINDOW_UTC_HOURS = [7, 19]
   const SEEGANG_REFRESH_WINDOW_SPAN_MINUTES = 90
   const NORDATLANTIK_REPORT_REFRESH_TTL_MS = 5 * 60 * 1000
@@ -61,6 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const NORDSEE_TS_CACHE_KEY = 'dwdNordseeTimeseriesCache'
   const NORDSEE_TS_UPDATED_AT_CACHE_KEY = 'dwdNordseeTimeseriesUpdatedAt'
   const NORDATLANTIK_REPORT_CACHE_KEY = 'dwdNordatlantikStreckenwetterCache'
+  const REGIONAL_SEA_REPORT_CACHE_KEY_PREFIX = 'dwdRegionalSeaReport:'
+  const REGIONAL_SEA_REPORT_REFRESH_TTL_MS = 5 * 60 * 1000
   const REGIONAL_WETTERLAGE_CACHE_KEYS = {
     nordsee: {
       text: 'dwdNordseeWetterlageText',
@@ -85,6 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
     'https://www.dwd.de/DE/leistungen/seevorhersagenordsee/seevorhersagennordsee.html?nn=16102'
   const DWD_NORDATLANTIK_REPORT_URL =
     'https://www.dwd.de/DE/leistungen/streckenseewetterbericht/streckenseewetterbericht.html?nn=392762'
+  const DWD_WESTMED_FORECAST_URL =
+    'https://www.dwd.de/DE/leistungen/seevorhersagemmwest/seewettermittelmeerwest.html'
+  const DWD_EASTMED_FORECAST_URL =
+    'https://www.dwd.de/DE/leistungen/seevorhersagemmost/seewettermittelmeerost.html'
   const OSTSEE_TS_CACHE_TTL_MS = 3 * 60 * 60 * 1000
   const WETTERLAGE_STALE_AFTER_MS = 24 * 60 * 60 * 1000
   const LAST_KNOWN_IMAGE_URL_KEY_PREFIX = 'dwdImageLastKnownUrl:'
@@ -99,7 +109,61 @@ document.addEventListener('DOMContentLoaded', () => {
     'Seegang Nordatlantik',
     'Seegang Nordsee',
     'Seegang Ostsee',
-    'Seewetter Texte'
+    'Seewetter Texte',
+    'Seegang Nordsee mit Zeitreihe',
+    'Seegang Ostsee mit Zeitreihe',
+    'Seegang Mittelmeer West mit Zeitreihe',
+    'Seegang Mittelmeer Ost mit Zeitreihe'
+  ]
+  const REGIONAL_SEA_REPORT_CONFIGS = [
+    {
+      key: 'nordsee',
+      pageIndex: NORDSEE_REPORT_PAGE_INDEX,
+      label: 'Nordsee',
+      reportTitle: 'Seewettervorhersagen Nordsee',
+      sourceUrl: DWD_NORDSEE_3DAY_URL,
+      mapForecastHours: [0, 24, 48, 72],
+      loadingLabel: 'Nordsee-Zeitreihe wird geladen ...',
+      offlineLabel: 'Offline: Keine gespeicherte Nordsee-Zeitreihe verfügbar.',
+      unavailableLabel: 'Nordsee-Zeitreihe derzeit nicht verfügbar.'
+    },
+    {
+      key: 'ostsee',
+      pageIndex: OSTSEE_REPORT_PAGE_INDEX,
+      label: 'Ostsee',
+      reportTitle: 'Seewettervorhersagen Ostsee',
+      sourceUrl: DWD_OSTSEE_3DAY_URL,
+      mapForecastHours: [0, 24, 48, 72],
+      loadingLabel: 'Ostsee-Zeitreihe wird geladen ...',
+      offlineLabel: 'Offline: Keine gespeicherte Ostsee-Zeitreihe verfügbar.',
+      unavailableLabel: 'Ostsee-Zeitreihe derzeit nicht verfügbar.'
+    },
+    {
+      key: 'mittelmeer-west',
+      pageIndex: WESTMED_REPORT_PAGE_INDEX,
+      label: 'Westliches Mittelmeer',
+      reportTitle: 'Seewettervorhersagen Mittelmeer Westteil',
+      sourceUrl: DWD_WESTMED_FORECAST_URL,
+      mapForecastHours: [0, 24, 48, 72],
+      loadingLabel: 'Westliche Mittelmeer-Zeitreihe wird geladen ...',
+      offlineLabel:
+        'Offline: Keine gespeicherte Westliche Mittelmeer-Zeitreihe verfügbar.',
+      unavailableLabel:
+        'Westliche Mittelmeer-Zeitreihe derzeit nicht verfügbar.'
+    },
+    {
+      key: 'mittelmeer-ost',
+      pageIndex: EASTMED_REPORT_PAGE_INDEX,
+      label: 'Östliches Mittelmeer',
+      reportTitle: 'Seewettervorhersagen Mittelmeer Ostteil',
+      sourceUrl: DWD_EASTMED_FORECAST_URL,
+      mapForecastHours: [0, 24, 48, 72],
+      loadingLabel: 'Östliche Mittelmeer-Zeitreihe wird geladen ...',
+      offlineLabel:
+        'Offline: Keine gespeicherte Östliche Mittelmeer-Zeitreihe verfügbar.',
+      unavailableLabel:
+        'Östliche Mittelmeer-Zeitreihe derzeit nicht verfügbar.'
+    }
   ]
   const IMAGE_ELEMENTS = Array.from(
     document.querySelectorAll('img[data-base][data-path]')
@@ -131,6 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentPageIndex = 0
   let nordatlantikReportRequest = null
   let nordatlantikReportPayload = null
+  const regionalSeaReportRequests = new Map()
+  const regionalSeaReportPayloads = new Map()
   let lightboxImageList = []
   let currentLightboxImageIndex = -1
   let isLightboxOpen = false
@@ -672,6 +738,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getSeaTimeseriesConfigForPageIndex (pageIndex) {
+    const regionalReportConfig =
+      getRegionalSeaReportConfigForPageIndex(pageIndex)
+    if (regionalReportConfig) {
+      return regionalReportConfig
+    }
+
     if (pageIndex === NORDSEE_PAGE_INDEX) {
       return {
         key: 'nordsee',
@@ -698,6 +770,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     return null
+  }
+
+  function getRegionalSeaReportConfigForPageIndex (pageIndex) {
+    return REGIONAL_SEA_REPORT_CONFIGS.find(
+      config => config.pageIndex === pageIndex
+    ) || null
   }
 
   function getSeaTimeseriesConfigForImageElement (imageElement) {
@@ -1042,19 +1120,83 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getNordatlantikMapSlotMatches (payload) {
+    return getSeaReportMapSlotMatches(
+      payload,
+      NORDATLANTIK_MAP_FORECAST_HOURS
+    )
+  }
+
+  function getSeaReportMapSlotMatches (payload, forecastHours) {
     const forecastStartAt = getStreckenwetterForecastStartAt(payload)
-    if (forecastStartAt === null) {
+    if (forecastStartAt === null || !Array.isArray(forecastHours)) {
       return []
     }
 
     const slotTimestamps = getStreckenwetterSlotTimestamps(payload)
-    return NORDATLANTIK_MAP_FORECAST_HOURS.flatMap(horizon => {
+    return forecastHours.flatMap(horizon => {
       const nominalForecastAt = forecastStartAt + horizon * HOUR_IN_MS
       const slotIndex = slotTimestamps.findIndex(
         slotAt => slotAt === nominalForecastAt
       )
       return slotIndex < 0 ? [] : [{ horizon, slotIndex }]
     })
+  }
+
+  function parseRegionalSeaForecastFromHtml (rawHtml, config) {
+    if (!rawHtml) {
+      throw new Error(`Leere DWD-${config.label}-Quelle`)
+    }
+
+    const sourceText = extractHtmlFragmentText(rawHtml)
+    const issueMatch = sourceText.match(
+      /\bam\s+(\d{2}\.\d{2}\.\d{4}),?\s+(\d{2}\.\d{2})\s+UTC\b/i
+    )
+    if (!issueMatch) {
+      throw new Error(`DWD-Ausgabestand für ${config.label} nicht gefunden`)
+    }
+
+    const weatherSituationMatch = rawHtml.match(
+      /<(?:b|strong)\b[^>]*>\s*Wetterlage(?:\s+und\s+-entwicklung)?\s*:\s*<\/(?:b|strong)>\s*(?:<br\b[^>]*>\s*)?([\s\S]*?)(?=<table\b)/i
+    )
+    if (!weatherSituationMatch) {
+      throw new Error(`DWD-Wetterlage für ${config.label} nicht gefunden`)
+    }
+
+    const forecastPeriodMatch = rawHtml.match(
+      /<(?:caption|summary)\b[^>]*>([\s\S]*?)<\/(?:caption|summary)>/i
+    )
+    if (!forecastPeriodMatch) {
+      throw new Error(`DWD-Vorhersagezeitraum für ${config.label} nicht gefunden`)
+    }
+
+    const forecastSummary = extractHtmlFragmentText(forecastPeriodMatch[1])
+    const forecastStartMatch = forecastSummary.match(
+      /^Vorhersagen\s+von\s+(.+?)\s+UTC\.?$/i
+    )
+    if (!forecastStartMatch) {
+      throw new Error(
+        `DWD-Vorhersagezeitraum für ${config.label} hat ein unbekanntes Format`
+      )
+    }
+
+    const forecastStartAt = parseStreckenwetterForecastStartAt(
+      forecastStartMatch[1]
+    )
+    if (forecastStartAt === null) {
+      throw new Error(
+        `DWD-Vorhersagebeginn für ${config.label} ist ungültig`
+      )
+    }
+
+    const timeseries = parseSeaTimeseriesFromHtml(rawHtml, config.label)
+    return {
+      reportTitle: config.reportTitle,
+      issuedAt: `${issueMatch[1]}, ${issueMatch[2]} UTC`,
+      weatherSituation: extractHtmlFragmentText(weatherSituationMatch[1]),
+      forecastPeriod: forecastStartMatch[1],
+      forecastStartAt,
+      ...timeseries
+    }
   }
 
   async function fetchSeaTimeseriesPayload (config) {
@@ -2077,21 +2219,21 @@ document.addEventListener('DOMContentLoaded', () => {
     ].join('')
   }
 
-  function updateNordatlantikCurrentTimeColumn () {
-    if (!nordatlantikReportElement || !nordatlantikReportPayload) {
+  function updateSeaReportCurrentTimeColumn (
+    reportElement,
+    payload,
+    timeseriesSelector
+  ) {
+    if (!reportElement || !payload) {
       return
     }
 
-    const table = nordatlantikReportElement.querySelector(
-      '.nordatlantik-report__timeseries .ostsee-ts-table'
-    )
+    const table = reportElement.querySelector(timeseriesSelector)
     if (!table) {
       return
     }
 
-    const currentSlotIndex = getCurrentStreckenwetterSlotIndex(
-      nordatlantikReportPayload
-    )
+    const currentSlotIndex = getCurrentStreckenwetterSlotIndex(payload)
     Array.from(
       table.querySelectorAll('thead tr:first-child th[scope="col"]')
     )
@@ -2118,6 +2260,14 @@ document.addEventListener('DOMContentLoaded', () => {
         )
       })
     })
+  }
+
+  function updateNordatlantikCurrentTimeColumn () {
+    updateSeaReportCurrentTimeColumn(
+      nordatlantikReportElement,
+      nordatlantikReportPayload,
+      '.nordatlantik-report__timeseries .ostsee-ts-table'
+    )
   }
 
   function ensureNordatlantikReportContent (force = false) {
@@ -2192,6 +2342,195 @@ document.addEventListener('DOMContentLoaded', () => {
     })()
 
     return nordatlantikReportRequest
+  }
+
+  function getCachedRegionalSeaReport (config) {
+    try {
+      const cachedPayload = localStorage.getItem(
+        `${REGIONAL_SEA_REPORT_CACHE_KEY_PREFIX}${config.key}`
+      )
+      if (!cachedPayload) {
+        return null
+      }
+
+      const payload = JSON.parse(cachedPayload)
+      return payload?.slots?.length && payload?.areas?.length ? payload : null
+    } catch {
+      return null
+    }
+  }
+
+  function setCachedRegionalSeaReport (config, payload) {
+    try {
+      localStorage.setItem(
+        `${REGIONAL_SEA_REPORT_CACHE_KEY_PREFIX}${config.key}`,
+        JSON.stringify(payload)
+      )
+      return true
+    } catch (error) {
+      console.warn(
+        `${config.label}-Zeitreihe konnte nicht offline gespeichert werden.`,
+        error
+      )
+      return false
+    }
+  }
+
+  function renderRegionalSeaReport (config, payload, status) {
+    const reportElement = document.getElementById(
+      `regionalSeaReport-${config.key}`
+    )
+    if (!reportElement) {
+      return
+    }
+
+    const existingSituation = reportElement.querySelector(
+      '.sea-region-report__situation'
+    )
+    const isWeatherSituationOpen = existingSituation
+      ? existingSituation.open
+      : !window.matchMedia('(max-width: 767px)').matches
+
+    regionalSeaReportPayloads.set(config.key, payload)
+    if (!payload) {
+      reportElement.innerHTML = `<p class="sea-region-report__status" aria-live="polite">${escapeHtml(
+        status
+      )}</p>`
+      return
+    }
+
+    const statusLabels = {
+      current: `DWD-Ausgabestand: ${payload.issuedAt} · zuletzt abgerufen ${formatTimestamp(payload.updatedAt)}`,
+      cached: `Gespeicherter Stand · DWD-Ausgabestand: ${payload.issuedAt} · zuletzt abgerufen ${formatTimestamp(payload.updatedAt)}`,
+      offline: `Offline · zuletzt verfügbarer Stand · DWD-Ausgabestand: ${payload.issuedAt} · abgerufen ${formatTimestamp(payload.updatedAt)}`,
+      stale: `Aktualisierung nicht möglich · letzter verfügbarer Stand · DWD-Ausgabestand: ${payload.issuedAt} · abgerufen ${formatTimestamp(payload.updatedAt)}`,
+      storageWarning: `DWD-Ausgabestand: ${payload.issuedAt} · zuletzt abgerufen ${formatTimestamp(payload.updatedAt)} · Offline-Speicherung nicht verfügbar`
+    }
+    const tableMarkup = buildSeaTimeseriesOverlayMarkup(payload, {
+      regionLabel: config.label,
+      regionKey: config.key,
+      includeWetterlage: false,
+      includeStand: false,
+      separateGustRow: true,
+      currentSlotIndex: getCurrentStreckenwetterSlotIndex(payload),
+      mapSlotMatches: getSeaReportMapSlotMatches(
+        payload,
+        config.mapForecastHours
+      )
+    })
+
+    reportElement.innerHTML = [
+      '<header class="sea-region-report__header">',
+      `<h2>${escapeHtml(payload.reportTitle)}</h2>`,
+      `<p class="sea-region-report__status" aria-live="polite">${escapeHtml(
+        statusLabels[status] || statusLabels.cached
+      )}</p>`,
+      `<details class="sea-region-report__situation" aria-label="Wetterlage"${isWeatherSituationOpen ? ' open' : ''}>`,
+      '<summary>Wetterlage</summary>',
+      `<p>${escapeHtml(payload.weatherSituation)}</p>`,
+      '</details>',
+      `<h3 class="sea-region-report__period">Vorhersagen von ${escapeHtml(
+        payload.forecastPeriod
+      )} UTC</h3>`,
+      '</header>',
+      `<section class="sea-region-report__timeseries" aria-label="${escapeHtml(
+        config.label
+      )}-Zeitreihe">${tableMarkup}</section>`
+    ].join('')
+  }
+
+  function updateRegionalSeaReportCurrentTimeColumn (config) {
+    const reportElement = document.getElementById(
+      `regionalSeaReport-${config.key}`
+    )
+    const payload = regionalSeaReportPayloads.get(config.key)
+    updateSeaReportCurrentTimeColumn(
+      reportElement,
+      payload,
+      '.sea-region-report__timeseries .ostsee-ts-table'
+    )
+  }
+
+  function ensureRegionalSeaReportContent (config, force = false) {
+    const cachedPayload = getCachedRegionalSeaReport(config)
+    if (cachedPayload) {
+      renderRegionalSeaReport(
+        config,
+        cachedPayload,
+        navigator.onLine ? 'cached' : 'offline'
+      )
+    }
+
+    if (!navigator.onLine) {
+      if (!cachedPayload) {
+        renderRegionalSeaReport(
+          config,
+          null,
+          `Offline: Keine gespeicherte ${config.label}-Zeitreihe verfügbar.`
+        )
+      }
+      return Promise.resolve()
+    }
+
+    if (
+      !force &&
+      cachedPayload &&
+      Date.now() - Number(cachedPayload.updatedAt) <
+        REGIONAL_SEA_REPORT_REFRESH_TTL_MS
+    ) {
+      return Promise.resolve()
+    }
+
+    if (regionalSeaReportRequests.has(config.key)) {
+      return regionalSeaReportRequests.get(config.key)
+    }
+
+    const request = (async () => {
+      try {
+        const response = await fetch(config.sourceUrl, {
+          cache: 'no-store'
+        })
+        if (!response.ok) {
+          throw new Error(
+            `DWD-${config.label}-Zeitreihe nicht erreichbar (HTTP ${response.status})`
+          )
+        }
+
+        const report = parseRegionalSeaForecastFromHtml(
+          await response.text(),
+          config
+        )
+        const payload = {
+          ...report,
+          updatedAt: Date.now()
+        }
+        const wasCached = setCachedRegionalSeaReport(config, payload)
+        renderRegionalSeaReport(
+          config,
+          payload,
+          wasCached ? 'current' : 'storageWarning'
+        )
+      } catch (error) {
+        console.warn(
+          `DWD-${config.label}-Zeitreihe konnte nicht aktualisiert werden.`,
+          error
+        )
+        const fallbackPayload = getCachedRegionalSeaReport(config)
+        renderRegionalSeaReport(
+          config,
+          fallbackPayload,
+          fallbackPayload
+            ? navigator.onLine
+              ? 'stale'
+              : 'offline'
+            : `${config.label}-Zeitreihe derzeit nicht verfügbar. Bitte später erneut versuchen.`
+        )
+      } finally {
+        regionalSeaReportRequests.delete(config.key)
+      }
+    })()
+    regionalSeaReportRequests.set(config.key, request)
+    return request
   }
 
   async function ensureSeaTimeseriesOverlayContent (config) {
@@ -3184,6 +3523,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentPageIndex === NORDATLANTIK_PAGE_INDEX) {
       void ensureNordatlantikReportContent()
     }
+    const regionalReportConfig =
+      getRegionalSeaReportConfigForPageIndex(currentPageIndex)
+    if (regionalReportConfig) {
+      void ensureRegionalSeaReportContent(regionalReportConfig)
+    }
 
     refreshVisibleImages()
   }
@@ -3681,15 +4025,62 @@ document.addEventListener('DOMContentLoaded', () => {
     )
   }
 
-  function startPullRefresh (clientY) {
-    const scrollTop =
-      currentPageIndex === NORDATLANTIK_PAGE_INDEX
-        ? nordatlantikReportElement?.parentElement?.scrollTop || 0
-        : viewportElement.scrollTop
+  function isRegionalSeaReportInteraction (target) {
+    const config = getRegionalSeaReportConfigForPageIndex(currentPageIndex)
+    return Boolean(
+      config &&
+        target?.closest?.(
+          '.sea-region-report__situation, .sea-region-report__timeseries .ostsee-ts-wrap'
+        )
+    )
+  }
 
+  function isSeaReportInteraction (target) {
+    return (
+      isNordatlantikReportInteraction(target) ||
+      isRegionalSeaReportInteraction(target)
+    )
+  }
+
+  function getCurrentPageReportScrollTop () {
+    if (currentPageIndex === NORDATLANTIK_PAGE_INDEX) {
+      return (
+        nordatlantikReportElement?.querySelector(
+          '.nordatlantik-report__timeseries .ostsee-ts-wrap'
+        )?.scrollTop ||
+        nordatlantikReportElement?.parentElement?.scrollTop ||
+        0
+      )
+    }
+
+    const config = getRegionalSeaReportConfigForPageIndex(currentPageIndex)
+    if (config) {
+      return (
+        document
+          .getElementById(`regionalSeaReport-${config.key}`)
+          ?.querySelector('.sea-region-report__timeseries .ostsee-ts-wrap')
+          ?.scrollTop || 0
+      )
+    }
+
+    return viewportElement.scrollTop
+  }
+
+  function refreshCurrentPageSeaReport (force = false) {
+    if (currentPageIndex === NORDATLANTIK_PAGE_INDEX) {
+      return ensureNordatlantikReportContent(force)
+    }
+
+    const config = getRegionalSeaReportConfigForPageIndex(currentPageIndex)
+    return config
+      ? ensureRegionalSeaReportContent(config, force)
+      : Promise.resolve()
+  }
+
+  function startPullRefresh (clientY) {
     // Only track pull-to-refresh if at top of viewport and on allowed pages
     if (
-      scrollTop === 0 &&
+      getCurrentPageReportScrollTop() === 0 &&
       isPullToRefreshEnabledPage(currentPageIndex)
     ) {
       pullRefreshStartY = clientY
@@ -3706,23 +4097,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const gestureDurationMs = Date.now() - pullRefreshStartTimestamp
     const PULL_REFRESH_MIN_DISTANCE_PX = 60
     const PULL_REFRESH_MAX_DURATION_MS = 800
-    const scrollTop =
-      currentPageIndex === NORDATLANTIK_PAGE_INDEX
-        ? nordatlantikReportElement?.parentElement?.scrollTop || 0
-        : viewportElement.scrollTop
 
     // Trigger refresh if pull was downward, fast, and at top
     if (
       deltaY >= PULL_REFRESH_MIN_DISTANCE_PX &&
       gestureDurationMs <= PULL_REFRESH_MAX_DURATION_MS &&
-      scrollTop === 0 &&
+      getCurrentPageReportScrollTop() === 0 &&
       isPullToRefreshEnabledPage(currentPageIndex) &&
       !isLightboxOpen
     ) {
       refreshVisibleImages(true)
-      if (currentPageIndex === NORDATLANTIK_PAGE_INDEX) {
-        void ensureNordatlantikReportContent(true)
-      }
+      void refreshCurrentPageSeaReport(true)
     }
 
     pullRefreshStartY = null
@@ -3784,9 +4169,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('online', () => {
     updateOfflineUi()
     void preloadWetterlageInBackground()
-    if (currentPageIndex === NORDATLANTIK_PAGE_INDEX) {
-      void ensureNordatlantikReportContent(true)
-    }
+    void refreshCurrentPageSeaReport(true)
     IMAGE_ELEMENTS.forEach(imageElement => {
       const cardElement = imageElement.closest('.card')
       const statusBadge = cardElement?.querySelector('.card-status')
@@ -3815,6 +4198,18 @@ document.addEventListener('DOMContentLoaded', () => {
         cachedReport
           ? 'offline'
           : 'Offline: kein gespeicherter Streckenwetterbericht verfügbar.'
+      )
+    }
+    const regionalReportConfig =
+      getRegionalSeaReportConfigForPageIndex(currentPageIndex)
+    if (regionalReportConfig) {
+      const cachedReport = getCachedRegionalSeaReport(regionalReportConfig)
+      renderRegionalSeaReport(
+        regionalReportConfig,
+        cachedReport,
+        cachedReport
+          ? 'offline'
+          : `Offline: Keine gespeicherte ${regionalReportConfig.label}-Zeitreihe verfügbar.`
       )
     }
 
@@ -4121,7 +4516,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return
       }
 
-      if (isNordatlantikReportInteraction(event.target)) {
+      if (isSeaReportInteraction(event.target)) {
         pageSwipeStartX = null
         pageSwipeStartY = null
         pullRefreshStartY = null
@@ -4142,7 +4537,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return
       }
 
-      if (isNordatlantikReportInteraction(event.target)) {
+      if (isSeaReportInteraction(event.target)) {
         pageSwipeStartX = null
         pageSwipeStartY = null
         pullRefreshStartY = null
@@ -4163,7 +4558,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return
       }
 
-      if (isNordatlantikReportInteraction(event.target)) {
+      if (isSeaReportInteraction(event.target)) {
         return
       }
 
@@ -4187,7 +4582,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    if (isNordatlantikReportInteraction(event.target)) {
+    if (isSeaReportInteraction(event.target)) {
       return
     }
 
@@ -4279,6 +4674,11 @@ document.addEventListener('DOMContentLoaded', () => {
     updateNordatlantikCurrentTimeColumn,
     NORDATLANTIK_CURRENT_SLOT_UPDATE_INTERVAL_MS
   )
+  window.setInterval(() => {
+    REGIONAL_SEA_REPORT_CONFIGS.forEach(
+      updateRegionalSeaReportCurrentTimeColumn
+    )
+  }, NORDATLANTIK_CURRENT_SLOT_UPDATE_INTERVAL_MS)
 
   window.setInterval(() => {
     if (
@@ -4288,8 +4688,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ) {
       refreshVisibleImages()
     }
-    if (!isLightboxOpen && currentPageIndex === NORDATLANTIK_PAGE_INDEX) {
-      void ensureNordatlantikReportContent()
+    if (!isLightboxOpen) {
+      void refreshCurrentPageSeaReport()
     }
   }, REFRESH_INTERVAL_MS)
 })

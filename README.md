@@ -27,7 +27,8 @@ Safe-Area-Abstände und Carousel-Bedienung sind für Mobilgeräte berücksichtig
 ### Das Wetter im Überblick
 
 Vom Boden bis in die Höhe: Entdecke DWD-Wetterkarten, Seewetterberichte und
-Seegangsvorhersagen für Nord- und Ostsee. Mehrere Seegebiete und
+Seegangsvorhersagen für Nord- und Ostsee sowie das westliche und östliche
+Mittelmeer. Mehrere Seegebiete und
 Vorhersagezeitpunkte machen Entwicklungen auf einen Blick vergleichbar.
 
 ### Reinzoomen. Zusammenhänge erkennen.

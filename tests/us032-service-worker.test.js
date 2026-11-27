@@ -286,6 +286,9 @@ async function testDwdTextAndReportRequestsBypassCache () {
     'https://www.dwd.de/DE/leistungen/seewetternordostsee/seewetternordostsee.html',
     'https://opendata.dwd.de/weather/maritime/forecast/german/FQEN50_EDZW_LATEST',
     'https://www.dwd.de/DE/leistungen/seevorhersagenordsee/seevorhersagennordsee.html?nn=16102',
+    'https://www.dwd.de/DE/leistungen/seevorhersageostsee/seevorhersagenostsee.html?nn=16102',
+    'https://www.dwd.de/DE/leistungen/seevorhersagemmwest/seewettermittelmeerwest.html',
+    'https://www.dwd.de/DE/leistungen/seevorhersagemmost/seewettermittelmeerost.html',
     'https://www.dwd.de/DE/leistungen/streckenseewetterbericht/streckenseewetterbericht.html?nn=392762'
   ]
 

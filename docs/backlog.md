@@ -3,6 +3,8 @@
 > Release-1.9.1 (2026-11-27): US-032 repariert Offline-Start und Karten-Cache
 > des Service Workers; Akzeptanzkriterien und vollständige Testsuite sind
 > abgeschlossen.
+> US-031 ergänzt vier regionale Integrationsseiten für Nordsee, Ostsee und das
+> westliche sowie östliche Mittelmeer; die Offline-Abnahme ist noch offen.
 
 ---
 
@@ -14,6 +16,11 @@
 
 - US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 - US-017 – UI-Texte für Internationalisierung strukturieren
+
+## 🟨 DOING
+
+- US-029 – Höhenwetter-Karten im Mobiltelefon-Portrait reduzieren
+- US-031 – Regionale Seegangskarten und Zeitreihen integrieren
 
 ## ✅ DONE
 
@@ -43,7 +50,6 @@
 - US-026 – Startseiten-Grid im Mobiltelefon-Portrait anpassen
 - US-027 – Bodenluftdruckkarte im Mobiltelefon-Portrait unverzerrt zoomen
 - US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
-- US-029 – Höhenwetter-Karten im Mobiltelefon-Portrait reduzieren
 - US-030 – Seegangskarten und Streckenwetterbericht Nordatlantik integrieren
 - US-032 – Service-Worker-Offline-Start und Karten-Cache reparieren
 
@@ -2376,6 +2382,108 @@ aufeinander bezogen beurteilen kann.
 - Keine Änderung an bestehenden Nordsee-/Ostsee-Seegangskarten oder deren
   Zeitreihen.
 - Keine Änderung an anderen DWD-Seiten, Datenquellen oder Vorhersageinhalten.
+
+---
+
+## 🌊 US-031 – Regionale Seegangskarten und Zeitreihen integrieren
+
+**Status:** DOING
+**Priorität:** Mittel
+
+### Beschreibung
+
+Als Nutzer möchte ich Seegangskarten und die zugehörige DWD-Zeitreihenvorhersage
+für Nordsee, Ostsee sowie das westliche und östliche Mittelmeer gemeinsam auf
+eigenen Seiten sehen und nach einer Online-Aktualisierung auch offline verfügbar
+haben, damit Kartenhorizonte und regionale Wetterentwicklung zeitlich
+vergleichbar bleiben.
+
+### Datenquellen
+
+- Nordsee: `https://www.dwd.de/DE/leistungen/seevorhersagenordsee/seevorhersagennordsee.html?nn=16102`
+- Ostsee: `https://www.dwd.de/DE/leistungen/seevorhersageostsee/seevorhersagenostsee.html?nn=16102`
+- Westliches Mittelmeer: `https://www.dwd.de/DE/leistungen/seevorhersagemmwest/seewettermittelmeerwest.html`
+- Östliches Mittelmeer: `https://www.dwd.de/DE/leistungen/seevorhersagemmost/seewettermittelmeerost.html`
+
+### Zielbild
+
+- Vier zusätzliche integrierte Seiten ergänzen Nordsee, Ostsee, West- und
+  Ostmittelmeer; die bisherigen Seiten und Kartenbereiche bleiben erhalten.
+- Jede neue Seite zeigt die vier DWD-Seegangskarten +00h, +24h, +48h und +72h
+  in zeitlicher Reihenfolge oben sowie den passenden Bericht darunter.
+- Der Bericht zeigt DWD-Ausgabestand, Wetterlage und den dynamischen
+  Vorhersagebeginn; die Zeitreihe übernimmt Gebiete und DWD-Vorhersagewerte.
+- Die Darstellungs- und Interaktionsmuster von US-030 werden regionsbezogen
+  wiederverwendet: Karten-Zeitreihen-Zuordnung, Jetzt-Markierung, Scrollen,
+  Cache/Offline-Fallback und Pull-to-Refresh.
+- Berichte und Karten aller vier Regionen werden unabhängig von der sichtbaren
+  Seite im Hintergrund aktualisiert. Das geschieht datensparsam: beim
+  App-Start, bei Rückkehr ins Netz und bei Pull-to-Refresh, für Karten
+  zusätzlich im bestehenden Seegang-Zeitfenster (07/19 UTC ± 90 min), mit
+  bedingten Abrufen (ETag/Last-Modified). Ein vollständiger Abruf
+  (ca. 3,5 MB) erfolgt nicht in jedem 5-Minuten-Intervall.
+
+### Abhängigkeit
+
+- Der Offline-Kaltstart und die lokale Speicherung der Karten setzen den
+  Service-Worker-Fix aus US-032 voraus. US-032 wird zuerst auf einem eigenen
+  Branch ab `main` umgesetzt und freigegeben; US-031 baut danach darauf auf.
+
+### Akzeptanzkriterien
+
+- [x] Für alle vier Regionen werden passende DWD-Zeitreihenquellen verwendet;
+  Tabellenfelder und Berichtsköpfe werden anhand ihrer Quellformate geparst.
+- [x] Nordsee/Ostsee-`caption`- und Wetterlagevarianten sowie Mittelmeer-
+  `summary`- und Wetterlagevarianten sind mit Fixture-Tests abgesichert.
+- [x] Die Tabellenwerte werden vollständig aus den jeweiligen DWD-Zeitreihen
+  übernommen; Wind und Böen erscheinen in getrennt beschrifteten Zeilen.
+- [x] Vorhandene Spalten werden dynamisch dem nominalen Kartenhorizont ab dem
+  DWD-Vorhersagebeginn zugeordnet; nicht vorhandene Spalten werden ausgelassen.
+- [x] Die vier neuen Seiten verwenden +00/+24/+48/+72h; die vorhandenen
+  Kartenbereiche und ihre Reihenfolge bleiben unverändert.
+- [x] Jede Region hat einen eigenen Cache und einen sichtbaren Status für
+  aktuellen, gespeicherten, veralteten und Offline-Stand.
+- [x] Der letzte gültige UTC-Vorhersagezeitpunkt wird minütlich ohne neuen
+  Request markiert; Touch-Scrollen in Wetterlage und Tabelle löst keine
+  Carousel-Navigation aus.
+- [x] Neue DWD-Berichtsrouten umgehen den Service-Worker-Cache, damit der
+  lokale Berichtscache einen nachvollziehbaren Datenstand anzeigt.
+- [x] Fixture- und Seitentests prüfen Kartenquellen, Reihenfolge, Parsing,
+  Zeitzuordnung und Netzwerk-Routen ohne Live-DWD-Abhängigkeit.
+- [ ] Eine erfolgreiche Online-Aktualisierung lädt und speichert die Berichte
+  aller vier Regionen sowie alle 16 zugehörigen Karten (+00h, +24h, +48h,
+  +72h), ohne dass jede Seite zuvor einzeln geöffnet werden muss.
+- [ ] Die Hintergrundaktualisierung aller Regionen erfolgt beim App-Start, bei
+  Rückkehr ins Netz und bei Pull-to-Refresh. Karten werden zusätzlich nur im
+  Seegang-Zeitfenster und mit bedingten Abrufen aktualisiert; das reguläre
+  5-Minuten-Intervall lädt nicht alle Regionen vollständig neu.
+- [ ] Nach erfolgreicher Aktualisierung sind die vier integrierten Seiten
+  einschließlich ihrer zuletzt geladenen Karten und Berichte auch nach einem
+  Neustart ohne Netzwerk verfügbar; der gespeicherte DWD-Ausgabestand und der
+  Offline-Status bleiben erkennbar.
+- [ ] Schlägt die Aktualisierung einzelner Datenquellen fehl, bleiben zuvor
+  gespeicherte Daten nutzbar; nicht verfügbare oder nicht gespeicherte Inhalte
+  werden eindeutig gekennzeichnet und nicht als aktuell ausgegeben.
+- [ ] Der Offline-Kaltstart und die Verfügbarkeit aller vier Seiten werden
+  nach einer Online-Aktualisierung auf Desktop und unterstützten Mobilgeräten
+  geprüft.
+- [ ] Umsetzung erfolgt auf `us-031-regionale-seegangberichte`; `main` bleibt
+  bis zur Prüfung und Freigabe unverändert.
+- [ ] GitHub Actions führt für Pushes auf den Feature-Branch die Testsuite aus.
+- [ ] Pushes auf den Feature-Branch aktualisieren eine eigene Cloudflare-
+  Pages-Preview, getrennt von der Produktionsversion; die Preview wird vor
+  dem Merge geprüft.
+- [ ] Die Änderung gelangt erst nach erfolgreicher Prüfung und Freigabe über
+  einen Pull Request nach `main`.
+
+### Abgrenzung
+
+- Keine Änderung an den bestehenden Karten-only-Seiten oder ihrer
+  Navigationsreihenfolge.
+- Keine Gezeiten- oder Strömungsableitung für das Mittelmeer.
+- Keine Änderung an der Nordatlantik-Quelle oder deren Kartenhorizonten.
+- Die Reparatur der allgemeinen Service-Worker-Registrierung und des
+  App-Shell-Caches erfolgt separat in US-032.
 
 ---
 
