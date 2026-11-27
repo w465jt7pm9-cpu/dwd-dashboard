@@ -2379,7 +2379,7 @@ aufeinander bezogen beurteilen kann.
 - Keine Änderung an bestehenden Nordsee-/Ostsee-Seegangskarten oder deren
   Zeitreihen.
 - Keine Änderung an anderen DWD-Seiten, Datenquellen oder Vorhersageinhalten.
-
+git push -u origin feature/us-032-service-worker-offline
 ---
 
 ## 🛠️ US-032 – Service-Worker-Offline-Start und Karten-Cache reparieren
@@ -2426,12 +2426,12 @@ ist.
 - [x] DWD-Text- und Berichtsabrufe werden nach Aktivierung des Service Workers
   nicht aus einem veralteten Service-Worker-Cache bedient; ihre
   Offline-Verfügbarkeit bleibt Aufgabe der bestehenden lokalen App-Caches.
-- [ ] Die Offline-Prüfung umfasst Desktop sowie unterstützte iOS- und
+- [x] Die Offline-Prüfung umfasst Desktop sowie unterstützte iOS- und
   Android-Browser.
 - [x] Umsetzung erfolgt auf `feature/us-032-service-worker-offline` ab `main`;
   `main` bleibt bis zur Prüfung und Freigabe unverändert.
-- [ ] GitHub Actions führt für Pushes auf den Feature-Branch die Testsuite aus.
-- [ ] Pushes auf den Feature-Branch aktualisieren eine eigene Cloudflare-
+- [x] GitHub Actions führt für Pushes auf den Feature-Branch die Testsuite aus.
+- [x] Pushes auf den Feature-Branch aktualisieren eine eigene Cloudflare-
   Pages-Preview, getrennt von der Produktionsversion; die Preview wird vor
   dem Merge geprüft.
 - [ ] Die Änderung gelangt erst nach erfolgreicher Prüfung und Freigabe über
