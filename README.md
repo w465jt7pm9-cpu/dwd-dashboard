@@ -5,6 +5,11 @@ Es ist für die Nutzung vor dem Ablegen und unterwegs auf dem Wasser gedacht. Zu
 
 ## Aktueller Release
 
+`Release-1.9.1` repariert die Offline-Funktion: Das Dashboard startet nach
+einem Online-Besuch auch ohne Netzwerkverbindung, und die zuletzt geladenen
+Wetterkarten bleiben sichtbar und sind als letzter Stand gekennzeichnet. Die
+gespeicherten Karten bleiben auch über künftige Releases erhalten.
+
 `Release-1.9` ergänzt eine eigene Nordatlantik-Seite mit vier Seegangskarten
 (+00h, +36h, +60h, +84h) und dem DWD-Streckenwetterbericht für die Strecke
 Englischer Kanal bis Kanarische Inseln. Eine kompakte Zeitreihe ordnet die

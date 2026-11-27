@@ -1,7 +1,7 @@
 # Tests und Qualitätssicherung
 
-> Release-1.9 (2026-11-09): Die vollständige automatisierte Testsuite besteht;
-> US-030 wurde einschließlich mobiler Landscape- und Safe-Area-Anpassungen
+> Release-1.9.1 (2026-11-27): Die vollständige automatisierte Testsuite besteht;
+> der Offline-Kaltstart aus US-032 wurde auf Desktop sowie iOS und Android
 > geprüft.
 
 ## Zweck

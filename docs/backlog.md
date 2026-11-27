@@ -1,8 +1,8 @@
 # 📊 DWD Dashboard – Mini Backlog
 
-> Release-1.9 (2026-11-09): US-030 ergänzt die Nordatlantik-Seegangskarten und
-> den Streckenwetterbericht; Akzeptanzkriterien und vollständige Testsuite
-> sind abgeschlossen.
+> Release-1.9.1 (2026-11-27): US-032 repariert Offline-Start und Karten-Cache
+> des Service Workers; Akzeptanzkriterien und vollständige Testsuite sind
+> abgeschlossen.
 
 ---
 
@@ -14,10 +14,6 @@
 
 - US-006 – Wind-gegen-Strom Erkennung (Nordsee)
 - US-017 – UI-Texte für Internationalisierung strukturieren
-
-## 🟨 DOING
-
-- US-032 – Service-Worker-Offline-Start und Karten-Cache reparieren
 
 ## ✅ DONE
 
@@ -49,6 +45,7 @@
 - US-028 – Seewetter-Karten im Mobiltelefon-Portrait reduzieren
 - US-029 – Höhenwetter-Karten im Mobiltelefon-Portrait reduzieren
 - US-030 – Seegangskarten und Streckenwetterbericht Nordatlantik integrieren
+- US-032 – Service-Worker-Offline-Start und Karten-Cache reparieren
 
 ---
 
@@ -2379,12 +2376,12 @@ aufeinander bezogen beurteilen kann.
 - Keine Änderung an bestehenden Nordsee-/Ostsee-Seegangskarten oder deren
   Zeitreihen.
 - Keine Änderung an anderen DWD-Seiten, Datenquellen oder Vorhersageinhalten.
-git push -u origin feature/us-032-service-worker-offline
+
 ---
 
 ## 🛠️ US-032 – Service-Worker-Offline-Start und Karten-Cache reparieren
 
-**Status:** DOING
+**Status:** DONE
 **Priorität:** Hoch
 
 ### Beschreibung
@@ -2434,7 +2431,7 @@ ist.
 - [x] Pushes auf den Feature-Branch aktualisieren eine eigene Cloudflare-
   Pages-Preview, getrennt von der Produktionsversion; die Preview wird vor
   dem Merge geprüft.
-- [ ] Die Änderung gelangt erst nach erfolgreicher Prüfung und Freigabe über
+- [x] Die Änderung gelangt erst nach erfolgreicher Prüfung und Freigabe über
   einen Pull Request nach `main`.
 
 ### Abgrenzung
