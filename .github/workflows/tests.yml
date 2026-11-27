@@ -10,6 +10,7 @@ on:
       - feature/us-029-upperair-portrait-cards
       - feature/us-030-nordatlantik-streckenwetter
       - feature/us-032-service-worker-offline
+      - us-031-regionale-seegangberichte
   pull_request:
     branches: [main]
 

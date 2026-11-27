@@ -102,6 +102,10 @@ kontrolliert das Dashboard. Der Service Worker:
   dass ein letzter Stand angezeigt wird; die Karte erhält dann das Offline-Badge
 - lässt DWD-Text- und Berichtsabrufe unverändert ans Netz durch; deren
   Offline-Stand verwaltet die App selbst in `localStorage`
+- lädt die vier regionalen Seegangberichte beim App-Start, bei Netzrückkehr
+  und Pull-to-Refresh vor; die 16 Karten werden nur im aktiven UTC-
+  Seegang-Zeitfenster mit `cache: no-cache` revalidiert und vor Abschluss des
+  Vorab-Ladens im Karten-Cache gespeichert
 - löscht bei einer neuen Cache-Version alle älteren App-Shell-Caches, behält
   aber den Karten-Cache; die App entfernt zusätzlich die frühere Registrierung
   mit Scope `/js/`
@@ -119,6 +123,13 @@ Die Anwendung bezieht Inhalte aus DWD-Produktquellen, insbesondere:
 - Wetterkarten und Seegangsbilder
 - Seewettertexte und Vorhersageinhalte
 - Zeitreihen- und Prognoseinformationen
+
+Für Nordsee, Ostsee sowie das westliche und östliche Mittelmeer verwendet die
+App eine gemeinsame, regionskonfigurierte Berichtsdarstellung und Zuordnung der
+Kartenhorizonte zu den UTC-Zeitreihen. Die regionalen Berichte werden je Gebiet
+im lokalen Speicher vorgehalten; der Service Worker fängt diese DWD-
+Vorhersageseiten nicht ab (siehe Abschnitt 4), damit die App ihren eigenen
+regionalen Offline-Stand kontrolliert anzeigen kann.
 
 Die fachliche Darstellung bleibt dabei bewusst an die verfügbaren DWD-Produkte gekoppelt; die App transformiert diese Inhalte überwiegend nur für die Anzeige. Eine begrenzte eigene Ableitung ist die Gezeitenphase, die aus astronomischen Mondphasen und BSH-Referenzdaten berechnet und als Orientierungshilfe dargestellt wird. Eine Wind-gegen-Strom-Bewertung ist derzeit nicht implementiert.
 

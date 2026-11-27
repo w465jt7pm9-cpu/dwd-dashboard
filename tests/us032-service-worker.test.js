@@ -261,6 +261,43 @@ async function testMapImagesKeepLatestCopyAndServeOffline () {
   ])
 }
 
+async function testMapPrefetchPreservesNoCacheRevalidation () {
+  const sw = loadServiceWorker()
+  await sw.install()
+
+  sw.setFetch(async () => textResponse('prefetched map', 'image/png'))
+  const response = await sw.dispatchFetch({
+    url: MAP_URL,
+    cache: 'no-cache'
+  }).settled()
+
+  assert.strictEqual(await response.text(), 'prefetched map')
+  assert.strictEqual(sw.fetchCalls.at(-1).input, MAP_URL)
+  assert.strictEqual(sw.fetchCalls.at(-1).init.cache, 'no-cache')
+  assert.ok((await getMapCache(sw)).entries.has(MAP_URL))
+}
+
+async function testMapPrefetchReportsCacheWriteFailure () {
+  const sw = loadServiceWorker()
+  await sw.install()
+  const mapCache = await sw.caches.open(MAP_CACHE_NAME)
+  mapCache.put = async () => {
+    throw new Error('map cache write failed')
+  }
+
+  let fetchCount = 0
+  sw.setFetch(async () => {
+    fetchCount += 1
+    return textResponse('prefetched map', 'image/png')
+  })
+
+  await assert.rejects(
+    sw.dispatchFetch({ url: MAP_URL, cache: 'no-cache' }).settled(),
+    /map cache write failed/
+  )
+  assert.strictEqual(fetchCount, 1)
+}
+
 async function testMissingMapsAreNotReportedAsLoaded () {
   const sw = loadServiceWorker()
   await sw.install()
@@ -286,6 +323,9 @@ async function testDwdTextAndReportRequestsBypassCache () {
     'https://www.dwd.de/DE/leistungen/seewetternordostsee/seewetternordostsee.html',
     'https://opendata.dwd.de/weather/maritime/forecast/german/FQEN50_EDZW_LATEST',
     'https://www.dwd.de/DE/leistungen/seevorhersagenordsee/seevorhersagennordsee.html?nn=16102',
+    'https://www.dwd.de/DE/leistungen/seevorhersageostsee/seevorhersagenostsee.html?nn=16102',
+    'https://www.dwd.de/DE/leistungen/seevorhersagemmwest/seewettermittelmeerwest.html',
+    'https://www.dwd.de/DE/leistungen/seevorhersagemmost/seewettermittelmeerost.html',
     'https://www.dwd.de/DE/leistungen/streckenseewetterbericht/streckenseewetterbericht.html?nn=392762'
   ]
 
@@ -371,6 +411,8 @@ async function main () {
   await testPrecacheRejectsRedirectedShell()
   await testActivateRemovesOutdatedCachesButKeepsMaps()
   await testMapImagesKeepLatestCopyAndServeOffline()
+  await testMapPrefetchPreservesNoCacheRevalidation()
+  await testMapPrefetchReportsCacheWriteFailure()
   await testMissingMapsAreNotReportedAsLoaded()
   await testDwdTextAndReportRequestsBypassCache()
   await testStaticAndNavigationOfflineFallback()

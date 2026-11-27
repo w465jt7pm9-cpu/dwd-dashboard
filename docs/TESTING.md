@@ -1,8 +1,9 @@
 # Tests und Qualitätssicherung
 
-> Release-1.9.1 (2026-11-27): Die vollständige automatisierte Testsuite besteht;
-> der Offline-Kaltstart aus US-032 wurde auf Desktop sowie iOS und Android
-> geprüft.
+> Release-1.10 (2026-11-27): Die vollständige automatisierte Testsuite besteht;
+> der Offline-Kaltstart der vier regionalen Seiten aus US-031 wurde auf
+> Desktop und einem physischen iOS-Gerät geprüft. Der Offline-Kaltstart aus
+> US-032 (Release-1.9.1) wurde auf Desktop sowie iOS und Android geprüft.
 
 ## Zweck
 
@@ -31,6 +32,7 @@ ohne `python3`-Alias läuft.
 | `boden-refresh-cycle.test.js`         | Veröffentlichungs- und Modelllauf-Zyklen für Bodenwetterkarten             |
 | `us015-forecast-maps.test.js`         | Boden-Prognosekarten: DWD-Dateien, Beschriftungen und Reihenfolge          |
 | `us030-streckenwetter.test.js`        | Streckenwetter-Parsing, Quellverträge, Karten und responsive Seite         |
+| `regional-sea-reports.test.js`        | Regionale DWD-Berichte, Kartenhorizonte, Seiten und Hintergrundvorladung   |
 | `sea-timeseries-parsing.test.js`      | Parsing und Struktur der DWD-Seewetter-Zeitreihen                          |
 | `seewetter-highlighting.test.js`      | Strukturierung, Windwarnungen und Hervorhebungen im Seewettertext          |
 | `tide-phase.test.js`                  | Gezeitenphasen-Generator gegen BSH-Referenzdaten und Mondphasen-Zeitpunkte |
@@ -62,8 +64,8 @@ Mindestens abzusichern sind:
   Abschlussmarker vor Footer/Copyright.
 - Seewetterbericht-HTML: Überschrift `Seewetterbericht für Nord- und Ostsee`,
   Start bei `Aktuelle Wetterlage` und bekannte Endmarker.
-- Regionale HTML-Seiten: `Wetterlage und -entwicklung:` sowie der Beginn der
-  Vorhersagetabelle bei `Vorhersagen von`.
+- Regionale HTML-Seiten: `Wetterlage:` oder `Wetterlage und -entwicklung:`,
+  der Vorhersagebeginn in `caption` oder `summary` sowie `Vorhersagen von`.
 - Zeitreihen-HTML: Tabellenzeilen, Gebietszeile mit Position und `WT:`,
   Wochentag, zweistellige Stunde sowie die sieben erwarteten Datenzellen.
 - Zeichensatz: Latin-1-Decodierung des OpenData-Feeds einschließlich mindestens
@@ -123,6 +125,32 @@ Zeitspalten zugeordnet. Karten- und Spaltenmarker verwenden Text und dezente
 Akzentfarben; die zugeordneten Spalten sind über ihre gesamte Höhe dezent
 hervorgehoben. Zusätzliche Erläuterungs- und Scrollhinweise beanspruchen keinen
 vertikalen Platz im Bericht.
+
+### Regionale Seegangsvorhersagen (US-031)
+
+Nordsee und Ostsee verwenden in ihren DWD-Zeitreihenseiten ein `caption` für
+den Vorhersagebeginn und „Wetterlage und -entwicklung“; die Mittelmeerprodukte
+verwenden ein `summary` und „Wetterlage“. Der gemeinsame Parser deckt beide
+Quellvarianten ab und übernimmt je Gebiet Windrichtung, Wind, Böen,
+signifikante Wellenhöhe und Wetter aus der gemeinsamen Tabellenspaltenfolge.
+Die Test-Fixtures enthalten keine aktuellen Vorhersagetexte.
+
+Der Regressionstest prüft die vier neuen Seiten mit den Kartenhorizonten
++00/+24/+48/+72h, die Zuordnung vorhandener UTC-Spalten zu diesen Horizonten,
+Ausgabestände und Forecast-Starts. Zusätzlich bleiben die bisherigen
+Kartenbereiche erhalten. Der Service-Worker-Test (US-032) stellt sicher, dass
+die vier regionalen Berichtsabrufe nicht aus dem Service-Worker-Cache bedient
+werden und `cache: no-cache` für Karten bis zum Netzabruf durchgereicht wird.
+Der Regionaltest prüft außerdem alle vier Berichtsvorladungen, die 16 stabilen
+Karten-URLs, die Zeitfensterbegrenzung und Fehler ohne erfolgreiches
+Fenster-Merkmal. Die Tests laufen ohne Live-DWD-Verbindung.
+
+Manuell wurde die Cloudflare-Preview geprüft: Nach einer simulierten
+Aktualisierung im UTC-19-Zeitfenster lagen alle vier Berichte lokal und alle
+16 Regionalkarten im Karten-Cache. Ein Offline-Kaltstart zeigte auf Desktop
+(mobiler Viewport) und auf einem physischen iOS-Gerät alle vier Seiten mit
+Karten, Zeitreihe, gespeichertem Ausgabestand und Offline-Status. Eine
+Android-Prüfung war für US-031 nicht erforderlich.
 
 ### Live-Smoke-Test als Frühwarnsystem
 

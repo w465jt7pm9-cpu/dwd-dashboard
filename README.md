@@ -1,9 +1,21 @@
 # DWD Wetter Dashboard
 
-Das DWD Wetter Dashboard ist eine touch-freundliche Übersicht für Wetterkarten, Seewetterberichte und Seegangsvorhersagen des Deutschen Wetterdienstes.
-Es ist für die Nutzung vor dem Ablegen und unterwegs auf dem Wasser gedacht. Zuletzt geladene Inhalte bleiben auch bei eingeschränkter Verbindung verfügbar.
+Das DWD Wetter Dashboard ist eine touch-freundliche Übersicht für Wetterkarten,
+Seewetterberichte und Seegangsvorhersagen des Deutschen Wetterdienstes. Es ist
+für die Nutzung vor dem Ablegen und unterwegs auf dem Wasser gedacht. Zuletzt
+erfolgreich geladene Wetterkarten und lokal gespeicherte Berichte stehen auch
+bei eingeschränkter Verbindung zur Verfügung.
 
 ## Aktueller Release
+
+`Release-1.10` ergänzt vier regionale Seiten für Nordsee, Ostsee sowie das
+westliche und östliche Mittelmeer. Jede Seite zeigt die DWD-Seegangskarten
++00h, +24h, +48h und +72h zusammen mit der regionalen Zeitreihenvorhersage;
+Kartenhorizonte und der aktuelle Zeitpunkt sind in der Zeitreihe
+hervorgehoben. Berichte aller vier Regionen werden beim App-Start, bei
+Rückkehr ins Netz und per Pull-to-Refresh im Hintergrund aktualisiert, die
+Karten zusätzlich nur im Seegang-Zeitfenster. Nach einer erfolgreichen
+Aktualisierung stehen beide auch offline zur Verfügung.
 
 `Release-1.9.1` repariert die Offline-Funktion: Das Dashboard startet nach
 einem Online-Besuch auch ohne Netzwerkverbindung, und die zuletzt geladenen
@@ -27,7 +39,8 @@ Safe-Area-Abstände und Carousel-Bedienung sind für Mobilgeräte berücksichtig
 ### Das Wetter im Überblick
 
 Vom Boden bis in die Höhe: Entdecke DWD-Wetterkarten, Seewetterberichte und
-Seegangsvorhersagen für Nord- und Ostsee. Mehrere Seegebiete und
+Seegangsvorhersagen für Nord- und Ostsee sowie das westliche und östliche
+Mittelmeer. Mehrere Seegebiete und
 Vorhersagezeitpunkte machen Entwicklungen auf einen Blick vergleichbar.
 
 ### Reinzoomen. Zusammenhänge erkennen.

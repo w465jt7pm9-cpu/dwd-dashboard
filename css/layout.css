@@ -140,12 +140,14 @@
 }
 
 @media (max-width: 767px) and (orientation: portrait) {
-  .page[data-page='3'] .nordatlantik-grid {
+  .page[data-page='3'] .nordatlantik-grid,
+  .sea-region-page .sea-region-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.page[data-page='3'] {
+.page[data-page='3'],
+.sea-region-page {
   min-width: 0;
 }
 
@@ -192,7 +194,8 @@
   grid-template-rows: 1fr 1fr;
 }
 
-.nordatlantik-page {
+.nordatlantik-page,
+.sea-region-page {
   height: 100%;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -203,29 +206,34 @@
   padding-inline: var(--safe-left) var(--safe-right);
 }
 
-.nordatlantik-grid {
+.nordatlantik-grid,
+.sea-region-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
   padding: 0;
 }
 
-.nordatlantik-grid .card {
+.nordatlantik-grid .card,
+.sea-region-grid .card {
   aspect-ratio: 16 / 10;
   border-radius: 0;
   box-shadow: none;
 }
 
-.nordatlantik-grid .card:hover {
+.nordatlantik-grid .card:hover,
+.sea-region-grid .card:hover {
   transform: none;
   box-shadow: none;
 }
 
-.nordatlantik-grid .card img {
+.nordatlantik-grid .card img,
+.sea-region-grid .card img {
   object-fit: cover;
 }
 
-.nordatlantik-card__label {
+.nordatlantik-card__label,
+.sea-region-card__label {
   position: absolute;
   left: var(--space-2);
   bottom: var(--space-2);
@@ -257,6 +265,7 @@
 }
 
 .nordatlantik-card__label[data-horizon='0'],
+.sea-region-card__label[data-horizon='0'],
 .nordatlantik-map-horizon[data-horizon='0'] {
   border-left-color: #80d8f2;
 }
@@ -276,7 +285,23 @@
   border-left-color: #8be0b1;
 }
 
-.nordatlantik-report {
+.sea-region-card__label[data-horizon='24'],
+.nordatlantik-map-horizon[data-horizon='24'] {
+  border-left-color: #ffd166;
+}
+
+.sea-region-card__label[data-horizon='48'],
+.nordatlantik-map-horizon[data-horizon='48'] {
+  border-left-color: #c5a0ff;
+}
+
+.sea-region-card__label[data-horizon='72'],
+.nordatlantik-map-horizon[data-horizon='72'] {
+  border-left-color: #8be0b1;
+}
+
+.nordatlantik-report,
+.sea-region-report {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   min-height: 0;
@@ -284,42 +309,51 @@
   padding: var(--space-3);
 }
 
-.nordatlantik-report__header {
+.nordatlantik-report__header,
+.sea-region-report__header {
   display: grid;
   gap: var(--space-3);
   margin-bottom: var(--space-3);
 }
 
-.nordatlantik-report__header h2 {
+.nordatlantik-report__header h2,
+.sea-region-report__header h2 {
   font-size: clamp(1rem, 2vw, 1.4rem);
   line-height: 1.3;
 }
 
-.nordatlantik-report__status {
+.nordatlantik-report__status,
+.sea-region-report__status {
   font-size: 0.82rem;
   opacity: 0.82;
 }
 
-.nordatlantik-report__situation {
+.nordatlantik-report__situation,
+.sea-region-report__situation {
   display: grid;
   gap: var(--space-2);
   line-height: 1.5;
 }
 
 .nordatlantik-report__situation summary,
-.nordatlantik-report__period {
+.nordatlantik-report__period,
+.sea-region-report__situation summary,
+.sea-region-report__period {
   font-size: 1rem;
 }
 
-.nordatlantik-report__situation summary {
+.nordatlantik-report__situation summary,
+.sea-region-report__situation summary {
   cursor: pointer;
 }
 
-.nordatlantik-report__situation p {
+.nordatlantik-report__situation p,
+.sea-region-report__situation p {
   white-space: pre-wrap;
 }
 
-.nordatlantik-report__timeseries .ostsee-ts-wrap {
+.nordatlantik-report__timeseries .ostsee-ts-wrap,
+.sea-region-report__timeseries .ostsee-ts-wrap {
   width: 100%;
   height: 100%;
   max-width: 100%;
@@ -328,38 +362,49 @@
   overscroll-behavior: contain;
 }
 
-.nordatlantik-report__timeseries {
+.nordatlantik-report__timeseries,
+.sea-region-report__timeseries {
   min-height: 0;
   overflow: hidden;
 }
 
-.nordatlantik-report__timeseries .ostsee-ts-table {
+.nordatlantik-report__timeseries .ostsee-ts-table,
+.sea-region-report__timeseries .ostsee-ts-table {
   min-width: 1320px;
 }
 
-.nordatlantik-report__timeseries .ostsee-ts-table th[scope='row'] {
+.nordatlantik-report__timeseries .ostsee-ts-table th[scope='row'],
+.sea-region-report__timeseries .ostsee-ts-table th[scope='row'] {
   width: 160px;
   white-space: nowrap;
 }
 
 .nordatlantik-report__timeseries .ostsee-ts-table thead th:first-child,
-.nordatlantik-report__timeseries .ostsee-ts-table tbody th[scope='row'] {
+.nordatlantik-report__timeseries .ostsee-ts-table tbody th[scope='row'],
+.sea-region-report__timeseries .ostsee-ts-table thead th:first-child,
+.sea-region-report__timeseries .ostsee-ts-table tbody th[scope='row'] {
   position: sticky;
   left: 0;
   z-index: 2;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.38);
 }
 
-.nordatlantik-report__timeseries .ostsee-ts-table thead th:first-child {
+.nordatlantik-report__timeseries .ostsee-ts-table thead th:first-child,
+.sea-region-report__timeseries .ostsee-ts-table thead th:first-child {
   z-index: 4;
   background: rgba(8, 16, 28, 0.98);
 }
 
-.nordatlantik-report__timeseries .ostsee-ts-table .ostsee-ts-area__label {
+.nordatlantik-report__timeseries .ostsee-ts-table .ostsee-ts-area__label,
+.sea-region-report__timeseries .ostsee-ts-table .ostsee-ts-area__label {
   background: rgba(26, 44, 68, 0.98);
 }
 
 .nordatlantik-report__timeseries
+  .ostsee-ts-table
+  .ostsee-ts-area__label
+  .ostsee-ts-meta,
+.sea-region-report__timeseries
   .ostsee-ts-table
   .ostsee-ts-area__label
   .ostsee-ts-meta {
@@ -368,13 +413,15 @@
   overflow-wrap: anywhere;
 }
 
-.nordatlantik-report__timeseries .nordatlantik-current-slot {
+.nordatlantik-report__timeseries .nordatlantik-current-slot,
+.sea-region-report__timeseries .nordatlantik-current-slot {
   background-color: rgba(32, 113, 196, 0.2);
   box-shadow: inset 1px 0 rgba(132, 196, 255, 0.72),
     inset -1px 0 rgba(132, 196, 255, 0.72);
 }
 
-.nordatlantik-report__timeseries .nordatlantik-map-aligned-slot {
+.nordatlantik-report__timeseries .nordatlantik-map-aligned-slot,
+.sea-region-report__timeseries .nordatlantik-map-aligned-slot {
   background-color: rgba(var(--nordatlantik-map-accent), 0.08);
   box-shadow: inset 2px 0 rgba(var(--nordatlantik-map-accent), 0.78),
     inset -2px 0 rgba(var(--nordatlantik-map-accent), 0.78);
@@ -396,7 +443,20 @@
   --nordatlantik-map-accent: 139, 224, 177;
 }
 
-.nordatlantik-report__timeseries th.nordatlantik-current-slot {
+.nordatlantik-map-aligned-slot[data-map-horizon='24'] {
+  --nordatlantik-map-accent: 255, 209, 102;
+}
+
+.nordatlantik-map-aligned-slot[data-map-horizon='48'] {
+  --nordatlantik-map-accent: 197, 160, 255;
+}
+
+.nordatlantik-map-aligned-slot[data-map-horizon='72'] {
+  --nordatlantik-map-accent: 139, 224, 177;
+}
+
+.nordatlantik-report__timeseries th.nordatlantik-current-slot,
+.sea-region-report__timeseries th.nordatlantik-current-slot {
   background: linear-gradient(
     180deg,
     rgba(38, 113, 177, 0.96),
@@ -405,6 +465,13 @@
 }
 
 .nordatlantik-report__timeseries
+  .nordatlantik-current-slot.nordatlantik-map-aligned-slot {
+  background-color: rgba(32, 113, 196, 0.2);
+  box-shadow: inset 2px 0 rgba(var(--nordatlantik-map-accent), 0.9),
+    inset -2px 0 rgba(var(--nordatlantik-map-accent), 0.9);
+}
+
+.sea-region-report__timeseries
   .nordatlantik-current-slot.nordatlantik-map-aligned-slot {
   background-color: rgba(32, 113, 196, 0.2);
   box-shadow: inset 2px 0 rgba(var(--nordatlantik-map-accent), 0.9),
@@ -421,42 +488,66 @@
   text-transform: uppercase;
 }
 
+.sea-region-report__timeseries .nordatlantik-now-marker {
+  display: none;
+  margin-top: 2px;
+  color: rgba(193, 225, 255, 0.98);
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
 .nordatlantik-current-slot .nordatlantik-now-marker {
   display: block;
 }
 
+.sea-region-report__timeseries
+  .nordatlantik-current-slot
+  .nordatlantik-now-marker {
+  display: block;
+}
+
 @media (max-height: 600px) and (orientation: landscape) {
-  .nordatlantik-grid .card {
+  .nordatlantik-grid .card,
+  .sea-region-grid .card {
     height: clamp(72px, 22vh, 132px);
     aspect-ratio: auto;
   }
 
-  .nordatlantik-report {
+  .nordatlantik-report,
+  .sea-region-report {
     padding: var(--space-2);
   }
 
-  .nordatlantik-report__header {
+  .nordatlantik-report__header,
+  .sea-region-report__header {
     gap: var(--space-1);
     margin-bottom: var(--space-1);
   }
 
-  .nordatlantik-report__header h2 {
+  .nordatlantik-report__header h2,
+  .sea-region-report__header h2 {
     font-size: 0.85rem;
     line-height: 1.15;
   }
 
-  .nordatlantik-report__status {
+  .nordatlantik-report__status,
+  .sea-region-report__status {
     font-size: 0.7rem;
   }
 
-  .nordatlantik-report__situation {
+  .nordatlantik-report__situation,
+  .sea-region-report__situation {
     gap: 2px;
     font-size: 0.75rem;
     line-height: 1.2;
   }
 
   .nordatlantik-report__situation summary,
-  .nordatlantik-report__period {
+  .nordatlantik-report__period,
+  .sea-region-report__situation summary,
+  .sea-region-report__period {
     font-size: 0.78rem;
   }
 
